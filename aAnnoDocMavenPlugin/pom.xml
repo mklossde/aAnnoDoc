@@ -1,0 +1,118 @@
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.openon.aannodoc</groupId>
+  <artifactId>aAnnoDocMavenPlugin</artifactId>
+  <version>0.0.1</version>
+  <packaging>maven-plugin</packaging>
+ 
+  <name>aAnnoDoc Maven Plugin</name>
+  <url>http://www.openon.org/aAnnodDoc</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+	<dependency>
+		<groupId>org.openon.aannodoc</groupId>
+		<artifactId>aAnnoDoc</artifactId>
+		<version>0.0.1</version>
+	</dependency>  
+	 	  
+	<!--  Mavin plugin - Mojo -->
+	<dependency>
+		<groupId>org.apache.maven</groupId>
+		<artifactId>maven-plugin-api</artifactId>
+		<version>3.0</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.maven.plugin-tools</groupId>
+		<artifactId>maven-plugin-annotations</artifactId>
+		<version>3.4</version>
+		<scope>provided</scope>
+	</dependency>	
+	  
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+  </dependencies>
+  
+  <build>
+    <plugins>    
+	     <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-compiler-plugin</artifactId>
+	        <version>3.6.1</version> 
+	        <configuration> 
+	          <source>1.8</source>
+	          <target>1.8</target>
+	        </configuration>
+	      </plugin>
+       
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>3.5</version>
+				<executions>
+					<execution>
+						<id>default-descriptor</id>
+						<goals>
+							<goal>descriptor</goal>
+						</goals>
+						<phase>process-classes</phase>
+					</execution> 
+					<execution>
+						<id>help-descriptor</id>
+						<goals>
+							<goal>helpmojo</goal>
+						</goals>
+						<phase>process-classes</phase>
+					</execution>
+				</executions>
+			</plugin>
+			
+            			      
+      </plugins>
+      
+                  <!--This plugin's configuration is used to store Eclipse 
+                m2e settings only. It has no influence on the Maven build itself. -->
+                
+ 	<pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.m2e</groupId>
+                <artifactId>lifecycle-mapping</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <lifecycleMappingMetadata>
+                        <pluginExecutions>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>aspectj-maven-plugin</artifactId>
+                                    <versionRange>[1.0,)</versionRange>
+                                    <goals>
+                                        <goal>test-compile</goal>
+                                        <goal>compile</goal>
+                                        <goal>helpmojo</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <execute />
+                                </action>
+                            </pluginExecution>
+                        </pluginExecutions>
+                    </lifecycleMappingMetadata>
+                </configuration>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+          
+	</build>  	  
+</project>
