@@ -8,8 +8,17 @@
   <packaging>jar</packaging>
  
   <name>aAnnoDoc</name>
+  <description>a annotation based documentation generator</description>
   <url>http://www.openon.org/aAnnodDoc</url>
 
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
