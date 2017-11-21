@@ -54,9 +54,9 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	// Options
 	
 	/** 
-	 * option: annotations => list all annotations used for document
-	 *  string=> a semicole based list of annotations
-	 *  empty/default=> list all annotations
+	 * option: annotations = list all annotations used for document
+	 *  string= a semicole based list of annotations
+	 *  empty/default= list all annotations
 	 *  
 	 *  @return option-annotation-list
 	 **/
@@ -70,9 +70,9 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	/**
 	 * option: format of output 
 	 * 
-	 * 		adoc=> AsciiDoc
-	 * 		html=> html (AsciiDoc)
-	 * 		pdf => pdf (AsciiDoc)
+	 * 		adoc= AsciiDoc
+	 * 		html= html (AsciiDoc)
+	 * 		pdf = pdf (AsciiDoc)
 	 * 
 	 * 
 	 * @return option-format

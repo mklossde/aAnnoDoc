@@ -33,8 +33,8 @@ import org.slf4j.LoggerFactory;
  * inside the project. 
  * 
  * The document-generation is splitted into two parts
- * - scanner => SourceCode or JAR scanner/reader which read all the project informations 
- * - generator => generates the structure/documents into a readable format (like AsciiDoc,PDF,HTML,.. )  
+ * - scanner: SourceCode or JAR scanner/reader which read all the project informations 
+ * - generator: generates the structure/documents into a readable format (like AsciiDoc,PDF,HTML,.. )  
  * 
  * The important part are the gernerator, which are individual programmable to 
  * generate individual documents. There are some base generators included
@@ -67,7 +67,7 @@ public class AnnoDoc {
 	public static final String GEN_ALIST=AnnotationListDoc.NAME;
 	public static final String GEN_JAVA=JavaDoc.NAME;
 	
-	/** option-output==stdout => write output to standard-out (console) **/
+	/** option-output==stdout = write output to standard-out (console) **/
 	public static final String OUT_STDOUT="stdout";
 	
 //	protected Map options;
@@ -99,7 +99,14 @@ public class AnnoDoc {
 		generator.close();
 	}
 	
-	/** get doc generator **/
+	
+	/**
+	 * get doc generator
+	 * @param anno
+	 * @param options
+	 * @return
+	 * @throws IOException
+	 */
 	public DocGenerator getGenerator(SourceAnnotations anno,Map options) throws IOException {
 		try{
 			Object generator=options.get(GENERATOR);		
@@ -123,7 +130,12 @@ public class AnnoDoc {
 
 	//-----------------------------------------------------------------
 	
-	/** get options for attribtues **/
+	/**
+	 * @param outputFile
+	 * @param format
+	 * @param generator
+	 * @return
+	 */
 	public static Map<String,Object> toOptions(Object outputFile,String format,Object generator) {
 		Map<String,Object>  options=new HashMap<String, Object>();
 		options.put(AnnoDoc.FORMAT,format);

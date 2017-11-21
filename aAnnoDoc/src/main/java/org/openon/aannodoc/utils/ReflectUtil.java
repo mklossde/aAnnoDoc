@@ -9,7 +9,7 @@ public class ReflectUtil {
 	public static final String SET="set";
 	public static final String IS="is";
 
-	/** remove get/set from string and first char toLowerCase (getHallo => hallo) **/
+	/** remove get/set from string and first char toLowerCase (getHallo = hallo) **/
 	public static String removeGetSet(String str) {
 		if (str == null) {
 			return null;

@@ -42,9 +42,9 @@ public class AnnotationListDoc extends AsciiDocGeneratorImpl implements DocGener
 	// Options
 	
 	/** 
-	 * option: annotations => list all annotations used for document
-	 *  string=> a semicole based list of annotations
-	 *  empty/default=> list all annotations
+	 * option: annotations = list all annotations used for document
+	 *  string= a semicole based list of annotations
+	 *  empty/default list all annotations
 	 *  
 	 *  @return option-annotation-list
 	 **/

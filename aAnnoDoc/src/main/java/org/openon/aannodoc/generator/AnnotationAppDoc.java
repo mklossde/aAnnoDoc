@@ -49,9 +49,9 @@ public class AnnotationAppDoc extends AsciiDocGeneratorImpl implements DocGenera
 	/**
 	 * option: format of output 
 	 * 
-	 * 		adoc=> AsciiDoc
-	 * 		html=> html (AsciiDoc)
-	 * 		pdf => pdf (AsciiDoc)
+	 * 		adoc= AsciiDoc
+	 * 		html= html (AsciiDoc)
+	 * 		pdf = pdf (AsciiDoc)
 	 * 
 	 * 
 	 * @return option-format

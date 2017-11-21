@@ -18,7 +18,7 @@ public static final String DOC_EXAMPLE="example";
 	 * \@see(src=NAVIGATE) "LABEL" 
 	 * include link with label to a navigation-reference
 	 * 
-	 * Simple "@see label" => display a link to label named label  
+	 * Simple "@see label" = display a link to label named label  
 	 * 
 	 **/
 	@aDoc(name="Annotation/Annotation see")
@@ -37,8 +37,8 @@ public static final String DOC_EXAMPLE="example";
 	public static final String DOC_CODE="code";
 	
 	/**
-	 * <HTML>
-	 * Display as html unitl ending > 
+	 * &lt;HTML&gt;
+	 * Display as html unitl ending &gt; 
 	 */
 	@aDoc(name="Annotation/Annotation html")
 	public static final String DOC_HTML="<";

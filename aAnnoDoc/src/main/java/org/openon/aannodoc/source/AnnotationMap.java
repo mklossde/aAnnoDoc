@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class AnnotationMap {
 
-	/** Map annotationName to List of Annotations (TagAttribute=List<AnnotationDoc) **/
+	/** Map annotationName to List of Annotations (TagAttribute=List AnnotationMap) **/
 	protected Map<String,List<AnnotationDoc>> annotationClass=new HashMap<String, List<AnnotationDoc>>();	
 	protected List<String> annotationNamesNotInline=new ArrayList<String>();
 		

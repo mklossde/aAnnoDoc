@@ -12,15 +12,15 @@ import org.openon.aannodoc.source.JavaParserScanner;
 /** 
  * Annotation Object and Scanner in javaDoc
  * 
- * 	 @anno		- ok 
+ * 	 \@anno		- ok 
  * 	 x@anno 	- only annotation with space in front
- * 	 @ anno		- only annotation with no space behind
+ * 	 \@ anno		- only annotation with no space behind
  * 
- * 	 @exampe @  	- annotation until next annotation or empty @
- *   @author xxx 	- annotation until end of line
+ * 	 \@exampe \@  	- annotation until next annotation or empty @
+ *   \@author xxx 	- annotation until end of line
  *   
  * default annotations are ignores
- * 	@see,@include,@author,@sample,@version,@todo - are ignored			
+ * 	\@see,\@include,\@author,\@sample,\@version,\@todo - are ignored			
  * 
  */
 

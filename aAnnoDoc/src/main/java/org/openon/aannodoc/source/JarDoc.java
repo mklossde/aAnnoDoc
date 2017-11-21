@@ -126,7 +126,7 @@ public class JarDoc extends DocObject implements Serializable {
 	}
 	
 	// new ArrayList<ClassDoc>
-	/** get list of parents 0=parent..n=root - addtag=true => tag is added to first of list **/
+	/** get list of parents 0=parent..n=root - addtag=true = tag is added to first of list **/
 	protected void getParentList(List<ClassDoc> parents,ClassDoc tag,boolean addtag) {
 		// add tag	
 		if(addtag) {

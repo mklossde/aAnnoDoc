@@ -37,7 +37,7 @@ public class SourceAnnotations {
 	
 	//------------------------------------------------------------------------------------------------
 	
-	/** list extern class in given pkg (without pkg=> list all extern classes) **/
+	/** list extern class in given pkg (without pkg= list all extern classes) **/
 	public List<String> listExternClasses(String pkg,boolean excludeJre) {
 		List<String> list=new ArrayList<String>();
 		List<String> internClasses=unit.getAllClassNames();
@@ -50,7 +50,7 @@ public class SourceAnnotations {
 		return list;
 	}
 	
-	/** list extern class in given pkg (without pkg=> list all extern classes) **/
+	/** list extern class in given pkg (without pkg= list all extern classes) **/
 	public static void externClasses(ClassDoc src,String pkg,boolean excludeJre,List<String> list,List<String> internClasses) {
 		List<String> imports=src.getImports();
 		for(int t=0;imports!=null && t<imports.size();t++) {

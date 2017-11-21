@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * 		isNew(days):	boolean if valueDate newer then days 
  * 
  * 		get("value'):	get any attribute (e.g. aTag (test='qwert') )
- * 		getValues():	get all values as Map<String,Object>
+ * 		getValues():	get all values as Map String,Object
  * 		has(String key,String value):	attribute key eqlas value 
  * 		is(String valueName,String valuePath):	is valueName and/or valuePath
  * 
@@ -75,7 +75,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	}
 	public String getValuePath() { return (String)values.get(PATH); }
 	
-	/** is this anoation new - (noew-days<valueDate) **/
+	/** is this anoation new - (noew-days &lt; valueDate) **/
 	public boolean isNew(long days) {
 		try {
 //			int d=PainterObjUtil.toInt(days);
@@ -112,7 +112,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 		if(values==null) { return null; }
 		return values.get(key); 
 	}
-	/** getValues():	get all values as Map<String,Object> **/
+	/** getValues():	get all values as Map String,Object  **/
 	public Map<String,Object> getValues() { return values; }
 	/** get resolved value as string **/
 	public String getValueString(String key) { 
