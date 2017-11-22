@@ -4,16 +4,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Sub-component of aDoc to decument application-feature
- * 	e.g. this annotation is a feature to document a feature
+ * Annotation to document fields/inputs/values/beans of applciation
+ * 	e.g. a field is recevied - computed - and send to backend
  * 
  * 
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aFeature")
+@aDoc(title="annotation/aField")
 @Retention( RetentionPolicy.RUNTIME ) 
-public @interface aFeature {
+public @interface aField {
 	/** file for comment will by inserted **/
 	String file() default "";
 	/** group this documenation belongs to **/
@@ -21,6 +21,21 @@ public @interface aFeature {
 	/** title or subTitle for documentation **/
 	String title() default "";
 
+	/** bean or group this field belongs to **/
+	String bean() default "";
+	/** input information about this field **/
+	String input() default "";
+	/** output information about this field **/
+	String output() default "";
+	/** compute information about this field **/
+	String compute() default "";
+	
+	/** document hte validation of this field **/
+	String validation() default "";
+	
+	/** define the layer of this field **/
+	String layer() default "";
+	
 	/** description (alternative to java-comment) **/
 	String description() default "";
 	/** simple or short information **/

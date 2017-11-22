@@ -4,23 +4,24 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Sub-component of aDoc to decument application-feature
- * 	e.g. this annotation is a feature to document a feature
+ * Annotation to document a architecture design of application
+ * e.g. define the layer or components 
  * 
  * 
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aFeature")
+@aDoc(title="annotation/aArchitecture")
 @Retention( RetentionPolicy.RUNTIME ) 
-public @interface aFeature {
+public @interface aArchitecture {
 	/** file for comment will by inserted **/
 	String file() default "";
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/
-	String title() default "";
-
+	@aAttribute(defaultValue="DEFAULT=title attribute from java METHOD/FIELD name")
+	String title() default "DEFAULT";
+	
 	/** description (alternative to java-comment) **/
 	String description() default "";
 	/** simple or short information **/
@@ -34,5 +35,4 @@ public @interface aFeature {
 	String version() default ""; 
 	/** description is no longer correct **/
 	String deprecated() default ""; 
-	
 }

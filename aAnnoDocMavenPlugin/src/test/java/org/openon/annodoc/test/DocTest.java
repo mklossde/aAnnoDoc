@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openon.aannodoc.AnnoDoc;
+import org.openon.aannodoc.aAnnoDoc;
 
 public class DocTest {
 
@@ -14,10 +14,10 @@ public class DocTest {
 		
 		String source=srcDir+"org/openon/onannodoc/example/SimpleJavaExample.java";
 		String out=docDir+"SimpleJavaExample";
-		String gen=AnnoDoc.GEN_JAVA; // AnnoDoc.GEN_AAPP; GEN_JAVA
+		String gen=aAnnoDoc.GENERATOR_JAVADOC; // AnnoDoc.GEN_AAPP; GEN_JAVA
 		
-		AnnoDoc doc=new AnnoDoc();
-		Map options=AnnoDoc.toOptions(out,AnnoDoc.PDF,gen);
+		aAnnoDoc doc=new aAnnoDoc();
+		Map options=aAnnoDoc.toOptions(out,aAnnoDoc.FORMAT_PDF,gen);
 		
 		doc.create(source,options);
 		

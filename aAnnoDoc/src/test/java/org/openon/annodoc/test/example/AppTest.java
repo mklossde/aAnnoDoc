@@ -1,4 +1,4 @@
-package org.openon.annodoc;
+package org.openon.annodoc.test.example;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

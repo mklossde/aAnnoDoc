@@ -8,7 +8,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.openon.aannodoc.AnnoDoc;
+import org.openon.aannodoc.aAnnoDoc;
 
 /**
  * 
@@ -60,7 +60,7 @@ public class AnnoDocMojo extends AbstractMojo {
 	@Parameter(property = "annodoc.format", defaultValue = "pdf")
 	private String format;
 	
-	@Parameter(property = "annodoc.generator", defaultValue = AnnoDoc.GEN_ALIST)
+	@Parameter(property = "annodoc.generator", defaultValue = aAnnoDoc.GENERATOR_ANNOTATIONS)
 	private String generator;
 	
 	/**
@@ -73,7 +73,7 @@ public class AnnoDocMojo extends AbstractMojo {
 		String user = System.getProperty("user.name");
 		
 		try {
-			AnnoDoc doc=new AnnoDoc();
+			aAnnoDoc doc=new aAnnoDoc();
 			String javaSourceFileOrDirectory=source;		
 			Map<String, Object> options=doc.toOptions(outputFile, format, generator);
 					

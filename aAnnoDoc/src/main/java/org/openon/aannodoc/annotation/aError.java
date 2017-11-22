@@ -4,23 +4,26 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Sub-component of aDoc to decument application-feature
- * 	e.g. this annotation is a feature to document a feature
+ * Annotation to document error-handling  
+ * 	e.g. what's happening when a timeout occurs   
  * 
  * 
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aFeature")
+@aDoc(title="annotation/aError")
 @Retention( RetentionPolicy.RUNTIME ) 
-public @interface aFeature {
+public @interface aError {
 	/** file for comment will by inserted **/
 	String file() default "";
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/
 	String title() default "";
-
+	
+	/** error will occure when **/
+	String when() default "";
+	
 	/** description (alternative to java-comment) **/
 	String description() default "";
 	/** simple or short information **/
@@ -34,5 +37,4 @@ public @interface aFeature {
 	String version() default ""; 
 	/** description is no longer correct **/
 	String deprecated() default ""; 
-	
 }

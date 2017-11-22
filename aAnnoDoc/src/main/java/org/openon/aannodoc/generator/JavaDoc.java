@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @author michael
  *
  */
-@aDoc(name="generator/JavaDocGenerator")
+@aDoc(title="generator/JavaDocGenerator")
 public class JavaDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	private static final Logger LOG=LoggerFactory.getLogger(JavaDoc.class);
 	
@@ -33,13 +33,13 @@ public class JavaDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	//---------------------------------------------
 	
 	/** document head **/
-	public void head() throws IOException {
+	public void head(String outputName) throws IOException {
 		w.title(doc.getName()); // ,doc.getAnnotation("author"),doc.getAnnotation("date"));
 		w.paragraph(doc.getComment());
 	}
 	
 	/** document bottom **/
-	public void bottom() throws IOException {
+	public void bottom(String outputName) throws IOException {
 		w.close();
 	}
 	
@@ -47,7 +47,7 @@ public class JavaDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	
 	
 	/** document body **/
-	public void body() throws IOException {
+	public void body(String outputName) throws IOException {
 		List<ClassDoc> list=doc.getAllClasses();
 		for(int i=0;i<list.size();i++) { write(list.get(i)); }
 	}

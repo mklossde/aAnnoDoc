@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author michael
  *
  */
-@aDoc(name="generator/AnnoDocGenerator")
+@aDoc(title="generator/AnnoDocGenerator")
 public class AnnotationListDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	private static final Logger LOG=LoggerFactory.getLogger(AnnotationListDoc.class);
 	
@@ -48,7 +48,7 @@ public class AnnotationListDoc extends AsciiDocGeneratorImpl implements DocGener
 	 *  
 	 *  @return option-annotation-list
 	 **/
-	@aAttribute(name="options/annotations")
+	@aAttribute(title="options/annotations")
 	public Object[] getAnnotations() throws IOException {
 		Object obj=options.get("annotations");
 		if(obj==null) { obj=adoc.listAnnotions(false); }
@@ -58,13 +58,22 @@ public class AnnotationListDoc extends AsciiDocGeneratorImpl implements DocGener
 	//---------------------------------------------
 	
 	/** document head **/
-	public void head() throws IOException {
+	public void head(String outputName) throws IOException {
 		w.title(doc.getName()); // ,doc.getAnnotation("author"),doc.getAnnotation("date"));
 		w.paragraph(doc.getComment());
 	}
 	
+	
+	/** document bottom **/
+	public void bottom(String outputName) throws IOException {
+		w.close();
+	}
+	
+	//----------------------------------------------------------
+	
+	
 	/** document body **/
-	public void body() throws IOException {
+	public void body(String outputName) throws IOException {
 		Object a[]=getAnnotations();
 		Arrays.sort(a); 
 		for(int i=0;a!=null && i<a.length;i++) {
@@ -85,11 +94,7 @@ public class AnnotationListDoc extends AsciiDocGeneratorImpl implements DocGener
 			}
 		}
 	}
-	
-	/** document bottom **/
-	public void bottom() throws IOException {
-		w.close();
-	}
+
 		
 	//---------------------------------------------
 	

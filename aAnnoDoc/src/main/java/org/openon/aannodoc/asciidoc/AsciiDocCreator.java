@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
-import org.openon.aannodoc.AnnoDoc;
+import org.openon.aannodoc.aAnnoDoc;
 import org.asciidoctor.Options;
 import org.asciidoctor.SafeMode;
 
@@ -29,9 +29,9 @@ public class AsciiDocCreator {
 	
 	
 	public void create(Object adoc,String format,String outputFile) throws IOException {
-		if(format==null || format.length()==0 || format.equals(AnnoDoc.ADOC)) { createAdoc(adoc, outputFile); }
-		else if(format.equals(AnnoDoc.PDF)) { createPdf(adoc, outputFile); }
-		else if(format.equals(AnnoDoc.HTML)) { createHtml(adoc, outputFile); }
+		if(format==null || format.length()==0 || format.equals(aAnnoDoc.FORMAT_ASCIIDOC)) { createAdoc(adoc, outputFile); }
+		else if(format.equals(aAnnoDoc.FORMAT_PDF)) { createPdf(adoc, outputFile); }
+		else if(format.equals(aAnnoDoc.FORMAT_HTML)) { createHtml(adoc, outputFile); }
 		else { throw new IOException("unkown format "+format); }
 	}
 	
@@ -44,7 +44,7 @@ public class AsciiDocCreator {
 		else if(outputFile instanceof File) { wr=new PrintWriter((File)outputFile);}
 		else if(outputFile instanceof String) {
 			String str=(String)outputFile;
-			if(str.equals(AnnoDoc.OUT_STDOUT)) { wr=new PrintWriter(System.out); }
+			if(str.equals(aAnnoDoc.OUT_STDOUT)) { wr=new PrintWriter(System.out); }
 			else { wr=new PrintWriter(new File(str)); }
 		}else { throw new IOException("unkown outputFile "+outputFile); }
 		

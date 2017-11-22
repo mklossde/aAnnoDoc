@@ -1,4 +1,4 @@
-package org.openon.annodoc.test;
+package org.openon.annodoc.test.example;
 
 import java.io.File;
 import java.io.FileWriter;

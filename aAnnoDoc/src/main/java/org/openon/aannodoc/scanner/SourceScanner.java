@@ -64,7 +64,7 @@ public class SourceScanner {
 	
 	/** scan source directory **/
 	public SourceScanner scan(String javaSourceDirectory) throws IOException  {	
-		LOG.debug("SourceDir sacn {}",javaSourceDirectory);
+		LOG.debug("SourceDir sacn {} ({})",javaSourceDirectory,System.getProperty("user.dir"));
 		JavaParserScanner scanner=new JavaParserScanner(); 
 		if(javaSourceDirectory.endsWith(".java")) { scanner.readFile(javaSourceDirectory); }
 		else scanner.readDir(javaSourceDirectory);

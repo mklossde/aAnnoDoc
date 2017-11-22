@@ -8,7 +8,7 @@ import org.openon.aannodoc.annotation.aDoc;
 /**
  * This is a simple Example of aDoc Annotations on top of class
  */
-@aDoc(name="Example/SimpleJava")
+@aDoc(title="Example/SimpleJava")
 /**
  * This is a Java Example Class-Example
  * 
@@ -29,7 +29,7 @@ public class SimpleJavaExample extends Object implements Serializable {
 	
 	
 	/** this is a simple aDoc t a method **/ 
-	@aDoc(name="Example/SimpleMethod")
+	@aDoc(title="Example/SimpleMethod")
 	/**
 	 * document this method API
 	 * @return - return nothing 

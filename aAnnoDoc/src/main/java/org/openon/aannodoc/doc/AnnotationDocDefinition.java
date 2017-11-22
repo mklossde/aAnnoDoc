@@ -21,7 +21,7 @@ public static final String DOC_EXAMPLE="example";
 	 * Simple "@see label" = display a link to label named label  
 	 * 
 	 **/
-	@aDoc(name="Annotation/Annotation see")
+	@aDoc(title="Annotation/Annotation see")
 	public static final String DOC_SEE="see";
 	/** include doc from reference **/
 	public static final String DOC_INCLUDE="include";
@@ -33,14 +33,14 @@ public static final String DOC_EXAMPLE="example";
 	 * The \@code Annotation MUST end with a " \@ ". All code inside this will display as code (annotation inside are not interpreted)
 	 * 
 	 **/
-	@aDoc(name="Annotation/Annotation code")
+	@aDoc(title="Annotation/Annotation code")
 	public static final String DOC_CODE="code";
 	
 	/**
 	 * &lt;HTML&gt;
 	 * Display as html unitl ending &gt; 
 	 */
-	@aDoc(name="Annotation/Annotation html")
+	@aDoc(title="Annotation/Annotation html")
 	public static final String DOC_HTML="<";
 	
 	/** example **/

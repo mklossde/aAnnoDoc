@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: org.openon.aannodoc.aAnnoDoc
+Class-Path: aAnnoDoc.jar

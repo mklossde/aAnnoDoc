@@ -56,14 +56,15 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	public boolean isInline() { return inline; }
 	
 	public Object getValueName() {
-		return values.get(ID);
+		if(values!=null) { return values.get(ID); } else { return null; }
+		
 	}
 	
 	public String getValueNameString() {
 		return getValueString(ID);
 	}
 	
-	public String getValueDate() { return (String)values.get(DATE); }
+	public String getValueDate() { if(values!=null) { return (String)values.get(DATE); } else { return null; } }
 	/** get annotation value-date as date object ( date="value") ....  **/
 	public Date getDate() {
 		String date=(String)values.get(DATE);
@@ -73,7 +74,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 			return null;  
 		}
 	}
-	public String getValuePath() { return (String)values.get(PATH); }
+	public String getValuePath() { if(values!=null) { return (String)values.get(PATH); } else { return null; } }
 	
 	/** is this anoation new - (noew-days &lt; valueDate) **/
 	public boolean isNew(long days) {

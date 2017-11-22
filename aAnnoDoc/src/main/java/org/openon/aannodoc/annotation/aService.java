@@ -4,23 +4,23 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Sub-component of aDoc to decument application-feature
- * 	e.g. this annotation is a feature to document a feature
+ * Annotation to document a service which is called from other application
+ * 	e.g. a rest service inside this application
  * 
  * 
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aFeature")
+@aDoc(title="annotation/aService")
 @Retention( RetentionPolicy.RUNTIME ) 
-public @interface aFeature {
+public @interface aService {
 	/** file for comment will by inserted **/
 	String file() default "";
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/
 	String title() default "";
-
+	
 	/** description (alternative to java-comment) **/
 	String description() default "";
 	/** simple or short information **/
