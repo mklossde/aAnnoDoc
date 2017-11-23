@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory;
  * aAnnoDoc - Java annotation based documentation
  * (Apache License 2.0)
  * 
+ * DONATE :-) to https://www.paypal.me/openonorg/5
+ * (If you like aAnnoDoc please donate via paypal to openonorg. Every $1-$nnn is welcome. )
+ * 
  * Normaly documenation and devleopment are two seperated parts
  * and it is time and coast intensive to write one after each other. 
  * 
@@ -65,9 +68,9 @@ import org.slf4j.LoggerFactory;
  * 			String myVar;
  * 		}
  * 		\/**
- * 	      * This is the myReturn api-documenation (which include comment-annotations) 
+ * 		  * This is the myReturn api-documenation (which include comment-annotations) 
  * 		  *	@Bug - this is the annoDoc documentation of aBug (until next \@) 
- *        **\/
+ * 		  **\/
  * 		public void myReturn(String arg) { }
  * 
  * 
@@ -104,6 +107,8 @@ public class aAnnoDoc {
 	
 	/** option-output==stdout = write output to standard-out (console) **/
 	public static final String OUT_STDOUT="stdout";
+	
+	public static final String DEFAULT_FILE="default";
 	
 	protected SourceAnnotations anno;
 
@@ -239,6 +244,7 @@ public class aAnnoDoc {
 	@aFeature(title="execute/manuel/DocFiles")
 	public aAnnoDoc createDocFiles(String useDocFile,String output,String format) throws IOException  {
 		Map options=aAnnoDoc.toOptions(null,output,GENERATOR_ADOC,format);
+options.put(aAnnoDoc.OPTION_OUT_ADOC, "true");		
 		if(useDocFile!=null) { options.put(aAnnoDoc.OPTION_DOCFILE, useDocFile); }
 		return create(options);
 	}

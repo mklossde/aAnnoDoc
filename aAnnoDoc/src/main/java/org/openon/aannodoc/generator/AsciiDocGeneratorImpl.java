@@ -10,6 +10,8 @@ import org.openon.aannodoc.annotation.aAttribute;
 import org.openon.aannodoc.asciidoc.AsciiDocCreator;
 import org.openon.aannodoc.asciidoc.AsciiDocWriter;
 import org.openon.aannodoc.scanner.SourceAnnotations;
+import org.openon.aannodoc.source.AnnotationDoc;
+import org.openon.aannodoc.source.DocObject;
 import org.openon.aannodoc.source.JarDoc;
 import org.openon.aannodoc.utils.ReflectUtil;
 import org.slf4j.Logger;
@@ -18,7 +20,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	private static final Logger LOG=LoggerFactory.getLogger(AsciiDocGeneratorImpl.class);
 	
-	public static final String DEFAULT_FILE="default";
+	public static final String ATR_TITLE="title";
+	public static final String ATR_DESCRIPTION="desciption";
+	
 	
 	protected JarDoc doc;
 	protected SourceAnnotations adoc;
@@ -108,14 +112,15 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	
 	//--------------------------------------------------------------------
 	
-	protected String toFile(String fileName) {
+	protected String toFile(String fileName,String format,boolean setFormat) {
 		if(fileName.equals(aAnnoDoc.OUT_STDOUT)) { return fileName; }
 		
 		String prefix=(String)options.get(aAnnoDoc.OPTION_OUTFILE_PREFIX);
 		if(prefix==null) { prefix="doc"; }
-		
-		else if(fileName.indexOf('.')==-1) { fileName=fileName+"."+getFormat(); }
-		return prefix+"/"+fileName;
+		int index=fileName.lastIndexOf('.');
+		if(index==-1) { fileName=fileName+"."+format; }
+		else if(setFormat) { fileName= (fileName.substring(0,index+1))+format; }
+		return  prefix+"/"+fileName;
 	}
 	
 	//--------------------------------------------------------------------
@@ -139,12 +144,20 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 		String adoc=w.toString();	
 		LOG.trace("document {} adoc: {}",outputName,adoc);	
 		
-		if(outputName.equals(DEFAULT_FILE)) { outputName=getOutput(); } 
+		String outputFile=outputName;
+		if(outputName.equals(aAnnoDoc.DEFAULT_FILE)) { outputFile=getOutput(); } 
 		AsciiDocCreator cr=new AsciiDocCreator();
 		
-		String file=toFile(outputName);
-		LOG.info("write {} output to {}",outputName,file);
-		cr.create(adoc, getFormat(), file);
+		if(options.get(aAnnoDoc.OPTION_OUT_ADOC)!=null) { 
+			String file=toFile(outputFile,aAnnoDoc.FORMAT_ASCIIDOC,true);
+			LOG.info("write {} format adoc to {}",outputName,file);
+			cr.create(adoc, aAnnoDoc.FORMAT_ASCIIDOC, file);
+		}
+		
+		String format=getFormat();
+		String file=toFile(outputFile,format,false);
+		LOG.info("write {} format {} to {}",outputName,format,file);
+		cr.create(adoc, format, file);
 	}
 	
 	/** close generator **/
@@ -152,4 +165,47 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 		w.close(); 
 	}
 	
+	//----------------------------------------------------------------------
+	
+	/** get doc of DocObject **/
+	public String getDoc(DocObject doc,boolean preFormat) {
+		String text=doc.getComment();
+		// add descibtoon of annotation **/
+		if(doc instanceof AnnotationDoc) { text=addString(text, ((AnnotationDoc)doc).getValue(ATR_DESCRIPTION));}
+		if(text==null) { return null; }
+		text=removeLeadingSpace(text);
+		text=removeBackslash(text);
+//		if(preFormat) { text=preFormat(text); }
+		return text;
+	}
+	
+	//----------------------------------------------------------------------
+	
+	public String removeLeadingSpace(String text) { return text.replaceAll("\n ", "\n");}
+	public String removeBackslash(String text) {  return text.replaceAll("\\\\", "");}
+	public String preFormat(String text) { return text.replaceAll("\n", " +\n");}
+		
+	
+	/** add toStrings into one **/
+	public String addString(Object... objs) {
+		StringBuilder sb=new StringBuilder();
+		for (Object object : objs) {
+			if(object!=null) { sb.append(toString(object,"")); }
+		}
+		if(sb.length()==0) { return null; }
+		else { return sb.toString(); }
+	}
+//	public String addString(Object one,Object two) {
+//		if(one==null && two==null) { return null; }
+//		else if(one!=null && two!=null) { return toString(one)+toString(two); }
+//		else if(one==null) { return toString(two); }
+//		else { return toString(one); }
+//	}
+	
+	/** get string of obejct **/
+	public String toString(Object obj,String def) {
+		if(obj==null) { return def; }
+		else if(obj instanceof String) { return (String)obj; }
+		else { return obj.toString(); }
+	}
 }

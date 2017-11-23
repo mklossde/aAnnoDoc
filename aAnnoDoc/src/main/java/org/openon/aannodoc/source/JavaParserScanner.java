@@ -1,5 +1,6 @@
 package org.openon.aannodoc.source;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -117,11 +118,16 @@ public class JavaParserScanner {
 	    	String name = entry.getName();
 	    	if(entry.isDirectory()) {    		
 	    	}else if(name.endsWith(".java")) {
-	    		LOG.debug("scan jar file "+name);	    		
+	    		LOG.debug("scan jar java "+name);	    		
 	    		InputStream in=jar.getInputStream(entry);
-	    		read(in,name);
+	    		readJava(in,name);
 	    		in.close();
-	      }
+	    	}else if(name.endsWith(".adoc")) {
+	    		LOG.debug("scan jar text "+name);	    		
+	    		InputStream in=jar.getInputStream(entry);
+	    		readText(in,name);
+	    		in.close();
+	    	}
 	    }
 	    LOG.info("scan jar "+jarPath+" in "+(System.currentTimeMillis()-start)+"ms");
 	}
@@ -157,15 +163,41 @@ public class JavaParserScanner {
 	
 	protected void readOneFile(String file) throws IOException  {
 		long start=System.currentTimeMillis();	
+		LOG.trace("start read file {}",file);
 		FileInputStream in = new FileInputStream(file);
-		read(in,file);
-		in.close();
+		try {
+			if(file.endsWith(".java")) { readJava(in,file); }
+			else if(file.endsWith(".adoc")) { readText(in,file); }
+			else { throw new IOException("unkown file type "+file); }
+		}finally{
+			if(in!=null) { in.close(); }
+		}
 		LOG.debug("read file "+file+" in "+(System.currentTimeMillis()-start)+"ms");
 //System.out.println("read file "+file+" in "+(System.currentTimeMillis()-start)+"ms");
 	}
 
+	public void readText(InputStream in,String name) throws IOException  {	
+		StringBuilder result = new StringBuilder();
+	    try {
+	        byte[] buf = new byte[1024]; int r = 0;
+	        while ((r = in.read(buf)) != -1) {result.append(new String(buf, 0, r));}
+	    } finally { in.close();}
+		String text=result.toString();
+				
+		try {
+			String pkgName=name,clName=name;
+			if(unit==null) unit=new JarDoc(pkgName); // create unit for this package
+			PackageDoc pkg=unit.addPackage(pkgName); // add apckage	
+			ClassDoc clSource=pkg.addClass(clName); // add Class	
+			DocObject parent=clSource;
+//FIXME: read file here !!!!			
+			scanComment(text, parent, clSource);
+		}catch(Throwable e) {
+			LOG.error("scan error in "+name+" ("+e+")",e);
+		}		
+	}
 	
-	public void read(InputStream in,String name) throws IOException  {	
+	public void readJava(InputStream in,String name) throws IOException  {	
 //if(name.indexOf("ButtonDesign")!=-1) {
 //	System.out.println("ButtonDesign");
 //}
@@ -316,8 +348,7 @@ System.out.println("InitializerDeclaration "+body);
 		    
 		    LOG.debug("scanned class "+clSource.name);
 		}catch(Throwable e) {
-			LOG.error("scan error in "+name+" ("+e+")");
-			e.printStackTrace();
+			LOG.error("scan error in "+name+" ("+e+")",e);
 		}
 	}	
 	
@@ -372,20 +403,20 @@ System.out.println("InitializerDeclaration "+body);
 //	}
 	
 	private void scanComment(Comment c,DocObject parent,ClassDoc clSource) throws Exception {
+		if(c instanceof LineComment) { return ; } // ignore line comments
+		String str=toString(c);
+		c.setEndLine(0); // set comment scanned)
+	}
+	
+	private void scanComment(String str,DocObject parent,ClassDoc clSource) throws Exception {
 		try {
-			if(c instanceof LineComment) { return ; } // ignore line comments
-			
-			String str=toString(c);
-			LOG.debug("scanComment ");
+			LOG.trace("scanComment "+str);
 			int index=AnnotationDocScanner.nextAnnotation(str, 0,true);
-//			if(index==-1) parent.setComment(str);
-//			else if(index>0) parent.setComment(str.substring(0,index));
 			parent.setComment(str);
 			
 			// find JavaDoc Annotions
 			while(index!=-1 && index<str.length()) {								
 				AnnotationDocScanner annoObject=AnnotationDocScanner.scan(str,index);
-//				if(annoObject==null) { throw new IOException("annoObject missing at "+index); }
 				if(annoObject!=null) {
 					AnnotationDoc anno=new AnnotationDoc(annoObject.name,findClassName(annoObject.name,clSource), parent, clSource,true);
 					anno.add(annoObject.attr);
@@ -399,7 +430,7 @@ System.out.println("InitializerDeclaration "+body);
 				}else { index=str.length(); }
 			}
 		}catch(Exception e) {LOG.error(e.getMessage(),e);}
-		c.setEndLine(0); // set comment scanned)
+		
 	}
 	
 	public String toAtString(Node c,ClassDoc clSource) {
@@ -489,7 +520,7 @@ System.out.println("InitializerDeclaration "+body);
 
 		dotname="."+name;
 		List<String> imports=source.getImports();
-		for(int i=0;i<imports.size();i++) {
+		for(int i=0;imports!=null && i<imports.size();i++) {
 			if(imports.get(i).endsWith(dotname)) return imports.get(i); // found name in imports
 		}
 		

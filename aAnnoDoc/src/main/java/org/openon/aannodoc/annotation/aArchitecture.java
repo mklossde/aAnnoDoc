@@ -12,7 +12,12 @@ import java.lang.annotation.RetentionPolicy;
  *
  */
 @aDoc(title="annotation/aArchitecture")
-@Retention( RetentionPolicy.RUNTIME ) 
+@Retention( RetentionPolicy.RUNTIME )
+/**
+ * 
+ * @author cq2klos
+ *
+ */
 public @interface aArchitecture {
 	/** file for comment will by inserted **/
 	String file() default "";

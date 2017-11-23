@@ -56,7 +56,7 @@ public class SourceScanner {
 	
 	/** organzise references of soruces - this is need after scan **/
 	public SourceScanner organize() {
-		unit.organize();
+		if(unit!=null) { unit.organize(); }
 		return this;
 	}
 	
@@ -67,6 +67,7 @@ public class SourceScanner {
 		LOG.debug("SourceDir sacn {} ({})",javaSourceDirectory,System.getProperty("user.dir"));
 		JavaParserScanner scanner=new JavaParserScanner(); 
 		if(javaSourceDirectory.endsWith(".java")) { scanner.readFile(javaSourceDirectory); }
+		else if(javaSourceDirectory.endsWith(".adoc")) { scanner.readFile(javaSourceDirectory); }
 		else scanner.readDir(javaSourceDirectory);
 		this.unit=scanner.getUnit();
 		return this;

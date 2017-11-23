@@ -35,8 +35,6 @@ public class AnnotationListDoc extends AsciiDocGeneratorImpl implements DocGener
 	
 	public AnnotationListDoc() {super();}
 	
-
-
 	
 	//-----------------------------------------------------------------------------
 	// Options
@@ -60,6 +58,8 @@ public class AnnotationListDoc extends AsciiDocGeneratorImpl implements DocGener
 	/** document head **/
 	public void head(String outputName) throws IOException {
 		w.title(doc.getName()); // ,doc.getAnnotation("author"),doc.getAnnotation("date"));
+		String genLabel=(String)options.get("genlabel"); if(genLabel==null) { genLabel="aAnnoDoc created on"; }
+		w.nl().w(":last-update-label: "+genLabel).nl();	
 		w.paragraph(doc.getComment());
 	}
 	

@@ -67,17 +67,17 @@ public class AsciiDocWriter {
 	public AsciiDocWriter quotes(String text) {  return w("'`").w(text).w("`'"); }
 	public AsciiDocWriter doubleQuotes(String text) {  return w("\"`").w(text).w("'\""); }
 	
-	public AsciiDocWriter title(Object text) {  return nnl().w("= ").w(text).nl(); }
-	public AsciiDocWriter title(Object text,String author,String email) {  return title(text).w(author).w(" <").w(email).w(">").nl(); }
-	public AsciiDocWriter title(Object text,String author,String email,String revision) {  return title(text, author, email).w(revision).nl(); }
-	public AsciiDocWriter attr(Object text) { return nnl().w(":").w(text).w(":").nl(); }	
+	public AsciiDocWriter title(Object text) { titleDeep++; return nnl().w("= ").w(text).nl2();   }
+	public AsciiDocWriter title(Object text,String author,String email) {  titleDeep++; return nnl().w("= ").w(text).nl().w(author).w(" <").w(email).w(">").nl2(); }
+	public AsciiDocWriter title(Object text,String author,String email,String revision) {  titleDeep++; return nnl().w("= ").w(text).nl().w(author).w(" <").w(email).w(">").nl().w(revision).nl2(); }
+	public AsciiDocWriter attr(Object text) { if(e(text)) return this; return nnl().w(":").w(text).w(":").nl(); }	
 	
-	public AsciiDocWriter title1(Object text) {  return nnl().w("== ").w(text).nl(); }
-	public AsciiDocWriter title2(Object text) {  return title(2,text); }
-	public AsciiDocWriter title3(Object text) {  return title(3,text); }
-	public AsciiDocWriter title4(Object text) {  return title(4,text); }
-	public AsciiDocWriter title5(Object text) {  return title(5,text); }
-	public AsciiDocWriter title(int deep,Object text) {  return nnl().w("",deep,"="," ").w(text).nl(); }
+	public AsciiDocWriter title1(Object text) {   return title(2,text); }
+	public AsciiDocWriter title2(Object text) {   return title(3,text); }
+	public AsciiDocWriter title3(Object text) {   return title(4,text); }
+	public AsciiDocWriter title4(Object text) {   return title(5,text); }
+	public AsciiDocWriter title5(Object text) {   return title(6,text); }
+	public AsciiDocWriter title(int deep,Object text) {  if(e(text)) { text="[unkown]"; }return nnl2().w("",deep,"="," ").w(text).nl(); }
 	
 	public AsciiDocWriter subTitle(Object text) { return title(titleDeep++, text); }
 	public AsciiDocWriter subTitleEnd() { titleDeep--; return this; }
@@ -108,7 +108,7 @@ public class AsciiDocWriter {
 	
 	public AsciiDocWriter reference(Object text) { return w("<<").w(text).w(">>"); }
 	
-	public AsciiDocWriter table(Object title,Object... heads) { nnl().w(".table ").w(title).nl().w("|===").nl();for(int i=0;heads!=null && i<heads.length;i++) { w("|").w(heads[i]); } return nl(); }
+	public AsciiDocWriter table(Object title,Object... heads) { nnl2().w(".table ").w(title).nl().w("|===").nl();for(int i=0;heads!=null && i<heads.length;i++) { w("|").w(heads[i]); } return nl(); }
 	public AsciiDocWriter tableLine(Object... cells) { for(int i=0;cells!=null && i<cells.length;i++) { nnl().w("|").w(cells[i]); } return nl(); } 
 	public AsciiDocWriter tableEnd() { return nnl().wnl("|==="); }
 	
@@ -173,5 +173,16 @@ public class AsciiDocWriter {
 	public String toString() { 
 		if(sw!=null) { return sw.toString(); } 
 		else { return "AsciiWriter "+wr; }
+	}
+	
+	//----------------------------------------------------------------------------
+	
+	/** is empty **/
+	public boolean e(Object o) {
+		if(o==null) { return true; }
+//		else if(o instanceof String && ((String)o).length()==0) { return true; }
+//		else { return false; }
+		String str=o.toString().trim();
+		return str.length()==0;
 	}
 }

@@ -83,7 +83,7 @@ public class SourceAnnotations {
 		List<Object> list=new ArrayList<Object>();
 		List<AnnotationDoc> annos=listAnnotation(className, annotationClass, null, null,true);
 		for (AnnotationDoc aDoc : annos) {
-			Object val=aDoc.get(key);
+			Object val=aDoc.getValue(key);
 			if(val!=null && !list.contains(val)) list.add(val);
 		}
 		return list;

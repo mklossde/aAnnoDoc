@@ -109,7 +109,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	}
 	
 	/** get("value'):	get any attribute (e.g. aTag (test='qwert') ) **/
-	public Object get(String key) { 
+	public Object getValue(String key) { 
 		if(values==null) { return null; }
 		return values.get(key); 
 	}
