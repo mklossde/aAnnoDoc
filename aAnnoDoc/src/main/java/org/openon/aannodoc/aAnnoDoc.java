@@ -58,18 +58,18 @@ import org.slf4j.LoggerFactory;
  * 		- Inline-comments are ignored !!! 
  * 
  * 		\/** this is the AnnoDoc documentation of aDoc **\/
- * 		@aDoc
+ * 		\@aDoc
  * 		\/** this is api-documenation of myFunction **\/
  * 		public void myFunction(String arg) {
  * 			// this inline code will be ignores
  * 			\/** this is the annoDoc-documentaiton of aFiled **\/
- * 			@aFiled
+ * 			\@aFiled
  * 			\/** this is the api-documentaiton of myVar **\/
  * 			String myVar;
  * 		}
  * 		\/**
  * 		  * This is the myReturn api-documenation (which include comment-annotations) 
- * 		  *	@Bug - this is the annoDoc documentation of aBug (until next \@) 
+ * 		  *	\@Bug - this is the annoDoc documentation of aBug (until next \@) 
  * 		  **\/
  * 		public void myReturn(String arg) { }
  * 
