@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.openon.aannodoc.Options;
 import org.openon.aannodoc.aAnnoDoc;
 import org.openon.aannodoc.annotation.aAttribute;
 import org.openon.aannodoc.asciidoc.AsciiDocCreator;
@@ -13,6 +14,7 @@ import org.openon.aannodoc.scanner.SourceAnnotations;
 import org.openon.aannodoc.source.AnnotationDoc;
 import org.openon.aannodoc.source.DocObject;
 import org.openon.aannodoc.source.JarDoc;
+import org.openon.aannodoc.utils.DocFilter;
 import org.openon.aannodoc.utils.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,16 +28,18 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	
 	protected JarDoc doc;
 	protected SourceAnnotations adoc;
-	protected Map<String,Object> options;
-	
+	protected Options options;
+	 
 	protected AsciiDocWriter w;
+	protected DocFilter filter;
 	
 	public AsciiDocGeneratorImpl() {		
 	}
 	
-	@Override public void init(SourceAnnotations adoc,Map<String,Object> options) {
+	@Override public void init(SourceAnnotations adoc,Options options) throws IOException {
 		this.adoc=adoc; this.doc=adoc.doc();		
 		this.options=options;
+		this.filter=options.getFilter();
 	}
 	
 	@Override public void generate() throws IOException {
@@ -51,7 +55,8 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 		}
 	}
 	
-	public void generate(String outputName) throws IOException {	
+	public void generate(String outputName) throws IOException {
+		if(filter!=null && !filter.generateOutput(outputName)) { return ; } // skip by filter
 		w=new AsciiDocWriter();
 		create(outputName);
 		output(outputName);

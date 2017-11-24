@@ -13,6 +13,8 @@ import org.openon.aannodoc.generator.AnnotationListDoc;
 import org.openon.aannodoc.generator.DocGenerator;
 import org.openon.aannodoc.generator.JavaDoc;
 import org.openon.aannodoc.scanner.SourceAnnotations;
+import org.openon.aannodoc.utils.DocFilter;
+import org.openon.aannodoc.utils.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +123,7 @@ public class aAnnoDoc {
 	 */
 	@aFeature(title="execute/command-line")
 	public static void main(String[] args) throws IOException {
-		Map options=new HashMap();
+		Options options=new Options();
 		if(args.length>0) { options.put(OPTION_SOURCE, args[0]); }
 		if(args.length>1) { options.put(OPTION_OUTPUT, args[1]); }
 		if(args.length>2) { options.put(OPTION_GENERATOR, args[2]); }
@@ -139,28 +141,33 @@ public class aAnnoDoc {
 	
 	/** create docuemntation with attribtues **/
 	public aAnnoDoc(String source,String outputFile,String generator,String format) throws IOException {
-		Map options=aAnnoDoc.toOptions(source,outputFile, generator, format);
+		Options options=aAnnoDoc.toOptions(source,outputFile, generator, format);
 		scan(options).create(options);
 	}
 	/** create documenation with options **/
-	public aAnnoDoc(Map options) throws IOException { scan(options).create(options); }
+	public aAnnoDoc(Options options) throws IOException { scan(options).create(options); }
 		 
+
+	
 	//-------------------------------------------------------------------------------------------------
 	
 	/** first step - scan soruce **/
-	public aAnnoDoc scan(Map options) throws IOException {
-		String javaSourceFileOrDirectory=(String)options.get(OPTION_SOURCE);
-		return scan(javaSourceFileOrDirectory);
+	public aAnnoDoc scan(Options options) throws IOException {		
+		return scan((String)options.get(OPTION_SOURCE),options.getFilter());
 	}
 	
+//	public aAnnoDoc scan(String javaSourceFileOrDirectory,Map<String,Object> options) throws IOException {
+//		return scan(javaSourceFileOrDirectory,getFilter(options));
+//	}
+	
 	/** first step - scan soruce **/
-	public aAnnoDoc scan(String javaSourceFileOrDirectory) throws IOException {
-		this.anno=new SourceAnnotations(javaSourceFileOrDirectory);
+	public aAnnoDoc scan(String javaSourceFileOrDirectory,DocFilter filter) throws IOException {		
+		this.anno=new SourceAnnotations(javaSourceFileOrDirectory,filter);
 		return this;
 	}
 	
 	/** second step - create documenation **/
-	public aAnnoDoc create(Map options) throws IOException {		
+	public aAnnoDoc create(Options options) throws IOException {		
 		LOG.info("create AnnoDoc (working dir:{})",Paths.get("").toAbsolutePath());
 		
 		DocGenerator generator=getGenerator(anno,options);
@@ -168,13 +175,6 @@ public class aAnnoDoc {
 		generator.generate();
 		return this;
 	}
-	
-//	/** map of generators **/
-//	protected Map<String,Object> generatorMap=new HashMap<String,Object>();	
-//	/** add generator to generator map **/
-//	public void addGenerator(String generatorName,Object generator) { generatorMap.put(generatorName, generator);}
-//	/** remove gerator from generator map **/
-//	public Object removeGenerator(String generatorName) { return generatorMap.remove(generatorName); }
 	
 	/**
 	 * get doc generator
@@ -184,7 +184,7 @@ public class aAnnoDoc {
 	 * @return
 	 * @throws IOException
 	 */
-	protected DocGenerator getGenerator(SourceAnnotations anno,Map options) throws IOException {
+	protected DocGenerator getGenerator(SourceAnnotations anno,Options options) throws IOException {
 		try{
 			Object generator=options.get(OPTION_GENERATOR);		
 			if(generator instanceof Class) { return (DocGenerator)((Class)generator).newInstance();  }
@@ -213,8 +213,8 @@ public class aAnnoDoc {
 	 * @param generator
 	 * @return
 	 */
-	public static Map<String,Object> toOptions(String soruce,Object outputFile,Object generator,Object format) {
-		Map<String,Object>  options=new HashMap<String, Object>();
+	public static Options toOptions(String soruce,Object outputFile,Object generator,Object format) {
+		Options  options=new Options();
 		options.put(aAnnoDoc.OPTION_SOURCE,soruce);
 		options.put(aAnnoDoc.OPTION_OUTPUT,outputFile);
 		options.put(aAnnoDoc.OPTION_GENERATOR,generator);
@@ -233,7 +233,7 @@ public class aAnnoDoc {
 	@aFeature(title="execute/manuel/DocFiles")
 	/** create documentation for all given files in source **/
 	public static void DocFiles(String source,String output,String format) throws IOException  {
-		Map options=aAnnoDoc.toOptions(source,output,GENERATOR_ADOC,format);
+		Options options=aAnnoDoc.toOptions(source,output,GENERATOR_ADOC,format);
 		new aAnnoDoc(options);		
 	}
 	
@@ -243,10 +243,13 @@ public class aAnnoDoc {
 	 */
 	@aFeature(title="execute/manuel/DocFiles")
 	public aAnnoDoc createDocFiles(String useDocFile,String output,String format) throws IOException  {
-		Map options=aAnnoDoc.toOptions(null,output,GENERATOR_ADOC,format);
+		Options options=aAnnoDoc.toOptions(null,output,GENERATOR_ADOC,format);
 options.put(aAnnoDoc.OPTION_OUT_ADOC, "true");		
 		if(useDocFile!=null) { options.put(aAnnoDoc.OPTION_DOCFILE, useDocFile); }
 		return create(options);
 	}
 
+	
+
+	
 }

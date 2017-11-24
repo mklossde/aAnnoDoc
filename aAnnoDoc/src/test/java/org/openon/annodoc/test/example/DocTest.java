@@ -3,6 +3,7 @@ package org.openon.annodoc.test.example;
 import java.io.IOException;
 import java.util.Map;
 
+import org.openon.aannodoc.Options;
 import org.openon.aannodoc.aAnnoDoc;
 
 public class DocTest {
@@ -16,7 +17,7 @@ public class DocTest {
 		String gen=aAnnoDoc.GENERATOR_JAVADOC; // AnnoDoc.GEN_AAPP; GEN_JAVA
 		
 		aAnnoDoc doc=new aAnnoDoc();
-		Map options=aAnnoDoc.toOptions(source,out,gen,aAnnoDoc.FORMAT_PDF);
+		Options options=aAnnoDoc.toOptions(source,out,gen,aAnnoDoc.FORMAT_PDF);
 		
 		doc.scan(options).create(options);
 		

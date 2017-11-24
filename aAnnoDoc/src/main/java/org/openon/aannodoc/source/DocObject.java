@@ -30,9 +30,11 @@ public abstract class DocObject implements Serializable {
 	
 	public DocObject(String name,DocObject parent,DocObject group) { 
 		this.name=name; 	
-		this.parent=parent;
-		this.group=group;
+		setParent(parent); setGrup(group);
 	}
+	
+	public void setParent(DocObject parent) { this.parent=parent; }
+	public void setGrup(DocObject group) { this.group=group; }
 	
 	//--------------------------------------------------------------------------
 	

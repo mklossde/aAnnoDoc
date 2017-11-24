@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import org.openon.aannodoc.source.AnnotationDoc;
 import org.openon.aannodoc.source.ClassDoc;
 import org.openon.aannodoc.source.JarDoc;
+import org.openon.aannodoc.utils.DocFilter;
 
 import java.util.Set;
 
@@ -24,8 +25,8 @@ public class SourceAnnotations {
 
 	private JarDoc unit;
 	
-	public SourceAnnotations(String javaSourceFileOrDirectory) throws IOException {
-		SourceScanner scanner=new SourceScanner(javaSourceFileOrDirectory);
+	public SourceAnnotations(String javaSourceFileOrDirectory,DocFilter filter) throws IOException {
+		SourceScanner scanner=new SourceScanner(javaSourceFileOrDirectory,filter);
 		this.unit=scanner.getUnit();
 	}
 	

@@ -226,7 +226,9 @@ public class AnnotationAppDoc extends AsciiDocGeneratorImpl implements DocGenera
 			AnnotationDoc a=list.get(i);
 //			String name=a.getValueNameString();
 			String name=getTitle(a);
-			tree.getTreeOf(name, true).add(list.get(i));
+			if(filter==null || filter.generateTitle(name,a)) {
+				tree.getTreeOf(name, true).add(list.get(i));
+			}
 		}
 		return tree.sort(null);
 	}

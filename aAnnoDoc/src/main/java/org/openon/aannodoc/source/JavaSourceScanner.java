@@ -1,6 +1,5 @@
 package org.openon.aannodoc.source;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,6 +15,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.openon.aannodoc.doc.AnnotationDocScanner;
+import org.openon.aannodoc.utils.DocFilter;
 import org.openon.aannodoc.utils.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +58,8 @@ import japa.parser.ast.type.ClassOrInterfaceType;
  * 
  * TODO: FEHLER in JavaParser !! mehrfache Kommentare werdenen ignoriert und nur das letzte genommen 
  */
-public class JavaParserScanner {
-	private Logger LOG=LoggerFactory.getLogger(JavaParserScanner.class);
+public class JavaSourceScanner {
+	private Logger LOG=LoggerFactory.getLogger(JavaSourceScanner.class);
 	
 	public static boolean ANALYSEAT=true;
 	
@@ -71,41 +71,44 @@ public class JavaParserScanner {
 	private List<Comment> comments;
 	private Node prev=null;
 
-	
+	protected DocFilter filter;
 	protected int fileCount=0;
 	
 	protected static Map<String,String> defaultClass=new HashMap<String,String>();
-	
-	public JavaParserScanner() {		
-//TODO: create a list of all classes in java.lang.*		
-		defaultClass.put("String","java.lang,String");
-	}
-	
+		
 	//----------------------------------------------------------------------------------------------
 	
-	protected static JarDoc scanPackage(String dir) throws Exception {
-		JavaParserScanner scnnner=new JavaParserScanner();
+	protected static JarDoc scanPackage(String dir,DocFilter filter) throws Exception {
+		JavaSourceScanner scnnner=new JavaSourceScanner(filter);
 		scnnner.readDir(dir);
 		return scnnner.getUnit();
 	}
 	
-	protected static JarDoc scanSource(String file) throws Exception {
-		JavaParserScanner scnnner=new JavaParserScanner();
+	protected static JarDoc scanSource(String file,DocFilter filter) throws Exception {
+		JavaSourceScanner scnnner=new JavaSourceScanner(filter);
 		scnnner.readFile(file);
 		return scnnner.getUnit();
 	}
 	
-	protected static JarDoc scanJar(String jarPath) throws Exception  {
-		JavaParserScanner scnnner=new JavaParserScanner();
+	protected static JarDoc scanJar(String jarPath,DocFilter filter) throws Exception  {
+		JavaSourceScanner scnnner=new JavaSourceScanner(filter);
 		scnnner.readJar(jarPath);
 		return scnnner.getUnit();
 	}
 	
 	//----------------------------------------------------------------------------------------------
 	
+	public JavaSourceScanner(DocFilter filter) {		
+		this.filter=filter;
+//TODO: create a list of all classes in java.lang.*				
+		defaultClass.put("String","java.lang,String");
+	}
+	
+	//----------------------------------------------------------------------------------------------
+	
 	public JarDoc getUnit() { return unit; }
 	public void clear() { unit=null; }
-//	public void setLOG.debug(boolean debug) { this.debug=debug; }
+
 	//----------------------------------------------------------------------------------------------
 	
 	public void readJar(String jarPath) throws Exception  {
@@ -116,7 +119,8 @@ public class JavaParserScanner {
 	    while(entries.hasMoreElements()) {
 	    	JarEntry entry=entries.nextElement();
 	    	String name = entry.getName();
-	    	if(entry.isDirectory()) {    		
+	    	if(entry.isDirectory()) {    	    		
+	    	}else if(filter!=null && !filter.scanClass(name)) { // ignroe by fitler
 	    	}else if(name.endsWith(".java")) {
 	    		LOG.debug("scan jar java "+name);	    		
 	    		InputStream in=jar.getInputStream(entry);
@@ -138,11 +142,9 @@ public class JavaParserScanner {
 		LOG.info("scan dir "+dir+" with "+fileCount+" Files in "+(System.currentTimeMillis()-start)+"ms");
 	}
 
-	public void readFile(String file) throws IOException  {
-		long start=System.currentTimeMillis();	
-		readOneFile(file);
-		LOG.info("read file "+file+" in "+(System.currentTimeMillis()-start)+"ms");
-	}
+//	public void readFile(String file) throws IOException  {
+//		readOneFile(file);
+//	}
 	
 	//----------------------------------------------------------------------------------------------
 	
@@ -152,8 +154,9 @@ public class JavaParserScanner {
 		File files[]=file.listFiles();
 		for(int i=0;files!=null && i<files.length;i++) {
 			File f=files[i];
-			if(f.isFile() && f.getName().endsWith(".java")) { 
-				readOneFile(f.getPath());
+			if(filter!=null && !filter.scanClass( f.getPath())) { // ignroe by fitler
+			}else if(f.isFile() && f.getName().endsWith(".java")) { 
+				readFile(f.getPath());
 			}else if(f.isDirectory()){
 				readDirectory(f.getPath());
 			}
@@ -161,12 +164,13 @@ public class JavaParserScanner {
 		LOG.debug("scan dir "+dir+" in "+(System.currentTimeMillis()-start)+"ms");
 	}
 	
-	protected void readOneFile(String file) throws IOException  {
+	public void readFile(String file) throws IOException  {
 		long start=System.currentTimeMillis();	
 		LOG.trace("start read file {}",file);
 		FileInputStream in = new FileInputStream(file);
 		try {
-			if(file.endsWith(".java")) { readJava(in,file); }
+			if(filter!=null && !filter.scanClass(file)) { // ignroe by fitler
+			}else if(file.endsWith(".java")) { readJava(in,file); }
 			else if(file.endsWith(".adoc")) { readText(in,file); }
 			else { throw new IOException("unkown file type "+file); }
 		}finally{
@@ -177,12 +181,7 @@ public class JavaParserScanner {
 	}
 
 	public void readText(InputStream in,String name) throws IOException  {	
-		StringBuilder result = new StringBuilder();
-	    try {
-	        byte[] buf = new byte[1024]; int r = 0;
-	        while ((r = in.read(buf)) != -1) {result.append(new String(buf, 0, r));}
-	    } finally { in.close();}
-		String text=result.toString();
+		String text=ReflectUtil.read(in);
 				
 		try {
 			String pkgName=name,clName=name;
@@ -214,13 +213,13 @@ public class JavaParserScanner {
 		    	// package------------------------------------------------------------------------------
 			    PackageDeclaration p=cu.getPackage();
 			    String pkgName=toString(p.getName());
-			    LOG.debug("package "+pkgName);
+			    LOG.trace("package "+pkgName);
 			    if(unit==null) unit=new JarDoc(pkgName); // create unit for this package
 			    PackageDoc pkg=unit.addPackage(pkgName); // add apckage	
 			    
 			    String sourceName=clDeclarion.getName();
 			    clSource=pkg.addClass(sourceName); // add Class	  
-			    LOG.debug("class "+sourceName);
+			    LOG.trace("class "+sourceName);
 			    clSource.pkgComment=findComment(cu,p); // package comment in class 
 			    pkg.setComment(clSource.pkgComment); // pacakge comment in package
 	
@@ -234,7 +233,7 @@ public class JavaParserScanner {
 			    for(int i=0;imports!=null && i<imports.size();i++) {
 			    	ImportDeclaration imp=(ImportDeclaration)imports.get(i);
 			    	list.add(toString(imp.getName()));
-			    	LOG.debug("import "+imp.getName());
+			    	LOG.trace("import "+imp.getName());
 			    	prev=imp;
 			    }
 			    clSource.imports=list;
@@ -255,7 +254,7 @@ public class JavaParserScanner {
 				    	ClassOrInterfaceType ex=exts.get(0);
 				    	exList.add(findClassName(ex.getName(),clSource));
 				    	 clSource.extendName=findClassName(ex.getName(),clSource);
-				    	 LOG.debug("extends "+ex.getName());
+				    	 LOG.trace("extends "+ex.getName());
 				    }else if(td.isInterface()) {
 				    }else if(exts!=null && exts.size()>1) LOG.error("extends more then one ? "+exts+" ? "+clSource); 
 				    
@@ -266,7 +265,7 @@ public class JavaParserScanner {
 				    for(int i=0;impl!=null && i<impl.size();i++) {
 				    	ClassOrInterfaceType im=(ClassOrInterfaceType)impl.get(i);
 				    	imist.add(findClassName(im.getName(),clSource));
-				    	LOG.debug("implement "+im.getName());
+				    	LOG.trace("implement "+im.getName());
 				    }
 				    clSource.implementList=imist;
 			    }
@@ -288,7 +287,7 @@ public class JavaParserScanner {
 			    			String type=dec.getType().toString();
 			    			
 			    			FieldDoc field=new FieldDoc(id.getName(),type,clSource,clSource,toObject(exp, clSource));
-			    			LOG.debug("VariableDeclarator "+id.getName());
+			    			LOG.trace("VariableDeclarator "+id.getName());
 			    			setAnnotations(field, dec.getAnnotations(), clSource);
 			    			field.modifiers=dec.getModifiers();
 			    			field.comment=findComment(cu, dec); // toString(dec.getJavaDoc());
@@ -300,7 +299,7 @@ public class JavaParserScanner {
 			    	}else if(body instanceof ConstructorDeclaration) { // Constructor
 			    		ConstructorDeclaration con=(ConstructorDeclaration)body;
 			    		ConstructorDoc cs=new ConstructorDoc(con.getName(), clSource.getTypeName(), clSource, clSource);
-			    		LOG.debug("ConstructorDeclaration "+con.getName());
+			    		LOG.trace("ConstructorDeclaration "+con.getName());
 			    		setAnnotations(cs, con.getAnnotations(), clSource);
 			    		cs.modifiers=con.getModifiers();
 			    		cs.comment=findComment(cu, con);
@@ -311,7 +310,7 @@ public class JavaParserScanner {
 			    		MethodDeclaration method=(MethodDeclaration)body;
 			    		ParameterDoc params=getParams(method,clSource);
 			    		MethodDoc mc=new MethodDoc(method.getName(), toString(method.getType()), params,clSource, clSource);
-			    		LOG.debug("MethodDeclaration "+method.getName());
+			    		LOG.trace("MethodDeclaration "+method.getName());
 			    		setAnnotations(mc, method.getAnnotations(), clSource);
 			    		mc.modifiers=method.getModifiers();
 			    		mc.comment=findComment(cu, method);
@@ -320,7 +319,7 @@ public class JavaParserScanner {
 			    		
 			    	}else if(body instanceof AnnotationMemberDeclaration) {// Annotation 
 			    		AnnotationMemberDeclaration an=(AnnotationMemberDeclaration)body;
-			    		LOG.debug("AnnotationMemberDeclaration "+an.getName());
+			    		LOG.trace("AnnotationMemberDeclaration "+an.getName());
 			    		
 			    	}else if(body instanceof ClassOrInterfaceDeclaration) { // inner Class
 	//TODO: scan inner class		    		
@@ -346,7 +345,7 @@ System.out.println("InitializerDeclaration "+body);
 	    		scanComment(com,parent,clSource);
 		    }
 		    
-		    LOG.debug("scanned class "+clSource.name);
+		    LOG.trace("scanned class "+clSource.name);
 		}catch(Throwable e) {
 			LOG.error("scan error in "+name+" ("+e+")",e);
 		}
@@ -405,29 +404,38 @@ System.out.println("InitializerDeclaration "+body);
 	private void scanComment(Comment c,DocObject parent,ClassDoc clSource) throws Exception {
 		if(c instanceof LineComment) { return ; } // ignore line comments
 		String str=toString(c);
+		parent.setComment(str);
 		c.setEndLine(0); // set comment scanned)
 	}
 	
 	private void scanComment(String str,DocObject parent,ClassDoc clSource) throws Exception {
 		try {
 			LOG.trace("scanComment "+str);
-			int index=AnnotationDocScanner.nextAnnotation(str, 0,true);
+//			int index=AnnotationDocScanner.nextAnnotation(str, 0,true);
+			AnnotationDocScanner aDocScanner=new AnnotationDocScanner(str,true);			
 			parent.setComment(str);
 			
 			// find JavaDoc Annotions
-			while(index!=-1 && index<str.length()) {								
-				AnnotationDocScanner annoObject=AnnotationDocScanner.scan(str,index);
-				if(annoObject!=null) {
-					AnnotationDoc anno=new AnnotationDoc(annoObject.name,findClassName(annoObject.name,clSource), parent, clSource,true);
-					anno.add(annoObject.attr);
-					anno.comment=annoObject.value;
+//			while(index!=-1 && index<str.length()) {
+//			AnnotationDocScanner annoObject=AnnotationDocScanner.scan(str,index);
+//			if(annoObject!=null) {
+//			AnnotationDoc anno=new AnnotationDoc(annoObject.name,findClassName(annoObject.name,clSource), parent, clSource,true);
+//			anno.add(annoObject.attr);
+//			anno.comment=annoObject.value;
+
+			AnnotationDoc anno=aDocScanner.nextAnnotation();
+			while(anno!=null) {
+					anno.setTypeName(findClassName(anno.name,clSource));
+					anno.setParent(parent); 
+					anno.setGrup(clSource);
 					
 					unit.addAnnotation(anno); // add annotation to unit
 					clSource.addAllAnnotations(anno); // add annotaion as source
 					parent.addAllAnnotations(anno); // add annotation to parent
 				
-					index=annoObject.pos;
-				}else { index=str.length(); }
+					anno=aDocScanner.nextAnnotation();
+//					index=annoObject.pos;
+//				}else { index=str.length(); }
 			}
 		}catch(Exception e) {LOG.error(e.getMessage(),e);}
 		
@@ -461,7 +469,7 @@ System.out.println("InitializerDeclaration "+body);
 	    			String name=pair.getName();
 	    			Object val=toObject(pair.getValue(),clSource);
 	    			as.add(name,val);
-	    			LOG.debug("Annotation param:"+name+"="+val);
+	    			LOG.trace("Annotation param:"+name+"="+val);
 	    		}
 	    	}
 	    	

@@ -29,13 +29,15 @@ public abstract class TypeDoc extends DocObject implements Serializable {
 	public TypeDoc(String name,String typeName,DocObject parent,DocObject group) { 
 		super(name,parent,group); 
 		
+		setTypeName(typeName);
+	}
+	
+	public void setTypeName(String typeName) {
 		this.typeName=typeName;
 		if(typeName!=null) {
 			int index=typeName.lastIndexOf('.');
 			if(index==-1) { this.typeSimpleName=typeName; typePackage=""; }
 			else {this.typeSimpleName=typeName.substring(index+1); typePackage=typeName.substring(0,index); }
-			
-
 		}
 	}
 

@@ -1,6 +1,7 @@
 package org.openon.aannodoc.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public class ReflectUtil {
@@ -28,5 +29,26 @@ public class ReflectUtil {
 		else if(obj instanceof String) { return ((String)obj).split(";"); }
 		else { throw new IOException("unkown "+obj.getClass()); }
 	}
+	 
+    /** get instanceof of class from obj **/
+	public static Object getInstance(Class cl,Object obj) throws IOException  {
+		try {
+			if(obj==null) { return null; }
+			else if(obj instanceof String) { obj=Class.forName((String)obj).newInstance(); }
+			else if(obj instanceof Class) { obj=((Class)obj).newInstance(); }
+		}catch(Throwable e) { throw new IOException(e); }		
+		if(cl.isAssignableFrom(obj.getClass())) { return obj; }
+		else { throw new IOException("wrong obj "+obj.getClass()); }
+	}
 	
+	/** read stream as string **/
+	public static String read(InputStream in)  throws IOException {
+		StringBuilder result = new StringBuilder();
+	    try {
+	        byte[] buf = new byte[1024]; int r = 0;
+	        while ((r = in.read(buf)) != -1) {result.append(new String(buf, 0, r));}
+	    } finally { in.close();}
+		String text=result.toString();
+		return text;
+	}
 }

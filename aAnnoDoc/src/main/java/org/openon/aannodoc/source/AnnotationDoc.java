@@ -46,6 +46,13 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	private Map<String,Object> values=new HashMap<String, Object>();
 //	private String valueName;
 	
+	public AnnotationDoc(String name,Map<String,Object> values,String comment,boolean inline) { 
+		super(name, null, null, null);
+		this.values=values;		
+		this.comment=comment;
+		this.inline=inline;
+	}
+		
 	public AnnotationDoc(String name,String fullName,DocObject parent,ClassDoc clSource,boolean inline) { 
 		super(name,fullName,parent,clSource);
 		this.inline=inline;
