@@ -3,7 +3,6 @@ package org.openon.aannodoc.generator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.openon.aannodoc.Options;
 import org.openon.aannodoc.aAnnoDoc;
@@ -43,7 +42,7 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	}
 	
 	@Override public void generate() throws IOException {
-		String outputName=(String)options.get(aAnnoDoc.OPTION_DOCFILE);
+		String outputName=(String)options.get(Options.OPTION_DOCFILE);
 		if(outputName!=null) { 
 			generate(outputName); 
 		}else {
@@ -120,8 +119,9 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	protected String toFile(String fileName,String format,boolean setFormat) {
 		if(fileName.equals(aAnnoDoc.OUT_STDOUT)) { return fileName; }
 		
-		String prefix=(String)options.get(aAnnoDoc.OPTION_OUTFILE_PREFIX);
+		String prefix=(String)options.get(Options.OPTION_OUTFILE_PREFIX);
 		if(prefix==null) { prefix="doc"; }
+//		if(prefix==null) { prefix=""; }
 		int index=fileName.lastIndexOf('.');
 		if(index==-1) { fileName=fileName+"."+format; }
 		else if(setFormat) { fileName= (fileName.substring(0,index+1))+format; }
@@ -153,7 +153,8 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 		if(outputName.equals(aAnnoDoc.DEFAULT_FILE)) { outputFile=getOutput(); } 
 		AsciiDocCreator cr=new AsciiDocCreator();
 		
-		if(options.get(aAnnoDoc.OPTION_OUT_ADOC)!=null) { 
+		
+		if(options.get(Options.OPTION_OUT_ADOC)!=null) { 
 			String file=toFile(outputFile,aAnnoDoc.FORMAT_ASCIIDOC,true);
 			LOG.info("write {} format adoc to {}",outputName,file);
 			cr.create(adoc, aAnnoDoc.FORMAT_ASCIIDOC, file);

@@ -17,8 +17,8 @@ public class CreateDocumenation {
 //		aAnnoDoc.DocFiles(src+"/AnnoDoc.java",aAnnoDoc.FORMAT_ASCIIDOC);
 		
 //		String src="src/main";
-		String src="src/main/java"+"/org/openon/aannodoc"+"/aAnnoDoc.java";
-//		String src="src/main/java"+"/org/openon/aannodoc"+"/aAnnoDoc.adoc";
+//		String src="src/main/java"+"/org/openon/aannodoc"+"/aAnnoDoc.java";
+		String src="src/main/java"+"/org/openon/aannodoc"+"/test.adoc";
 		
 		aAnnoDoc adoc=new aAnnoDoc().scan(src,null);
 //		adoc.createDocFiles("READ.md", null, aAnnoDoc.FORMAT_ASCIIDOC);

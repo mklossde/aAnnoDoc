@@ -60,6 +60,16 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	
 	//-----------------------------------------------------------------
 	
+	/** get name of parent this annotation referenced to (e.g. name of method/field/class) **/
+	public String getParentName() {  if(parent==null) { return null; } else { return parent.getName(); }}
+	
+	/** get inline annotation author (\@author MYNAME) **/
+	public String getAuthor() { String value=super.getAuthor(); if(value==null && parent!=null) { value=parent.getAuthor(); } return value; }
+	/** get inline annotation version (\@version VERSION) **/
+	public String getVersion() {  String value=super.getVersion(); if(value==null && parent!=null) { value=parent.getVersion(); } return value; }
+	
+	//-----------------------------------------------------------------
+	
 	public boolean isInline() { return inline; }
 	
 	public Object getValueName() {

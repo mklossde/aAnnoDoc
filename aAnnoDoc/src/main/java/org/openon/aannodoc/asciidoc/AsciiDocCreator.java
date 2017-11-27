@@ -25,6 +25,7 @@ public class AsciiDocCreator {
 	
 	public AsciiDocCreator() {
 		asciidoctor = Factory.create();
+		asciidoctor.requireLibrary("asciidoctor-diagram"); // add diagramm functions
 	}
 	
 	
@@ -56,7 +57,7 @@ public class AsciiDocCreator {
 	public void createHtml(Object adoc,String outputFile) throws IOException {	
 		Options options=new Options();
 		options.setSafe(SafeMode.UNSAFE);
-		
+				
 		options.setBackend("html");
 		options.setToFile(outputFile);
 		
@@ -67,6 +68,10 @@ public class AsciiDocCreator {
 		
 		Options options=new Options();
 		options.setSafe(SafeMode.UNSAFE);
+		
+//		options.setOption("imagesdir", "C:/Data/ws/gitaAnnoDoc/aAnnoDoc/aAnnoDoc/doc");
+//		options.setOption("imagesoutdir", "C:/Data/ws/gitaAnnoDoc/aAnnoDoc/aAnnoDoc/doc");
+		options.setOption("outputDirectory", "C:/Data/ws/gitaAnnoDoc/aAnnoDoc/aAnnoDoc/doc");	
 		
 		options.setBackend("pdf");
 		options.setToFile(outputFile);

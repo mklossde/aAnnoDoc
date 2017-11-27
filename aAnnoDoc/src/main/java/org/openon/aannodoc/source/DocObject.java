@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openon.aannodoc.doc.AnnotationDocScanner;
+
 
 /**
  * 	name:		
@@ -12,7 +14,7 @@ import java.util.List;
  * 	comment:	Java Comment
  * 
  * 	 
- * 
+ * @au
  *
  */
 public abstract class DocObject implements Serializable {
@@ -45,6 +47,23 @@ public abstract class DocObject implements Serializable {
 	
 	public void addAllAnnotations(AnnotationDoc anno) { annotations.add(anno);}
 	public void addAnnotations(List<AnnotationDoc> annos) { annotations.addAll(annos); }
+
+	//--------------------------------------------------------------------------
+	/** get inline annotation author (\@author MYNAME) **/
+	public String getAuthor() { return getCommentAnnotationValue("author"); }
+	/** get inline annotation version (\@version VERSION) **/
+	public String getVersion() { return getCommentAnnotationValue("version"); }
+	
+	public String getCommentAnnotationValue(String key) {
+		if(comment==null) { return null; }
+		String k="@"+key+" ";
+		int index=comment.indexOf(k);
+		if(index==-1) { return null; }
+		int start=index+k.length();
+		int end=AnnotationDocScanner.findValueEnd(comment,start);
+		if(end==-1) { return null; }
+		return comment.substring(start,end); 
+	}
 	
 	//--------------------------------------------------------------------------
 	// cross link/anker

@@ -1,19 +1,23 @@
 package org.openon.aannodoc.doc;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.source.AnnotationDoc;
-import org.openon.aannodoc.utils.ReflectUtil;
 
 /** 
- * Annotation Object and Scanner in javaDoc
+ * Annotation-Scanner in text
  * 		
+ * scanns for any annotation at first position and add text blow to it
+ * 
+ * \@aDoc(title="example")
+ * This is text of a example @see "my exmaples"
+ * until a new Annotation at first position starts		
  * 
  */
-
+@aDoc(title="scanner/Text scanner")
 public class AnnotationDocScanner {
 
 	/** to scanned text **/
@@ -24,49 +28,51 @@ public class AnnotationDocScanner {
 	protected boolean inline=false;
 	protected int minAnnoPos=1;
 	
+	/** instance new scanner for text **/
 	public AnnotationDocScanner(String text,boolean inline) { this.text=text; this.inline=inline; pos=0; }
 	
 	//------------------------------------------------------------------------------
 	
-	public static void main(String[] args) throws Exception { 
-		String text=ReflectUtil.read(new FileInputStream("C:/Data/ws/gitaAnnoDoc/aAnnoDoc/aAnnoDoc/src/main/java/org/openon/aannodoc/aAnnoDoc.adoc"));
-		AnnotationDocScanner a=new AnnotationDocScanner(text,false);
-		AnnotationDoc doc=a.nextAnnotation();
-		while(doc!=null) {
-			System.out.println("############################################################################");
-System.out.println("doc:"+doc);			
-			doc=a.nextAnnotation();
-		}
-		System.out.println("end");
-	}
-	
+//	public static void main(String[] args) throws Exception { 
+//		String text=ReflectUtil.read(new FileInputStream("C:/Data/ws/gitaAnnoDoc/aAnnoDoc/aAnnoDoc/src/main/java/org/openon/aannodoc/aAnnoDoc.adoc"));
+//		AnnotationDocScanner a=new AnnotationDocScanner(text,false);
+//		AnnotationDoc doc=a.nextAnnotation();
+//		while(doc!=null) {
+//			System.out.println("############################################################################");
+//System.out.println("doc:"+doc);			
+//			doc=a.nextAnnotation();
+//		}
+//		System.out.println("end");
+//	}
+//	
 	//------------------------------------------------------------------------------
 	
+	/** get next annotation (unitl null return=no more annotations in text) **/
 	public AnnotationDoc nextAnnotation() throws IOException {
 		int start=nextAnnotationStart(pos);
 		if(start==-1) { return null; }
 		
 		// get name
-		int nameEnd=findAnnotationNameEnd(start+1);
+		int nameEnd=findAnnotationNameEnd(text,start+1);
 		if(nameEnd==-1) { pos=start+1; return nextAnnotation(); } // skip singel \@ 
 		String name=text.substring(start+1,nameEnd);
 //System.out.println("name:"+name);		
 		
 		// get attribtues
 		Map attr=new HashMap();
-		int attrPos=isNextChar(nameEnd,'(');
+		int attrPos=isNextChar(text,nameEnd,'(');
 		if(attrPos!=-1) {			
 			int aPos=attrPos+1;
 			while(aPos<text.length()) {				
-				int endPos=isNextChar(aPos, ')');
+				int endPos=isNextChar(text,aPos, ')');
 				if(endPos!=-1) { aPos=endPos+1; break; }
-				aPos=nextKeyStart(aPos);					
-				int keyEnd=nextKey(aPos);
-				if(keyEnd==-1) { throw new IOException("wrong attribute-key ");}
+				aPos=nextKeyStart(text,aPos);					
+				int keyEnd=nextKey(text,aPos);
+				if(keyEnd==-1) { throw new IOException("wrong attribute-key '"+text.substring(nameEnd,aPos)+"'");}
 				String attrKey=text.substring(aPos,keyEnd).trim();
-				aPos=nextChar( keyEnd, '=');
-				int valEnd=nextKey(aPos);
-				if(valEnd==-1) { throw new IOException("wrong attribute-value ");}
+				aPos=nextChar(text,keyEnd, '=');
+				int valEnd=nextKey(text,aPos);
+				if(valEnd==-1) { throw new IOException("wrong attribute-value for "+attrKey);}
 				Object attrVal=toObject(text.substring(aPos,valEnd).trim());
 				aPos=valEnd;			
 //System.out.println("attr:"+attrKey+"="+attrVal+":");					
@@ -93,6 +99,7 @@ System.out.println("doc:"+doc);
 	
 	//-------------------------------------------------------------------------
 	
+	/** convert value to object **/
 	public Object toObject(String value) {
 //System.out.println("toObject:"+value+":");		
 		if(value==null) { return null; }
@@ -101,6 +108,7 @@ System.out.println("doc:"+doc);
 		else return value;
 	}
 	
+	//-------------------------------------------------------------------------
 	/** next \@ for annotation **/
 	protected int nextAnnotationStart(int pos) {
 		while(text!=null && pos<text.length()) {
@@ -112,7 +120,20 @@ System.out.println("doc:"+doc);
 		return -1;
 	}
 	
-	protected int findAnnotationNameEnd(int pos) {		
+	//-------------------------------------------------------------------------
+	
+	public static int findValueEnd(String text,int pos) {	
+		while(pos<text.length()) {
+			char c=text.charAt(pos);		
+//			if(!Character.isAlphabetic(c)) { return pos; }
+			if(c=='\n' || c=='@') { return pos; } 
+			else { pos++; }
+		}
+		return text.length();
+	}
+	
+	/** find end of annotaion name **/
+	public static int findAnnotationNameEnd(String text,int pos) {		
 		while(pos<text.length()) {
 			char c=text.charAt(pos);			
 			if(Character.isWhitespace(c)) { return pos; }
@@ -124,7 +145,7 @@ System.out.println("doc:"+doc);
 	}
 	
 	/** is next (not space) char ==nextChar => return index of this char **/
-	protected int isNextChar(int index,char nextChar) {
+	public static int isNextChar(String text, int index,char nextChar) {
 		while(index<text.length()) {
 			char c=text.charAt(index);
 			if(Character.isWhitespace(c)) { index++; }
@@ -134,7 +155,7 @@ System.out.println("doc:"+doc);
 		return -1;
 	}
 	
-	protected int nextKeyStart(int pos) throws IOException {
+	public static int nextKeyStart(String text,int pos) throws IOException {
 		while(pos<text.length()) {
 			char c=text.charAt(pos);
 			if(Character.isWhitespace(c) || c==',') { pos++; }
@@ -143,24 +164,24 @@ System.out.println("doc:"+doc);
 		throw new IOException("keyStart not found"); 
 	}
 	
-	protected int nextKey(int pos) {
-		pos=nextChar(pos);
+	protected static int nextKey(String text,int pos) {
+		pos=nextChar(text,pos);
 		int start=pos;
 		while(pos!=-1 && pos<text.length()) {
 			char c=text.charAt(pos);
 			if(Character.isWhitespace(c) || c=='=' || c==',' || c==')') { return pos; }
 //			else if(c=='\"' || c=='\''|| c=='{' || c=='(') { // end of ""
-			else if(c=='{' || c=='(') { // end of ""
-				start=pos+1; pos=nextChar(start,c);
+			else if(c=='{' || c=='(' || c=='"' || c=='\'') { // end of ""
+				start=pos+1; pos=nextChar(text,start,c);
 				if(pos==-1) { return -1; }
-				else { return pos-1; } 
+				else { return pos; } 
 			} 
 			else { pos++; }
 		}
 		return -1;
 	}
 	
-	protected int nextChar(int index) {
+	public static int nextChar(String text,int index) {
 		while(index<text.length() && index!=-1) {
 			char c=text.charAt(index);
 			if(Character.isWhitespace(c)) { index++; }
@@ -169,14 +190,14 @@ System.out.println("doc:"+doc);
 		return -1;
 	}
 		
-	protected int nextChar(int index,char findChar) {
+	public static int nextChar(String text,int index,char findChar) {
 		while(index!=-1 && index<text.length()) {
 			char c=text.charAt(index++);
 			if(c==findChar) { return index; }
 //			else if(c=='\'') { index=nextChar(index+1,'\''); } // end of ''
 //			else if(c=='\"') { index=nextChar(index+1,'\"'); } // end of ""
-			else if(c=='{') { index=nextChar(index+1,'}'); } // end of {}
-			else if(c=='(') { index=nextChar(index+1,')'); } // end of ()
+			else if(c=='{') { index=nextChar(text,index+1,'}'); } // end of {}
+			else if(c=='(') { index=nextChar(text,index+1,')'); } // end of ()
 			else { }
 		}
 		return -1;

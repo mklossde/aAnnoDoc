@@ -2,10 +2,7 @@ package org.openon.aannodoc;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.openon.aannodoc.annotation.aAttribute;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aFeature;
 import org.openon.aannodoc.generator.AnnotationAppDoc;
@@ -14,7 +11,6 @@ import org.openon.aannodoc.generator.DocGenerator;
 import org.openon.aannodoc.generator.JavaDoc;
 import org.openon.aannodoc.scanner.SourceAnnotations;
 import org.openon.aannodoc.utils.DocFilter;
-import org.openon.aannodoc.utils.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,16 +80,7 @@ import org.slf4j.LoggerFactory;
 public class aAnnoDoc {
 	private static final Logger LOG=LoggerFactory.getLogger(aAnnoDoc.class);
 	
-	@aAttribute()
-	public static final String OPTION_SOURCE="soruce";
-	public static final String OPTION_GENERATOR="generator";
-	public static final String OPTION_FORMAT="format";
-	public static final String OPTION_OUTPUT="output";
-	
-	public static final String OPTION_OUT_ADOC="outadoc";
-	public static final String OPTION_OUTFILE_PREFIX="outprefix";
-	/** write only docFile - contains file="xxx" in annotation-attribute **/
-	public static final String OPTION_DOCFILE="docfile";
+
 	
 	// Output-Formats
 	public static final String FORMAT_ASCIIDOC="adoc";
@@ -124,10 +111,10 @@ public class aAnnoDoc {
 	@aFeature(title="execute/command-line")
 	public static void main(String[] args) throws IOException {
 		Options options=new Options();
-		if(args.length>0) { options.put(OPTION_SOURCE, args[0]); }
-		if(args.length>1) { options.put(OPTION_OUTPUT, args[1]); }
-		if(args.length>2) { options.put(OPTION_GENERATOR, args[2]); }
-		if(args.length>3) { options.put(OPTION_FORMAT, args[3]); }
+		if(args.length>0) { options.put(Options.OPTION_SOURCE, args[0]); }
+		if(args.length>1) { options.put(Options.OPTION_OUTPUT, args[1]); }
+		if(args.length>2) { options.put(Options.OPTION_GENERATOR, args[2]); }
+		if(args.length>3) { options.put(Options.OPTION_FORMAT, args[3]); }
 		
 		new aAnnoDoc(options);		
 		
@@ -141,7 +128,7 @@ public class aAnnoDoc {
 	
 	/** create docuemntation with attribtues **/
 	public aAnnoDoc(String source,String outputFile,String generator,String format) throws IOException {
-		Options options=aAnnoDoc.toOptions(source,outputFile, generator, format);
+		Options options=new Options(source,outputFile, generator, format);
 		scan(options).create(options);
 	}
 	/** create documenation with options **/
@@ -153,7 +140,7 @@ public class aAnnoDoc {
 	
 	/** first step - scan soruce **/
 	public aAnnoDoc scan(Options options) throws IOException {		
-		return scan((String)options.get(OPTION_SOURCE),options.getFilter());
+		return scan((String)options.get(Options.OPTION_SOURCE),options.getFilter());
 	}
 	
 //	public aAnnoDoc scan(String javaSourceFileOrDirectory,Map<String,Object> options) throws IOException {
@@ -186,7 +173,7 @@ public class aAnnoDoc {
 	 */
 	protected DocGenerator getGenerator(SourceAnnotations anno,Options options) throws IOException {
 		try{
-			Object generator=options.get(OPTION_GENERATOR);		
+			Object generator=options.get(Options.OPTION_GENERATOR);		
 			if(generator instanceof Class) { return (DocGenerator)((Class)generator).newInstance();  }
 			else if(generator instanceof DocGenerator) { return (DocGenerator)generator; }
 			else if(generator==null) { return new AnnotationListDoc(); }
@@ -205,22 +192,6 @@ public class aAnnoDoc {
 		}catch(Exception e) { throw new IOException(e); }
 	}
 
-	//-----------------------------------------------------------------
-	
-	/**
-	 * @param outputFile
-	 * @param format
-	 * @param generator
-	 * @return
-	 */
-	public static Options toOptions(String soruce,Object outputFile,Object generator,Object format) {
-		Options  options=new Options();
-		options.put(aAnnoDoc.OPTION_SOURCE,soruce);
-		options.put(aAnnoDoc.OPTION_OUTPUT,outputFile);
-		options.put(aAnnoDoc.OPTION_GENERATOR,generator);
-		options.put(aAnnoDoc.OPTION_FORMAT,format);				
-		return options;
-	}
 	
 	//-----------------------------------------------------------------
 	
@@ -233,7 +204,7 @@ public class aAnnoDoc {
 	@aFeature(title="execute/manuel/DocFiles")
 	/** create documentation for all given files in source **/
 	public static void DocFiles(String source,String output,String format) throws IOException  {
-		Options options=aAnnoDoc.toOptions(source,output,GENERATOR_ADOC,format);
+		Options options=new Options(source,output,GENERATOR_ADOC,format);
 		new aAnnoDoc(options);		
 	}
 	
@@ -243,9 +214,9 @@ public class aAnnoDoc {
 	 */
 	@aFeature(title="execute/manuel/DocFiles")
 	public aAnnoDoc createDocFiles(String useDocFile,String output,String format) throws IOException  {
-		Options options=aAnnoDoc.toOptions(null,output,GENERATOR_ADOC,format);
-options.put(aAnnoDoc.OPTION_OUT_ADOC, "true");		
-		if(useDocFile!=null) { options.put(aAnnoDoc.OPTION_DOCFILE, useDocFile); }
+		Options options=new Options(null,output,GENERATOR_ADOC,format);
+options.put(Options.OPTION_OUT_ADOC, "true");		
+		if(useDocFile!=null) { options.put(Options.OPTION_DOCFILE, useDocFile); }
 		return create(options);
 	}
 

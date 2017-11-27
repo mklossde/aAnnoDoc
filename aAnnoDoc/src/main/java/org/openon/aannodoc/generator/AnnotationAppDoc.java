@@ -2,9 +2,9 @@ package org.openon.aannodoc.generator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
+import org.openon.aannodoc.Options;
 import org.openon.aannodoc.aAnnoDoc;
 import org.openon.aannodoc.annotation.aAttribute;
 import org.openon.aannodoc.annotation.aBug;
@@ -12,8 +12,8 @@ import org.openon.aannodoc.annotation.aConnection;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aExample;
 import org.openon.aannodoc.annotation.aFeature;
-import org.openon.aannodoc.annotation.aTest;
 import org.openon.aannodoc.annotation.aField;
+import org.openon.aannodoc.annotation.aTest;
 import org.openon.aannodoc.source.AnnotationDoc;
 import org.openon.aannodoc.utils.Tree;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class AnnotationAppDoc extends AsciiDocGeneratorImpl implements DocGenera
 	 */
 	@aAttribute(title="options/format")
 	public String getFormat() {
-		Object obj=options.get(aAnnoDoc.OPTION_FORMAT); if(obj==null) { obj="html"; }
+		Object obj=options.get(Options.OPTION_FORMAT); if(obj==null) { obj="html"; }
 		return (String)obj;
 	}
 	
@@ -65,7 +65,7 @@ public class AnnotationAppDoc extends AsciiDocGeneratorImpl implements DocGenera
 	 */
 	@aAttribute(title="options/output")
 	public String getOutput() throws IOException {
-		String obj=(String)options.get(aAnnoDoc.OPTION_OUTPUT); 
+		String obj=(String)options.get(Options.OPTION_OUTPUT); 
 		if(obj==null) { obj="AnnoDocOutput"; }
 		if(obj.indexOf('.')==-1) { obj=obj+"."+getFormat(); }
 		return (String)obj;
