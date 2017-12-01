@@ -1,4 +1,4 @@
-aAnnoDoc - Java annotation based documentation
+= aAnnoDoc - Java annotation based documentation
 (Apache License 2.0)
 
 DONATE :-) to https://www.paypal.me/openonorg/5
