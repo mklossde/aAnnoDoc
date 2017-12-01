@@ -4,7 +4,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation to document example  
+ * Annotation to document example or test
  * 	e.g. a example which is included 
  * 
  * 

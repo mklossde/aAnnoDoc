@@ -26,7 +26,7 @@ public class ExampleDoc {
 		this.doc=doc;
 		this.cl=this.doc.getClassDoc();
 		
-		this.name=doc.getValueNameString();
+		this.name=doc.getTitle();
 		if(this.name==null) { name=this.cl.getParent().getName(); }
 		this.attribute=doc.getValueString("attribute"); 
 		

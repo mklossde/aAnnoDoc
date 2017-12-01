@@ -14,8 +14,6 @@ import java.lang.annotation.RetentionPolicy;
 @aDoc(title="annotation/aService")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aService {
-	/** file for comment will by inserted **/
-	String file() default "";
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/
@@ -25,6 +23,11 @@ public @interface aService {
 	String description() default "";
 	/** simple or short information **/
 	String simple() default "";
+	
+	/** request of service **/
+	String request() default "";
+	/** resonse of service **/
+	String response() default "";
 	
 	/** author of this description **/
 	String author() default "";

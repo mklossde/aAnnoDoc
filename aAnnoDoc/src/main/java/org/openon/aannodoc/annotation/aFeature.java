@@ -14,8 +14,6 @@ import java.lang.annotation.RetentionPolicy;
 @aDoc(title="annotation/aFeature")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aFeature {
-	/** file for comment will by inserted **/
-	String file() default "";
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/

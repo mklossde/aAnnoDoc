@@ -65,16 +65,16 @@ public class AnnotationMap {
 //		return annotationNames.get(valueName);
 //	}
 	
-	//------------------------------------------------------------------
-	/** get annotation of annotationSimpleClass by path **/
-	public AnnotationDoc getAnnotation(String path,String annotationSimpleClass)  {
-		List<AnnotationDoc> list=findAnnotation(annotationSimpleClass);
-		for(int i=0;list!=null && i<list.size();i++) {
-			AnnotationDoc doc=list.get(i);
-			if(path==null || doc.is(null,path)) return doc;
-		}
-		return null;
-	}
+//	//------------------------------------------------------------------
+//	/** get annotation of annotationSimpleClass by path **/
+//	public AnnotationDoc getAnnotation(String path,String annotationSimpleClass)  {
+//		List<AnnotationDoc> list=findAnnotation(annotationSimpleClass);
+//		for(int i=0;list!=null && i<list.size();i++) {
+//			AnnotationDoc doc=list.get(i);
+//			if(path==null || doc.is(null,path)) return doc;
+//		}
+//		return null;
+//	}
 	
 	/** list of annotations,in all classes, by annotationClass **/
 	public List<AnnotationDoc> findAnnotation(String annotationSimpleClass) {

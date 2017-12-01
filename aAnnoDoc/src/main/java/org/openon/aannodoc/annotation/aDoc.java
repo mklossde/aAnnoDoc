@@ -33,7 +33,7 @@ public @interface aDoc {
 	public static final String fDEPRECATED="deprecated";
 	
 	/** attribute to defien a explizit file of documenation this annotatied-documentation will be inserted **/
-	@aAttribute(defaultValue="nothing=insert this attribute into default document")
+	@aAttribute(value="nothing=insert this attribute into default document")
 	String file() default "";
 	
 	/** group this documenation belongs to **/

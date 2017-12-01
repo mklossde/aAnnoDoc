@@ -14,15 +14,13 @@ import java.lang.annotation.RetentionPolicy;
 @aDoc(title="annotation/aAttribute")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aAttribute {
-	/** file for comment will by inserted **/
-	String file() default "";
 	/** group this documenation belongs to **/
 	String group() default "";
 	/** name of attribute **/
 	String title() default "";
-	
+	 
 	/** default value of attribtue **/
-	String defaultValue() default "";
+	String value() default "";
 	
 	/** is this attribute options **/
 	String optional() default "";
@@ -35,12 +33,6 @@ public @interface aAttribute {
 	/** simple or short information **/
 	String simple() default "";
 	
-	/** author of this description **/
-	String author() default "";
-	/** date of this description **/
-	String date() default ""; 
-	/** description belongs to version **/
-	String version() default ""; 
 	/** description is no longer correct **/
 	String deprecated() default ""; 
 }

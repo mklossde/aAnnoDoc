@@ -33,43 +33,43 @@ public class AsciiDocWriter {
 	/** text **/
 	public AsciiDocWriter text(Object text) { return w(text);}
 	/** paragraph **/
-	public AsciiDocWriter paragraph(Object text) { return nnl().w(text);}
-	public AsciiDocWriter literalBlock(Object text) { return nnl().wnl("....").w(text).nnl().wnl("....");}
+	public AsciiDocWriter paragraph(Object text) { if(text==null) {return this; } return nnl().w(text);}
+	public AsciiDocWriter literalBlock(Object text) { if(text==null) {return this; } return nnl().wnl("....").w(text).nnl().wnl("....");}
 	public AsciiDocWriter literalBlock() { return nnl().wnl("....");}
 	public AsciiDocWriter literalBlockEnd() { return nnl().wnl2("....");}
 	
 	public AsciiDocWriter pass() { return nnl().w("pass:");}
-	public AsciiDocWriter pass(Object obj) { return nnl().w("pass:").w(obj);}
+	public AsciiDocWriter pass(Object text) { if(text==null) {return this; } return nnl().w("pass:").w(text);}
 	
 	/** lead paragraph **/
-	public AsciiDocWriter lead(String text) { return nl().w("[.lead]").nl().w(text);}
-	public AsciiDocWriter litheral(String text) { nl(); for (String line : text.split("\n")) { w(" ");w(line); } return this;}
-	public AsciiDocWriter note(String text) { return nnl().w("NOTE: ").w(text).nnl2();  }
-	public AsciiDocWriter tip(String text) { return nnl().w("TIP: ").w(text).nnl2(); }
-	public AsciiDocWriter important(String text) { return nnl().w("IMPORTANT: ").w(text).nnl2();  }
-	public AsciiDocWriter warning(String text) { return nnl().w("WARNING: ").w(text).nnl2();  }
-	public AsciiDocWriter caution(String text) { return nnl().w("CAUTION: ").w(text).nnl2();  }
+	public AsciiDocWriter lead(Object text) { if(text==null) {return this; } return nl().w("[.lead]").nl().w(text);}
+	public AsciiDocWriter litheral(String text) { if(text==null) {return this; } nl(); for (String line : text.split("\n")) { w(" ");w(line); } return this;}
+	public AsciiDocWriter note(Object text) { if(text==null) {return this; } return nnl().w("NOTE: ").w(text).nnl2();  }
+	public AsciiDocWriter tip(Object text) { if(text==null) {return this; }return nnl().w("TIP: ").w(text).nnl2(); }
+	public AsciiDocWriter important(String text) { if(text==null) {return this; } return nnl().w("IMPORTANT: ").w(text).nnl2();  }
+	public AsciiDocWriter warning(Object text) { if(text==null) {return this; } return nnl().w("WARNING: ").w(text).nnl2();  }
+	public AsciiDocWriter caution(Object text) { if(text==null) {return this; } return nnl().w("CAUTION: ").w(text).nnl2();  }
 	
-	public AsciiDocWriter bold(String text) {  return w("*").w(text).w("*"); }
-	public AsciiDocWriter italic (String text) {  return w("_").w(text).w("_"); }
-	public AsciiDocWriter bolditalic(String text) {  return w("*_").w(text).w("_*"); }
-	public AsciiDocWriter monospace(String text) {  return w("`").w(text).w("`"); }
+	public AsciiDocWriter bold(Object text) {  return wIf(text!=null,"*",text,"*"); }
+	public AsciiDocWriter italic (Object text) {  return wIf(text!=null,"_",text,"_"); }
+	public AsciiDocWriter bolditalic(Object text) {  return wIf(text!=null,"*_",text,"_*"); }
+	public AsciiDocWriter monospace(Object text) {  return wIf(text!=null,"`",text,"`"); }
 	
-	public AsciiDocWriter cassia(String text) {  return w("#").w(text).w("#"); }
-	public AsciiDocWriter small(String text) {  return w("[.small]#").w(text).w("#"); }
-	public AsciiDocWriter big(String text) {  return w("[.big]##").w(text).w("##"); }
-	public AsciiDocWriter underline(String text) {  return w("[.underline]#").w(text).w("#"); }
-	public AsciiDocWriter linethrough(String text) {  return w("[.line-through]#").w(text).w("#"); }
+	public AsciiDocWriter cassia(Object text) {  return wIf(text!=null,"#",text,"#"); }
+	public AsciiDocWriter small(Object text) {  return wIf(text!=null,"[.small]#",text,"#"); }
+	public AsciiDocWriter big(Object text) {  return wIf(text!=null,"[.big]##",text,"##"); }
+	public AsciiDocWriter underline(Object text) {  return wIf(text!=null,"[.underline]#",text,"#"); }
+	public AsciiDocWriter linethrough(Object text) {  return wIf(text!=null,"[.line-through]#",text,"#"); }
 	
-	public AsciiDocWriter superScript(String text) {  return w("^").w(text).w("^"); }
-	public AsciiDocWriter subScript(String text) {  return w("~").w(text).w("~"); }
+	public AsciiDocWriter superScript(Object text) {  return wIf(text!=null,"^",text,"^"); }
+	public AsciiDocWriter subScript(Object text) {  return wIf(text!=null,"~",text,"~"); }
 	
-	public AsciiDocWriter quotes(String text) {  return w("'`").w(text).w("`'"); }
-	public AsciiDocWriter doubleQuotes(String text) {  return w("\"`").w(text).w("'\""); }
+	public AsciiDocWriter quotes(Object text) {  return wIf(text!=null,"'`",text,"`'"); }
+	public AsciiDocWriter doubleQuotes(Object text) {  return wIf(text!=null,"\"`",text,"'\""); }
 	
 	public AsciiDocWriter title(Object text) { titleDeep++; return nnl().w("= ").w(text).nl2();   }
 	public AsciiDocWriter title(Object text,String author,String email) {  titleDeep++; return nnl().w("= ").w(text).nl().w(author).w(" <").w(email).w(">").nl2(); }
-	public AsciiDocWriter title(Object text,String author,String email,String revision) {  titleDeep++; return nnl().w("= ").w(text).nl().w(author).w(" <").w(email).w(">").nl().w(revision).nl2(); }
+	public AsciiDocWriter title(Object text,String author,String email,String revision) {  titleDeep++; return nnl().w("= ").w(text).nl().w(author).wIf(email!=null," <",email,">").nl().w(revision).nl2(); }
 	public AsciiDocWriter attr(Object text) { if(e(text)) return this; return nnl().w(":").w(text).w(":").nl(); }	
 	
 	public AsciiDocWriter title1(Object text) {   return title(2,text); }
@@ -109,7 +109,7 @@ public class AsciiDocWriter {
 	public AsciiDocWriter reference(Object text) { return w("<<").w(text).w(">>"); }
 	
 	public AsciiDocWriter table(Object title,Object... heads) { nnl2().w(".table ").w(title).nl().w("|===").nl();for(int i=0;heads!=null && i<heads.length;i++) { w("|").w(heads[i]); } return nl(); }
-	public AsciiDocWriter tableLine(Object... cells) { for(int i=0;cells!=null && i<cells.length;i++) { nnl().w("|").w(cells[i]); } return nl(); } 
+	public AsciiDocWriter tableLine(Object... cells) { nnl(); for(int i=0;cells!=null && i<cells.length;i++) { w("|").w(cells[i]); } return nl(); } 
 	public AsciiDocWriter tableEnd() { return nnl().wnl("|==="); }
 	
 	public AsciiDocWriter include(String file) { return include(file,null); }
@@ -150,16 +150,25 @@ public class AsciiDocWriter {
 	public AsciiDocWriter wnl(Object t) { if(t!=null) { w(String.valueOf(t)).nnl(); } return this; }
 	public AsciiDocWriter wnl2(Object t) { if(t!=null) { w(String.valueOf(t)).nnl2(); } return this; }
 	
-	public AsciiDocWriter w(char c) { wr.print(c); lastcharNL=(c==NL); if(cacheOn) { cache.append(c); }  return this; }  
-	public AsciiDocWriter w(String t) { 
-		if(t!=null && t.length()>0) {  
-			wr.print(t);
-			lastcharNL=t.charAt(t.length()-1)==NL;
-			if(cacheOn) { cache.append(t); }
-		}
-		return this; }
-	
+	//---------------------------------------------------------------------------------------------------------
+	/** write if rule **/
+	public AsciiDocWriter wIf(boolean rule,Object... texts) { if(rule) { w(texts); } return this;}
 	public AsciiDocWriter w(String before,int count,String body,String after) { w(before) ;for(int i=0;i<count;i++) { w(body); } w(after); return this; }
+
+	public AsciiDocWriter w(Object... t) { for(int i=0;t!=null && i<t.length;i++) { w((String)valueOf(t[i]));} return this; }
+	//---------------------------------------------------------------------------------------------------------
+	
+	public AsciiDocWriter w(char c) { wr.print(c); lastcharNL=(c==NL); if(cacheOn) { cache.append(c); }  return this; }  
+	public AsciiDocWriter w(String str) {
+		if(str!=null && str.length()>0) {  
+			wr.print(str);
+			lastcharNL=str.charAt(str.length()-1)==NL;
+			if(cacheOn) { cache.append(str); }
+		}
+		return this;
+	}
+	public String valueOf(Object o) { return String.valueOf(o); }
+	//---------------------------------------------------------------------------------------------------------
 
 	public void flush() { wr.flush(); }
 	

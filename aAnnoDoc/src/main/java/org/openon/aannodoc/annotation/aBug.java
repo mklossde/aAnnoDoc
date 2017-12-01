@@ -14,8 +14,6 @@ import java.lang.annotation.RetentionPolicy;
 @aDoc(title="annotation/aBug")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aBug {
-	/** file for comment will by inserted **/
-	String file() default "";
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/
@@ -23,8 +21,6 @@ public @interface aBug {
 	
 	/** description (alternative to java-comment) **/
 	String description() default "";
-	/** simple or short information **/
-	String simple() default "";
 	
 	/** informaiton about the fix of this bug **/
 	String fix() default "";
@@ -33,8 +29,4 @@ public @interface aBug {
 	String author() default "";
 	/** date of this description **/
 	String date() default ""; 
-	/** description belongs to version **/
-	String version() default ""; 
-	/** description is no longer correct **/
-	String deprecated() default ""; 
 }

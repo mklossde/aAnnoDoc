@@ -41,8 +41,13 @@ public abstract class DocObject implements Serializable {
 	//--------------------------------------------------------------------------
 	
 	public void setComment(String comment) {
-		if(this.comment==null) this.comment=comment;
-		else this.comment=this.comment+"\n"+comment;
+		if(comment==null || comment.length()==0) { return ; }
+System.out.println("c:"+comment);
+		if(this.comment==null) {
+			this.comment=comment; 
+		}else {
+			this.comment=this.comment+"\n"+comment;
+		}
 	}
 	
 	public void addAllAnnotations(AnnotationDoc anno) { annotations.add(anno);}
@@ -53,6 +58,8 @@ public abstract class DocObject implements Serializable {
 	public String getAuthor() { return getCommentAnnotationValue("author"); }
 	/** get inline annotation version (\@version VERSION) **/
 	public String getVersion() { return getCommentAnnotationValue("version"); }
+	/** get inline annotation deprecated (\@deprecated DEPRECATED) **/
+	public String getDeprecated() { return getCommentAnnotationValue("deprecated"); }
 	
 	public String getCommentAnnotationValue(String key) {
 		if(comment==null) { return null; }

@@ -83,7 +83,7 @@ public class AnnotationListDoc extends AsciiDocGeneratorImpl implements DocGener
 			Collections.sort(list);
 			for(int t=0;list!=null && t<list.size();t++) {
 				AnnotationDoc ad=list.get(t);
-				w.title2(ad.getName()+" "+ad.getValueName());
+				w.title2(ad.getName()+" "+ad.getRef());
 				w.reference(ad.getClassDoc().getTypeName());
 				Map<String,Object> values=ad.getValues();
 				for (Entry<String, Object> e: values.entrySet()) {

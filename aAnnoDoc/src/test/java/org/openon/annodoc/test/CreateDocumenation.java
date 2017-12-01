@@ -9,22 +9,27 @@ public class CreateDocumenation {
 	public static void main(String[] args)  throws IOException  {
 		CreateDocumenation doc=new CreateDocumenation();
 		doc.createDocs();
+//		doc.createExamples();
 		System.out.println("end");
+	}
+	
+	public void createExamples() throws IOException {
+		String src="src/test/java"+"/examples"+"/SimpleaDocExample.java";
+		aAnnoDoc adoc=new aAnnoDoc().scan(src,null);
+		adoc.createDocFiles("SimpleaDocExample", null,aAnnoDoc.FORMAT_HTML);	
 	}
 	
 	public void createDocs() throws IOException {
 //		String src="src/main/java"+"/org/openon/aannodoc";
 //		aAnnoDoc.DocFiles(src+"/AnnoDoc.java",aAnnoDoc.FORMAT_ASCIIDOC);
 		
-//		String src="src/main";
+		String src="src/main/java";
 //		String src="src/main/java"+"/org/openon/aannodoc"+"/aAnnoDoc.java";
-		String src="src/main/java"+"/org/openon/aannodoc"+"/test.adoc";
+//		String src="src/main/java"+"/org/openon/aannodoc"+"/test.adoc";
 		
 		aAnnoDoc adoc=new aAnnoDoc().scan(src,null);
 //		adoc.createDocFiles("READ.md", null, aAnnoDoc.FORMAT_ASCIIDOC);
 //		adoc.createDocFiles(aAnnoDoc.DEFAULT_FILE, "aAnnoDoc",aAnnoDoc.FORMAT_HTML);
 		adoc.createDocFiles(null, "aAnnoDoc",aAnnoDoc.FORMAT_HTML);	
-		
-		
 	}
 }

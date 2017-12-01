@@ -46,13 +46,15 @@ public class AsciiDocCreator {
 		else if(outputFile instanceof String) {
 			String str=(String)outputFile;
 			if(str.equals(aAnnoDoc.OUT_STDOUT)) { wr=new PrintWriter(System.out); }
-			else { wr=new PrintWriter(new File(str)); }
+			else { wr=new PrintWriter(getFile(str)); }
 		}else { throw new IOException("unkown outputFile "+outputFile); }
 		
 		if(adoc instanceof String) { wr.write((String)adoc); }
 		else { throw new IOException("unkown adoc "+adoc); }
 		wr.close();
 	}
+	
+
 	
 	public void createHtml(Object adoc,String outputFile) throws IOException {	
 		Options options=new Options();
@@ -85,6 +87,15 @@ public class AsciiDocCreator {
 		}else if(adoc instanceof File) {
 			asciidoctor.convertFile((File)adoc,options);
 		}else { throw new IOException("unkown adoc "+adoc); }
+	}
+	
+	//-------------------------------------------------------------
+	
+	/** get file and create dirs of parent **/
+	public File getFile(String fileName) {
+		File file=new File(fileName); 
+		file.getParentFile().mkdirs(); // create parent dirs
+		return file;
 	}
 	
 }

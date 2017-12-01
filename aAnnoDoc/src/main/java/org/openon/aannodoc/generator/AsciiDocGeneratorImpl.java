@@ -172,35 +172,9 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	}
 	
 	//----------------------------------------------------------------------
-	
-	/** get doc of DocObject **/
-	public String getDoc(DocObject doc,boolean preFormat) {
-		String text=doc.getComment();
-		// add descibtoon of annotation **/
-		if(doc instanceof AnnotationDoc) { text=addString(text, ((AnnotationDoc)doc).getValue(ATR_DESCRIPTION));}
-		if(text==null) { return null; }
-		text=removeLeadingSpace(text);
-		text=removeBackslash(text);
-//		if(preFormat) { text=preFormat(text); }
-		return text;
-	}
-	
-	//----------------------------------------------------------------------
-	
-	public String removeLeadingSpace(String text) { return text.replaceAll("\n ", "\n");}
-	public String removeBackslash(String text) {  return text.replaceAll("\\\\", "");}
-	public String preFormat(String text) { return text.replaceAll("\n", " +\n");}
 		
 	
-	/** add toStrings into one **/
-	public String addString(Object... objs) {
-		StringBuilder sb=new StringBuilder();
-		for (Object object : objs) {
-			if(object!=null) { sb.append(toString(object,"")); }
-		}
-		if(sb.length()==0) { return null; }
-		else { return sb.toString(); }
-	}
+
 //	public String addString(Object one,Object two) {
 //		if(one==null && two==null) { return null; }
 //		else if(one!=null && two!=null) { return toString(one)+toString(two); }

@@ -51,6 +51,7 @@ import japa.parser.ast.expr.NullLiteralExpr;
 import japa.parser.ast.expr.StringLiteralExpr;
 import japa.parser.ast.expr.UnaryExpr;
 import japa.parser.ast.type.ClassOrInterfaceType;
+import japa.parser.ast.type.ReferenceType;
 
 /**
  * Java-Source-Scanner 
@@ -272,6 +273,9 @@ public class JavaSourceScanner {
 			    
 			    // Body: field && methods ------------------------------------------------------------------------------
 			    prev=clDeclarion;
+			    
+//			    scanComments(null,clDeclarion, clSource, clSource); // scan inside comments
+			    
 			    // analyse body
 			    List<BodyDeclaration> mem=clDeclarion.getMembers();
 			    for(int i=0;mem!=null && i<mem.size();i++) {
@@ -284,7 +288,8 @@ public class JavaSourceScanner {
 			    			VariableDeclarator v=(VariableDeclarator)vars.get(t);
 			    			VariableDeclaratorId id=v.getId();
 			    			Expression exp=v.getInit();
-			    			String type=dec.getType().toString();
+//			    			String type=dec.getType().toString();			    			
+			    			String type=toString(dec.getType());
 			    			
 			    			FieldDoc field=new FieldDoc(id.getName(),type,clSource,clSource,toObject(exp, clSource));
 			    			LOG.trace("VariableDeclarator "+id.getName());
@@ -332,7 +337,8 @@ System.out.println("InitializerDeclaration "+body);
 			    	}else { LOG.error("unkown body "+body.getClass()+toAtString(body, clSource)); }
 			    	prev=body;
 			    }
-			    
+
+//TODO: add comments of class before			    
 			    scanComments(null,clDeclarion, clSource, clSource); // scan inside comments
 			    
 		    }
@@ -362,7 +368,7 @@ System.out.println("InitializerDeclaration "+body);
 			VariableDeclaratorId var=p.getId();
 			String name=var.getName();
 //			Type type=p.getType();
-			String type=p.getType().toString();
+			String type=toString(p.getType());
 			String className=findClassName(type,clSource);
 			doc.set(i, className, name);
 		}
@@ -379,12 +385,24 @@ System.out.println("InitializerDeclaration "+body);
 	    	Comment com=it.next();
 	    	if((prev==null || com.getBeginLine()>prev.getBeginLine() || (com.getBeginLine()==prev.getBeginLine() && com.getBeginColumn()>prev.getBeginColumn()))
 	    			&& (com.getEndLine()<now.getEndLine() || (com.getEndLine()==now.getEndLine() && com.getEndColumn()<now.getEndColumn()))) {	    		    			    	
-	    		scanComment(com,parent,clSource);
-	    		it.remove(); // remove from list
+//System.out.println("c:"+com.getBeginLine()+","+com.getBeginColumn()+" p:"+prev.getBeginLine()+","+prev.getBeginColumn()+" n:"+now.getBeginLine()+","+now.getBeginColumn());
+	    		if(!have(prev,com)) {
+	    			scanComment(com,parent,clSource);
+	    			it.remove(); // remove from list
+	    		}
 	    	}
 	    }
 	}
-	
+
+//TODO: hack find comment in prev and ignore it 
+	public boolean have(Node prev,Comment com) {
+		if(prev==null) { return false; }
+		List<Comment> cc=prev.getOrphanComments();
+		for(int i=0;cc!=null && i<cc.size();i++) {
+			if(cc.get(i)==com) { return true; }
+		}
+		return false;
+	}
 	
 	//---------------------------------------------------------------------------------------
 
@@ -473,8 +491,9 @@ System.out.println("InitializerDeclaration "+body);
 	    		}
 	    	}
 	    	
-    		if(as.getValueName()==null) as.add(AnnotationDoc.ID, ReflectUtil.removeGetSet(source.getName())); // get name from parent
-    		if(as.getValuePath()==null) as.add(AnnotationDoc.PATH,shortPath(clSource.getTypePackage()));
+//    		if(as.getValueName()==null) as.add(AnnotationDoc.ID, ReflectUtil.removeGetSet(source.getName())); // get name from parent
+//    		if(as.getValuePath()==null) as.add(AnnotationDoc.PATH,shortPath(clSource.getTypePackage()));
+	    	as.setRef(clSource.getTypePackage(), ReflectUtil.removeGetSet(source.getName()));
 	    	
 	    	unit.addAnnotation(as); 
 	    	list.add(as);
@@ -569,8 +588,12 @@ System.out.println("InitializerDeclaration "+body);
 	    		return getCommentString(str);
     		}
 			return str;
-		}else if(obj instanceof Type) return ((Type)obj).toString();
-		else return String.valueOf(obj);
+		}else if(obj instanceof Type) { return ((Type)obj).toString(); 
+		}else if(obj instanceof ReferenceType) { return ((ReferenceType)obj).getType().toString();
+//		}else if(obj instanceof japa.parser.ast.type.Type) {
+//			japa.parser.ast.type.Type type=(japa.parser.ast.type.Type)obj;
+//			return type.getChildrenNodes().get(0).toString();
+		}else { return String.valueOf(obj); }
 	}
 	
 	public String getCommentString(String str) {

@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import org.openon.aannodoc.source.AnnotationDoc;
 import org.openon.aannodoc.source.ClassDoc;
+import org.openon.aannodoc.source.DocObject;
 import org.openon.aannodoc.source.JarDoc;
 import org.openon.aannodoc.utils.DocFilter;
 
@@ -144,10 +145,10 @@ public class SourceAnnotations {
 	}
 	
 	private void addAnnotation(List<AnnotationDoc> list,AnnotationDoc anno) { 	
-		String name=toString(anno.getValueName());
+		String name=toString(anno.getTitle());
 		for(int i=0;name!=null && i<list.size();i++) {
 			AnnotationDoc a=list.get(i);
-			if(name.equals(a.getValueName())) 
+			if(name.equals(a.getTitle())) 
 				return ; // newer know
 		}		
 		list.add(anno);
@@ -177,7 +178,14 @@ public class SourceAnnotations {
 	
 	/** find all annotations by annotationClass (e.g. all aTag-Annotations) **/ 
 	public List<AnnotationDoc> findAnnotation(Object annotationClassObject) { return findAnnotation(annotationClassObject, null, null); }
-
+	
+	public List<AnnotationDoc> findAnnotationIn(DocObject doc,Object annotationClassObject,String key,String value) {
+		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>(); 
+		String annotationClass=toAnnotationClassName(annotationClassObject);
+		List sub=doc.listAnnotationType(annotationClass, key, value);
+		if(sub!=null) { list.addAll(sub); }
+		return list;
+	}
 	
 	/** list of annotations, in all classes, with a key==value **/
 	public List<AnnotationDoc> findAnnotation(Object annotationClassObject,String key,String value) {
@@ -194,8 +202,8 @@ public class SourceAnnotations {
 			List<AnnotationDoc> list=unit.anno().findAnnotation(annotationClass);
 			for(int i=0;list!=null && i<list.size();i++) {
 				AnnotationDoc an=list.get(i);
-				if(key==null) l.add(an);
-				else if(an.has(key,value)) l.add(an);
+				if(key==null) { l.add(an); }
+				else if(an.has(key,value)) { l.add(an); }
 			}					
 		}
 		return l;
@@ -216,7 +224,7 @@ public class SourceAnnotations {
 			List<AnnotationDoc> list=unit.anno().getAnnotationMap().get(annotationClass);
 			for(int i=0;list!=null && i<list.size();i++) {
 				AnnotationDoc an=list.get(i);
-				if(an.isNew(newerThendays)) l.add(an);
+				if(an.isNewer(newerThendays)) l.add(an);
 			}
 		}
 		return l;

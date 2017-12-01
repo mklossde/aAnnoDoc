@@ -11,17 +11,19 @@ public class Tree<T> { //implements List<E> {
     protected T data; /** data of node **/
     protected String name; /** label of tree **/
     
+    public String del="/"; /** tree delemiter **/
+    
     public Tree() {}
     public Tree(String name) { this.name=name; }
     
     /** get root-tree **/
     public Tree<T> getRoot() { if(parent!=null){ return parent.getRoot(); } else { return this; } }
-    /** get sub-tree for name (aa/bb/cc) **/
-    public Tree<T> getTreeOf(String name,boolean create) {
+    /** get sub-tree for name (aa/bb/cc) - create= create tree- exclude:remove last**/
+    public Tree<T> getTreeOf(String name,boolean create,boolean excludeName) {
     	if(name==null || name.length()==0) { return this; }
-    	else if(name.startsWith("/")) { return getRoot().getTreeOf(name.substring(1),create); }
-    	Tree sub=this; String all[]=name.split("/");
-    	int len=all.length; //if(includeNode) { len--; }
+    	else if(name.startsWith(del)) { name=name.substring(1); } //return getRoot().getTreeOf(name.substring(1),create); }
+    	Tree sub=this; String all[]=name.split(del);
+    	int len=all.length; if(excludeName) { len--; }
     	for(int t=0;t<len;t++) { sub=sub.getLeaveOf(all[t],create);}
     	return sub;
     }
@@ -38,6 +40,7 @@ public class Tree<T> { //implements List<E> {
     public boolean is(String name) { return name.equals(name); }
     public String getName() { return (String)name; }
     public T getData() { return data; }
+    public Tree set(T data) { this.data=data; return this; }
     // 
     public Tree add(T data) {leaves.add(data); return this; }
     public Tree add(int index,T data) { if(index>=0) {leaves.add(index,data); } else if(index!=-1) {leaves.add(data); } return this; }
@@ -59,5 +62,5 @@ public class Tree<T> { //implements List<E> {
     	return this;
     }
     public String toString() { StringBuilder sb=new StringBuilder(); toString(sb,0); return sb.toString(); }
-    public static String[] splitTreeFile(String a) { int i=a.lastIndexOf("/"); if(i==-1) { return new String[]{null,a}; }return new String[]{a.substring(0,i),a.substring(i+1)}; }
+    public String[] splitTreeFile(String a) { int i=a.lastIndexOf(del); if(i==-1) { return new String[]{null,a}; }return new String[]{a.substring(0,i),a.substring(i+1)}; }
 }

@@ -19,12 +19,10 @@ import java.lang.annotation.RetentionPolicy;
  *
  */
 public @interface aArchitecture {
-	/** file for comment will by inserted **/
-	String file() default "";
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/
-	@aAttribute(defaultValue="DEFAULT=title attribute from java METHOD/FIELD name")
+	@aAttribute(value="DEFAULT=title attribute from java METHOD/FIELD name")
 	String title() default "DEFAULT";
 	
 	/** description (alternative to java-comment) **/
