@@ -14,7 +14,6 @@ import org.openon.aannodoc.doc.AnnotationDocScanner;
  * 	comment:	Java Comment
  * 
  * 	 
- * @au
  *
  */
 public abstract class DocObject implements Serializable {

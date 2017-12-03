@@ -144,7 +144,7 @@ public class AnnotationDocScanner {
 		return -1;
 	}
 	
-	/** is next (not space) char ==nextChar => return index of this char **/
+	/** is next (not space) char ==nextChar = return index of this char **/
 	public static int isNextChar(String text, int index,char nextChar) {
 		while(index<text.length()) {
 			char c=text.charAt(index);

@@ -8,7 +8,7 @@ import org.openon.aannodoc.annotation.aDoc;
  * Create a use-case diagram, within generator, with UseCaseDiagramWriter
  * 
  * 
- * for information plantuml use-case-diagrams see <http://plantuml.com/use-case-diagram>
+ * for information plantuml use-case-diagrams see http://plantuml.com/use-case-diagram
  * 
  */
 @aDoc(title="diagram/use case diagram")

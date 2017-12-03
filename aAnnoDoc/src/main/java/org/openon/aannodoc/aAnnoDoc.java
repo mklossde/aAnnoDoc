@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * - call org.openon.aannodoc.AnnoDoc from console with options
  * - program a AnnoDoc Process method 
  * 
- * For more information or examples see directory <docs/>
+ * For more information or examples see directory docs/
  * 
  * Have fun... 
  * 

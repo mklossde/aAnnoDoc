@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Generator for AnnoDoc-Annotation documents for aDoc-Annoations 
  * 
- * \@aDoc builds the base structure of the document by its titles see <aDoc> 
+ * \@aDoc builds the base structure of the document by its titles see aDoc 
  * The title may include path information (e.g. title="ExampleDocs/A sub chapter")  
  * 		\@aDoc(title="Overview/My application information")
  * 

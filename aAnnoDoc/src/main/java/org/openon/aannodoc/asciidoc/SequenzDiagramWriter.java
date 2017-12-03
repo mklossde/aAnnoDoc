@@ -13,7 +13,7 @@ import org.openon.aannodoc.annotation.aDoc;
  * 		dw.from("response, "WebFrontend", "WebService");
  *		dw.end();												// end sequenz
  * 
- * for information plantuml sequenz diagrams see <http://plantuml.com/sequence-diagram>
+ * for information plantuml sequenz diagrams see http://plantuml.com/sequence-diagram
  * 
  */
 @aDoc(title="diagram/sequenz diagram")
@@ -53,7 +53,7 @@ public class SequenzDiagramWriter {
 	
 	/** 
 	 * @param title - title of sequenz
-	 * @param style - arrow style [->X,->,->>,-\,\\-,\\--,->o,o\\--,<->,<->o]
+	 * @param style - arrow style 
 	 * @param from - left hand
 	 * @param to - right hand
 	 */
