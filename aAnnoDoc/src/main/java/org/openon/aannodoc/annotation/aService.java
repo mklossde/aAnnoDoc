@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aService")
+@aDoc(title="generator/AppDoc/aService")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aService {
 	/** group this documenation belongs to **/

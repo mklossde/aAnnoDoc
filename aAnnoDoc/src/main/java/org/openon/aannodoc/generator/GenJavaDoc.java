@@ -22,12 +22,12 @@ import org.slf4j.LoggerFactory;
  *
  */
 @aDoc(title="generator/JavaDocGenerator")
-public class JavaDoc extends AsciiDocGeneratorImpl implements DocGenerator {
-	private static final Logger LOG=LoggerFactory.getLogger(JavaDoc.class);
+public class GenJavaDoc extends AsciiDocGeneratorImpl implements DocGenerator {
+	private static final Logger LOG=LoggerFactory.getLogger(GenJavaDoc.class);
 	
-	public static final String NAME="Java";
+	public static final String NAME="JavaDoc";
 	
-	public JavaDoc() {super();}
+	public GenJavaDoc() {super();}
 
 	
 	//---------------------------------------------

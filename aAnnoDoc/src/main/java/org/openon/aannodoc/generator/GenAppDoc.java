@@ -8,12 +8,15 @@ import java.util.Map.Entry;
 
 import org.openon.aannodoc.Options;
 import org.openon.aannodoc.aAnnoDoc;
+import org.openon.aannodoc.annotation.aArchitecture;
 import org.openon.aannodoc.annotation.aAttribute;
 import org.openon.aannodoc.annotation.aBug;
 import org.openon.aannodoc.annotation.aConnection;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aError;
+import org.openon.aannodoc.annotation.aExample;
 import org.openon.aannodoc.annotation.aFeature;
+import org.openon.aannodoc.annotation.aObject;
 import org.openon.aannodoc.annotation.aService;
 import org.openon.aannodoc.asciidoc.SequenzDiagramWriter;
 import org.openon.aannodoc.source.AnnotationDoc;
@@ -23,14 +26,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Generator for AnnoDoc-Annotation documents (aDoc,aAttribtue,aBug,..) 
+ * Generator for AnnoDoc-Annotation documents for aDoc-Annoations 
  * 
+ * \@aDoc builds the base structure of the document by its titles see <aDoc> 
+ * The title may include path information (e.g. title="ExampleDocs/A sub chapter")  
+ * 		\@aDoc(title="Overview/My application information")
+ * 
+ * \@aFeature are for features/addons which are included into a sub-chapter 
+ * 
+ * \@aService - service inside the project
+ * 
+ * \@aAttribute - define any attribute of a program/connection/service
+ * 
+ * \@aBug - information about bugs/fixes/todo/..
+ * 
+ * \@aError - error handling - when this then that
+ * 
+ * \@aConnection - connection to the outside world
+ * 
+ * \@aArchitekture - for architecture/technical information
+ * 
+ * \@aObject - data-container information, input,output,compute
+ * 
+ * \@aExample - example and test descriptions
+ *
  * @author michael
  *
  */
-@aDoc(title="generator/AnnoDocGenerator")
-public class AnnotationAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
-	private static final Logger LOG=LoggerFactory.getLogger(AnnotationAppDoc.class);
+@aDoc(title="generator/AppDoc")
+public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
+	private static final Logger LOG=LoggerFactory.getLogger(GenAppDoc.class);
 	
 
 	
@@ -39,7 +64,7 @@ public class AnnotationAppDoc extends AsciiDocGeneratorImpl implements DocGenera
 	public static final String ANNOTATIONS="annotations";
 	
 	
-	public AnnotationAppDoc() { super(); }
+	public GenAppDoc() { super(); }
 	
 	
 	//-----------------------------------------------------------------------------
@@ -162,10 +187,34 @@ public class AnnotationAppDoc extends AsciiDocGeneratorImpl implements DocGenera
 		error(outputName);
 		bugs(outputName);
 		
-		// aField
-		// aArchitketure
-		// aExample		
+		architekture(outputName);
+		examples(outputName);
+		objects(outputName);	
 	}
+	
+	//-----------------------------------------------------------------------------
+	// TODO:
+	
+	public void examples(String outputName) throws IOException {
+		List<AnnotationDoc> list=find(aExample.class);
+		if(list==null || list.size()==0) { return ; }
+		annotationTree(toTree("Examples",list));
+	}
+	
+	public void objects(String outputName) throws IOException {
+		List<AnnotationDoc> list=find(aObject.class);
+		if(list==null || list.size()==0) { return ; }
+		annotationTree(toTree("Objects",list));
+	}
+	
+	public void architekture(String outputName) throws IOException {
+		List<AnnotationDoc> list=find(aArchitecture.class);
+		if(list==null || list.size()==0) { return ; }
+		annotationTree(toTree("Architekture",list));
+	}
+	
+	//-----------------------------------------------------------------------------
+
 	
 	public void services(String outputName) throws IOException {
 		List<AnnotationDoc> list=find(aService.class);
@@ -253,10 +302,10 @@ public class AnnotationAppDoc extends AsciiDocGeneratorImpl implements DocGenera
 	/** write list of bus **/
 	public void annotationBugs(List<AnnotationDoc> list) throws IOException {
 		if(list==null || list.size()==0) { return  ; }
-		w.table("Bugs", "Title","Author","Date","FIX","Describtion");
+		w.table("Bugs", "Title","Author","Date","ToDo","FIX","Describtion");
 		for(int i=0;i<list.size();i++) {
 			AnnotationDoc doc=list.get(i);
-			w.tableLine(AnnoUtils.getTitle(doc,true),AnnoUtils.getAuthor(doc),AnnoUtils.getDate(doc, 1),AnnoUtils.getValue(doc, "fix"),AnnoUtils.getDoc(doc));
+			w.tableLine(AnnoUtils.getTitle(doc,true),AnnoUtils.getAuthor(doc),AnnoUtils.getDate(doc, 1),AnnoUtils.getValue(doc, "todo"),AnnoUtils.getValue(doc, "fix"),AnnoUtils.getDoc(doc));
 		}
 		w.tableEnd();
 	}

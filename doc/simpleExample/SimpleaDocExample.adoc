@@ -1,0 +1,93 @@
+
+= SimpleExample
+Michael
+ExampleVersion
+
+
+:last-update-label: aAnnoDoc created on
+WARNING: This is only a doc example, not for execute
+
+This is a simple example of using aDoc 
+
+Create a Document with title SimpleExample for this aDoc comment
+and store it into the file SimpleaDocExample.FORMAT
+
+@author Michael
+@version ExampleVersion
+@deprecated This is only a doc example, not for execute
+
+.table Attributes of Attributes
+|===
+|Name|value|Type|Options|Optional|simple|description|deprecated
+|secondName|defaultName|String||||Attribute name - define the secondName how gets the greeting|
+|===
+
+== SimpleDoc documenation generation
+Generate this example-documentation by java-method
+
+		new aAnnoDoc()
+			.scan("src/test/java"+"/examples"+"/SimpleaDocExample.java",null)
+			.createDocFiles("SimpleaDocExample", null,aAnnoDoc.FORMAT_HTML);
+
+== Hello function
+
+.table Attributes of Hello function
+|===
+|Name|value|Type|Options|Optional|simple|description|deprecated
+|A second Name|unkown|String|{ "name1", "name2", "..." }|not need|any second name|this is the long descibtion inside annotation|not not use - only for tet
+|===
+the default function of this programm is to show Hello NAME to console
+
+== Features
+
+=== Greets the second name
+ther is another feature to greets a second person
+
+== Services
+
+=== HelloService
+WARNING: only for test
+
+
+* Author: mk
+
+
+* Version: 0.1
+
+
+* Date: 30.11.2017
+
+
+[plantuml,Service Request-Response]
+----
+Extern -> HelloService: incoming name
+Extern <- HelloService: greeting text
+----
+This is the HelloService, sennd greetings to name
+
+== Connections
+
+=== SystemTime
+|title|SystemTime
+
+.table Annoation Attrbutes
+|===
+|name|value
+|===
+read acutal time from system
+
+== Error Handling
+
+.table Errors
+|===
+|When|Title|Describtion
+|name is null|IOException|throw a ioexception
+|===
+
+== Bugs
+
+.table Bugs
+|===
+|Title|Author|Date|FIX|Describtion
+|doHelloSecond|MK|30.11.2017|not yet|greets second name - not realy implemented
+|===

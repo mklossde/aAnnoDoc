@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aFeature")
+@aDoc(title="generator/AppDoc/aFeature")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aFeature {
 	/** group this documenation belongs to **/

@@ -7,9 +7,13 @@ import org.openon.aannodoc.aAnnoDoc;
 public class CreateDocumenation {
 
 	public static void main(String[] args)  throws IOException  {
-		CreateDocumenation doc=new CreateDocumenation();
-		doc.createDocs();
+		CreateDocumenation doc=new CreateDocumenation();		
+//		doc.createReadme();
+		doc.createDocument();
 //		doc.createExamples();
+		
+//		doc.create();
+		
 		System.out.println("end");
 	}
 	
@@ -19,7 +23,21 @@ public class CreateDocumenation {
 		adoc.createDocFiles("SimpleaDocExample", null,aAnnoDoc.FORMAT_HTML);	
 	}
 	
-	public void createDocs() throws IOException {
+	public void createReadme() throws IOException {
+		String src="src/main/java"+"/org/openon/aannodoc"+"/aAnnoDoc.java";
+		
+		aAnnoDoc adoc=new aAnnoDoc().scan(src,null);
+		adoc.createDocFiles("READ.md", null, aAnnoDoc.FORMAT_ASCIIDOC);
+	}
+	
+	public void createDocument() throws IOException {
+		String src="src/main/java";
+		
+		aAnnoDoc adoc=new aAnnoDoc().scan(src,null);
+		adoc.createDocFiles(null, "aAnnoDoc",aAnnoDoc.FORMAT_HTML);	
+	}
+	
+	public void create() throws IOException {
 //		String src="src/main/java"+"/org/openon/aannodoc";
 //		aAnnoDoc.DocFiles(src+"/AnnoDoc.java",aAnnoDoc.FORMAT_ASCIIDOC);
 		

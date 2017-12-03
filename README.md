@@ -1,39 +1,41 @@
- = aAnnoDoc - Java annotation based documentation
+
+aAnnoDoc - (Java) annotation based documentation
 (Apache License 2.0)
 
 DONATE :-) to https://www.paypal.me/openonorg/5
-(If you like aAnnoDoc please donate via paypal to openonorg. Every $1-$nnn is welcome. )
+(If you like aAnnoDoc, donates are welcome via paypal to openonorg. Every $1 is fine ;-)
 
-Normaly documenation and devleopment are two seperated parts
+Background Story, why aAnnoDoc
+Normal, documentation and development are two separated parts
 and it is time and coast intensive to write one after each other. 
-
-A good idea is two sync the development and documenation process,
+A good idea is two sync the development and documentation process,
 by put the information near by the source code. 
 
-This is the base idea of AnnoDoc-Project to add application documenation
-(like dsciption, bugs, features, examples, atrriubtes,...) to (or near to) 
-the source code and generate the documenation during 
-compile-process (or maven deploy process). 
+This is the base idea of AnnoDoc-Project to add application documentation
+(like deception, bugs, features, examples, attributes,...) to (or near to) 
+the source code and generate the documentation during compile-process (or maven deploy process). 
+Write application information (like Manuals, installtion-guids, ReadMes, AsiccDoc,.. ) inside each project. 
 
-IT IS NOT ANOTHER JAVA-API-DOCUMENATION ! 
-The idea is write application information (like Manuals, installtion-guids, ReadMes, AsiccDoc,.. )  
-inside the project. 
+IT IS NOT ANOTHER JAVA-API-DOCUMENATION ! Its a application-documenation.
 
-The document-generation is splitted into two parts
-- scanner: SourceCode or JAR scanner/reader which read all the project informations 
-- generator: generates the structure/documents into a readable format (like AsciiDoc,PDF,HTML,.. )  
-
-The important part are the gernerator, which are individual programmable to 
-generate individual documents. There are some base generators included
-to create a Application-Manual, a Annotation-Overview,... 
+The documentation is flexible by use (or development) different generators.  
+For example the "AppDoc"-generator create a docs for predefined Annotations. 
+Other generators are "ProjectInfo" for quick project-documents, "RestDoc" 
+for Java-rest-service documents, "AnnoInfo" for Annotation-Overview. 
 
 To work with AnnoDoc use one of this ways
-- add the aAnnoDocMavenPlugin to generate documents during deployment
-- call org.openon.aannodoc.AnnoDoc from console
-- program a AnnoDoc Process manual 
+- add the aAnnoDocMavenPlugin to generate documents during maven deployment
+- call org.openon.aannodoc.AnnoDoc from console with options
+- program a AnnoDoc Process method 
 
-The Scanner scans all java-sources and use comments for documenation. 
-Simple: 
+For more information or examples see directory <docs/>
+
+Have fun... 
+
+
+ 
+Simple Example of a aDoc documentation:
+ 
 		- The comment above belong to the annotation/method below. 
 		- Test/comment-annotations belong to the text right until next @ 
 		- Inline-comments are ignored !!! 
@@ -55,5 +57,6 @@ Simple:
 		public void myReturn(String arg) { }
 
 
+
 @author Michael Kloss- mk@almi.de
-@version 0.0.1 - 21.11.2017
+@version 1.0.0 - 03.12.2017

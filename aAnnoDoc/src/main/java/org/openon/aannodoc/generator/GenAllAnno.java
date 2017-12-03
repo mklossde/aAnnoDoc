@@ -28,12 +28,12 @@ import org.slf4j.LoggerFactory;
  *
  */
 @aDoc(title="generator/AnnoDocGenerator")
-public class AnnotationListDoc extends AsciiDocGeneratorImpl implements DocGenerator {
-	private static final Logger LOG=LoggerFactory.getLogger(AnnotationListDoc.class);
+public class GenAllAnno extends AsciiDocGeneratorImpl implements DocGenerator {
+	private static final Logger LOG=LoggerFactory.getLogger(GenAllAnno.class);
 	
-	public static final String NAME="AList";
+	public static final String NAME="AllAnno";
 	
-	public AnnotationListDoc() {super();}
+	public GenAllAnno() {super();}
 	
 	
 	//-----------------------------------------------------------------------------

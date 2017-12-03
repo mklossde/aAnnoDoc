@@ -5,52 +5,53 @@ import java.nio.file.Paths;
 
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aFeature;
-import org.openon.aannodoc.generator.AnnotationAppDoc;
-import org.openon.aannodoc.generator.AnnotationListDoc;
+import org.openon.aannodoc.generator.GenAppDoc;
+import org.openon.aannodoc.generator.GenAllAnno;
 import org.openon.aannodoc.generator.DocGenerator;
-import org.openon.aannodoc.generator.JavaDoc;
+import org.openon.aannodoc.generator.GenJavaDoc;
 import org.openon.aannodoc.scanner.SourceAnnotations;
 import org.openon.aannodoc.utils.DocFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * aAnnoDoc - Java annotation based documentation
+ * aAnnoDoc - (Java) annotation based documentation
  * (Apache License 2.0)
  * 
  * DONATE :-) to https://www.paypal.me/openonorg/5
- * (If you like aAnnoDoc please donate via paypal to openonorg. Every $1-$nnn is welcome. )
+ * (If you like aAnnoDoc, donates are welcome via paypal to openonorg. Every $1 is fine ;-)
  * 
- * Normaly documenation and devleopment are two seperated parts
+ * Background Story, why aAnnoDoc
+ * Normal, documentation and development are two separated parts
  * and it is time and coast intensive to write one after each other. 
- * 
- * A good idea is two sync the development and documenation process,
+ * A good idea is two sync the development and documentation process,
  * by put the information near by the source code. 
  * 
- * This is the base idea of AnnoDoc-Project to add application documenation
- * (like dsciption, bugs, features, examples, atrriubtes,...) to (or near to) 
- * the source code and generate the documenation during 
- * compile-process (or maven deploy process). 
+ * This is the base idea of AnnoDoc-Project to add application documentation
+ * (like deception, bugs, features, examples, attributes,...) to (or near to) 
+ * the source code and generate the documentation during compile-process (or maven deploy process). 
+ * Write application information (like Manuals, installtion-guids, ReadMes, AsiccDoc,.. ) inside each project. 
  * 
- * IT IS NOT ANOTHER JAVA-API-DOCUMENATION ! 
- * The idea is write application information (like Manuals, installtion-guids, ReadMes, AsiccDoc,.. )  
- * inside the project. 
+ * IT IS NOT ANOTHER JAVA-API-DOCUMENATION ! Its a application-documenation.
  * 
- * The document-generation is splitted into two parts
- * - scanner: SourceCode or JAR scanner/reader which read all the project informations 
- * - generator: generates the structure/documents into a readable format (like AsciiDoc,PDF,HTML,.. )  
- * 
- * The important part are the gernerator, which are individual programmable to 
- * generate individual documents. There are some base generators included
- * to create a Application-Manual, a Annotation-Overview,... 
+ * The documentation is flexible by use (or development) different generators.  
+ * For example the "AppDoc"-generator create a docs for predefined Annotations. 
+ * Other generators are "ProjectDoc" for quick project-documents, "RestDoc" 
+ * for Java-rest-service documents, "AnnoInfo" for Annotation-Overview. 
  * 
  * To work with AnnoDoc use one of this ways
- * - add the aAnnoDocMavenPlugin to generate documents during deployment
- * - call org.openon.aannodoc.AnnoDoc from console
- * - program a AnnoDoc Process manual 
+ * - add the aAnnoDocMavenPlugin to generate documents during maven deployment
+ * - call org.openon.aannodoc.AnnoDoc from console with options
+ * - program a AnnoDoc Process method 
  * 
- * The Scanner scans all java-sources and use comments for documenation. 
- * Simple: 
+ * For more information or examples see directory <docs/>
+ * 
+ * Have fun... 
+ * 
+ * 
+ *  
+ * Simple Example of a aDoc documentation:
+ *  
  * 		- The comment above belong to the annotation/method below. 
  * 		- Test/comment-annotations belong to the text right until next \@ 
  * 		- Inline-comments are ignored !!! 
@@ -72,8 +73,9 @@ import org.slf4j.LoggerFactory;
  * 		public void myReturn(String arg) { }
  * 
  * 
+ * 
  * @author Michael Kloss- mk@almi.de
- * @version 0.0.1 - 21.11.2017
+ * @version 1.0.0 - 03.12.2017
  * 
  */
 @aDoc(file="READ.md")
@@ -88,11 +90,11 @@ public class aAnnoDoc {
 	public static final String FORMAT_PDF="pdf";	
 	
 	/** generator for aDoc-documents - create document for aDoc-Annotations**/
-	public static final String GENERATOR_ADOC=AnnotationAppDoc.NAME;
+	public static final String GENERATOR_ADOC=GenAppDoc.NAME;
 	/** generator for annotation-documents - list all annotations and its comments **/
-	public static final String GENERATOR_ANNOTATIONS=AnnotationListDoc.NAME;
+	public static final String GENERATOR_ANNOTATIONS=GenAllAnno.NAME;
 	/** generator for javaDoc like document **/
-	public static final String GENERATOR_JAVADOC=JavaDoc.NAME;
+	public static final String GENERATOR_JAVADOC=GenJavaDoc.NAME;
 	
 	/** option-output==stdout = write output to standard-out (console) **/
 	public static final String OUT_STDOUT="stdout";
@@ -110,13 +112,8 @@ public class aAnnoDoc {
 	 */
 	@aFeature(title="execute/command-line")
 	public static void main(String[] args) throws IOException {
-		Options options=new Options();
-		if(args.length>0) { options.put(Options.OPTION_SOURCE, args[0]); }
-		if(args.length>1) { options.put(Options.OPTION_OUTPUT, args[1]); }
-		if(args.length>2) { options.put(Options.OPTION_GENERATOR, args[2]); }
-		if(args.length>3) { options.put(Options.OPTION_FORMAT, args[3]); }
-		
-		new aAnnoDoc(options);		
+		Options options=new Options(args);
+		aAnnoDoc annoDoc=new aAnnoDoc(options);		
 		
 		System.out.println("end");
 	}
@@ -134,10 +131,25 @@ public class aAnnoDoc {
 	/** create documenation with options **/
 	public aAnnoDoc(Options options) throws IOException { scan(options).create(options); }
 		 
+	/** create documenation by options from propertie-file **/
+	public aAnnoDoc(String propertieFile) throws IOException { 
+		Options options=new Options(propertieFile);
+		scan(options).create(options); 
+	}
 
 	
 	//-------------------------------------------------------------------------------------------------
 	
+
+	/**
+	 * The document-generation is splitted into two parts
+	 * - scanner: SourceCode or JAR scanner/reader which read all the project informations 
+	 * - generator: generates the structure/documents into a readable format (like AsciiDoc,PDF,HTML,.. )
+	 * 
+	 *  The first step is scanning and read all source/packages/files/.. which includes the documenation
+	 *   
+	 */
+	@aDoc(title="scan")
 	/** first step - scan soruce **/
 	public aAnnoDoc scan(Options options) throws IOException {		
 		return scan((String)options.get(Options.OPTION_SOURCE),options.getFilter());
@@ -153,6 +165,12 @@ public class aAnnoDoc {
 		return this;
 	}
 	
+	/**
+	 * The important part are the gernerator, which are individual programmable to 
+	 * generate individual documents. There are some base generators included
+	 * to create a Application-Manual, a Annotation-Overview,... 
+	 */
+	@aDoc(title="Gernator")
 	/** second step - create documenation **/
 	public aAnnoDoc create(Options options) throws IOException {		
 		LOG.info("create AnnoDoc (working dir:{})",Paths.get("").toAbsolutePath());
@@ -176,12 +194,12 @@ public class aAnnoDoc {
 			Object generator=options.get(Options.OPTION_GENERATOR);		
 			if(generator instanceof Class) { return (DocGenerator)((Class)generator).newInstance();  }
 			else if(generator instanceof DocGenerator) { return (DocGenerator)generator; }
-			else if(generator==null) { return new AnnotationListDoc(); }
+			else if(generator==null) { return new GenAllAnno(); }
 			else if(generator instanceof String) {
 				String gen=(String)generator;
-				if(gen.length()==0|| gen.equalsIgnoreCase(AnnotationListDoc.NAME)) { return new AnnotationListDoc();
-				}else if(gen.equalsIgnoreCase(AnnotationAppDoc.NAME)) { return new AnnotationAppDoc();
-				}else if(gen.equalsIgnoreCase(JavaDoc.NAME)) { return new JavaDoc();
+				if(gen.length()==0|| gen.equalsIgnoreCase(GenAllAnno.NAME)) { return new GenAllAnno();
+				}else if(gen.equalsIgnoreCase(GenAppDoc.NAME)) { return new GenAppDoc();
+				}else if(gen.equalsIgnoreCase(GenJavaDoc.NAME)) { return new GenJavaDoc();
 				}else {
 					Class cl=Class.forName(gen);
 					 return (DocGenerator)((Class)generator).newInstance(); 

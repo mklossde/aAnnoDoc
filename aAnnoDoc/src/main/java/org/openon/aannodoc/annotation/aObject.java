@@ -4,16 +4,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation to document fields/inputs/values/beans of applciation
+ * Annotation to document any data-container like fields/inputs/values/beans/objects of application
  * 	e.g. a field is recevied - computed - and send to backend
  * 
  * 
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aField")
+@aDoc(title="generator/AppDoc/aObject")
 @Retention( RetentionPolicy.RUNTIME ) 
-public @interface aField {
+public @interface aObject {
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/

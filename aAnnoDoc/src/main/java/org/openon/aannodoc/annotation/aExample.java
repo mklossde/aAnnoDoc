@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aExample")
+@aDoc(title="generator/AppDoc/aExample")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aExample {
 	/** file for comment will by inserted **/

@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aDoc")
+@aDoc(title="generator/AppDoc/aDoc")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aDoc {
 	public static final String fFILE="file";

@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aError")
+@aDoc(title="generator/AppDoc/aError")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aError {
 	/** group this documenation belongs to **/

@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="annotation/aBug")
+@aDoc(title="generator/AppDoc/aBug")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aBug {
 	/** group this documenation belongs to **/
@@ -22,6 +22,8 @@ public @interface aBug {
 	/** description (alternative to java-comment) **/
 	String description() default "";
 	
+	/** informaiton about a todo **/
+	String todo() default "";
 	/** informaiton about the fix of this bug **/
 	String fix() default "";
 	
