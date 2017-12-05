@@ -41,7 +41,6 @@ public abstract class DocObject implements Serializable {
 	
 	public void setComment(String comment) {
 		if(comment==null || comment.length()==0) { return ; }
-System.out.println("c:"+comment);
 		if(this.comment==null) {
 			this.comment=comment; 
 		}else {
