@@ -5,12 +5,12 @@
 	<!-- for release: clean deploy -DperformRelease=true -->
 	
   <groupId>org.openon.aannodoc</groupId>
-  <artifactId>aAnnoDoc</artifactId>
+  <artifactId>aAnnoDocApi</artifactId>
   <version>1.0.1</version>
   <packaging>jar</packaging>
  
-  <name>aAnnoDoc</name>
-  <description>a annotation based documentation generator</description>
+  <name>aAnnoDocApi</name>
+  <description>api for annotation based documentation generator</description>
   <url>https://github.com/mklossde/aAnnoDoc</url>
 
   <licenses>
@@ -52,38 +52,7 @@
   </properties>
 
   <dependencies>
-	 <!-- AnnoDocApi -->
-	 <dependency> 
-		<groupId>org.openon.aannodoc</groupId>
-		<artifactId>aAnnoDocApi</artifactId>
-		<version>1.0.1</version> 
-	 </dependency> 
-	 
-	<!-- Java Parser --> 
-	<dependency> 
-		<groupId>com.google.code.javaparser</groupId>
-		<artifactId>javaparser</artifactId>
-		<version>1.0.11</version> <!--  1.0.8 vorhanden 1.0.11 benötigt -->
-	 </dependency>  
-	 	  
-		
-	<!-- AsciiDoc - Ascidoctor --> 
-	<dependency> 
-		<groupId>org.asciidoctor</groupId>
-		<artifactId>asciidoctorj</artifactId>
-		<version>1.5.4</version> 
-	 </dependency> 
-	 <dependency> 
-		<groupId>org.asciidoctor</groupId>
-		<artifactId>asciidoctorj-pdf</artifactId>
-		<version>1.5.0-alpha.15</version>
-	 </dependency>
-	 <dependency> 
-		<groupId>org.asciidoctor</groupId>
-		<artifactId>asciidoctorj-diagram</artifactId>
-		<version>1.5.4</version> 
-	 </dependency>
-	 
+<!--
 	<dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>
@@ -101,6 +70,7 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+-->	
   </dependencies>
   
 	<build>
