@@ -69,7 +69,7 @@ public class JavaSourceScanner {
 	private JarDoc unit;
 	
 	private CompilationUnit cu;
-	private List<Comment> comments;
+	
 	private Node prev=null;
 
 	protected DocFilter filter;
@@ -202,29 +202,30 @@ public class JavaSourceScanner {
 //	System.out.println("ButtonDesign");
 //}
 		this.fileCount++;
-		ClassDoc clSource=null;
+
 		try {
 			cu = JavaParser.parse(in);
-		    comments=cu.getComments();
+			List<Comment> comments=cu.getComments();
+
+	    	// package------------------------------------------------------------------------------
+		    PackageDeclaration p=cu.getPackage();
+		    String pkgName=toString(p.getName());
+		    LOG.trace("package "+pkgName);
+
+		    if(unit==null) unit=new JarDoc(pkgName); // create unit for this package
+		    PackageDoc pkg=unit.addPackage(pkgName); // add apckage	
 		    
 		    List<TypeDeclaration> allCl=cu.getTypes();	   
 		    for(int a=0;allCl!=null && a<allCl.size();a++) {
 		    	TypeDeclaration clDeclarion=allCl.get(a);
 		    	
-		    	// package------------------------------------------------------------------------------
-			    PackageDeclaration p=cu.getPackage();
-			    String pkgName=toString(p.getName());
-			    LOG.trace("package "+pkgName);
-			    if(unit==null) unit=new JarDoc(pkgName); // create unit for this package
-			    PackageDoc pkg=unit.addPackage(pkgName); // add apckage	
-			    
 			    String sourceName=clDeclarion.getName();
-			    clSource=pkg.addClass(sourceName); // add Class	  
+				ClassDoc clSource=pkg.addClass(sourceName); // add Class	  
 			    LOG.trace("class "+sourceName);
 			    clSource.pkgComment=findComment(cu,p); // package comment in class 
 			    pkg.setComment(clSource.pkgComment); // pacakge comment in package
 	
-			    scanComments(prev,p, pkg, clSource); // scan inside comments
+			    scanComments(prev,p, pkg, clSource,comments); // scan inside comments
 			    
 		    	// import------------------------------------------------------------------------------
 			    prev=p;
@@ -241,7 +242,7 @@ public class JavaSourceScanner {
 			    
 			    // class------------------------------------------------------------------------------
 			    //class annotations		   
-			    setAnnotations(clSource,clDeclarion.getAnnotations(),clSource);  
+			    setAnnotations(clSource,clDeclarion.getAnnotations(),clSource,comments);  
 			    clSource.comment=toString(clDeclarion.getComment()); //getJavaDoc());		    
 			    clSource.modifiers=clDeclarion.getModifiers(); // modifierers		    		    
 			    
@@ -293,11 +294,11 @@ public class JavaSourceScanner {
 			    			
 			    			FieldDoc field=new FieldDoc(id.getName(),type,clSource,clSource,toObject(exp, clSource));
 			    			LOG.trace("VariableDeclarator "+id.getName());
-			    			setAnnotations(field, dec.getAnnotations(), clSource);
+			    			setAnnotations(field, dec.getAnnotations(), clSource,comments);
 			    			field.modifiers=dec.getModifiers();
 			    			field.comment=findComment(cu, dec); // toString(dec.getJavaDoc());
 			    			clSource.addField(field);		    			
-			    			scanComments(prev,v, field, clSource); // scan inside comments
+			    			scanComments(prev,v, field, clSource,comments); // scan inside comments
 			    			prev=v;
 			    		}
 			    		
@@ -305,22 +306,22 @@ public class JavaSourceScanner {
 			    		ConstructorDeclaration con=(ConstructorDeclaration)body;
 			    		ConstructorDoc cs=new ConstructorDoc(con.getName(), clSource.getTypeName(), clSource, clSource);
 			    		LOG.trace("ConstructorDeclaration "+con.getName());
-			    		setAnnotations(cs, con.getAnnotations(), clSource);
+			    		setAnnotations(cs, con.getAnnotations(), clSource,comments);
 			    		cs.modifiers=con.getModifiers();
 			    		cs.comment=findComment(cu, con);
 			    		clSource.addConstructor(cs);
-			    		scanComments(prev,con, cs, clSource); // scan inside comments
+			    		scanComments(prev,con, cs, clSource,comments); // scan inside comments
 			    		
 			    	}else if(body instanceof MethodDeclaration) {// Method	
 			    		MethodDeclaration method=(MethodDeclaration)body;
 			    		ParameterDoc params=getParams(method,clSource);
 			    		MethodDoc mc=new MethodDoc(method.getName(), toString(method.getType()), params,clSource, clSource);
 			    		LOG.trace("MethodDeclaration "+method.getName());
-			    		setAnnotations(mc, method.getAnnotations(), clSource);
+			    		setAnnotations(mc, method.getAnnotations(), clSource,comments);
 			    		mc.modifiers=method.getModifiers();
 			    		mc.comment=findComment(cu, method);
 			    		clSource.addMethod(mc);
-			    		scanComments(prev,method, mc, clSource); // scan inside comments
+			    		scanComments(prev,method, mc, clSource,comments); // scan inside comments
 			    		
 			    	}else if(body instanceof AnnotationMemberDeclaration) {// Annotation 
 			    		AnnotationMemberDeclaration an=(AnnotationMemberDeclaration)body;
@@ -330,7 +331,7 @@ public class JavaSourceScanner {
 	//TODO: scan inner class		    		
 			    	}else if(body instanceof EmptyMemberDeclaration) { // ;
 			    	}else if(body instanceof InitializerDeclaration) { // static initialisation 
-System.out.println("InitializerDeclaration "+body);			    		
+//System.out.println("InitializerDeclaration "+body);			    		
 			    	}else if(body instanceof EnumDeclaration) { // enum declaration 
 			    		
 			    	//}else LOG.error("unkown body "+body.getClass()+" at "+body.getBeginLine()+" in "+clSource.name);
@@ -339,19 +340,18 @@ System.out.println("InitializerDeclaration "+body);
 			    }
 
 //TODO: add comments of class before			    
-			    scanComments(null,clDeclarion, clSource, clSource); // scan inside comments
+			    scanComments(null,clDeclarion, clSource, clSource,comments); // scan inside comments	
 			    
+			    LOG.trace("scanned class {}",clSource.name);			    
 		    }
-		     
+		    
 		    // un scanned - comments 	   
 		    for(int i=0;comments!=null && i<comments.size();i++) {
 		    	Comment com=comments.get(i);
-	    		LOG.debug("not scanned comment "+com);
-	    		DocObject parent=null; //findParent(com);		    			    	
-	    		scanComment(com,parent,clSource);
-		    }
-		    
-		    LOG.trace("scanned class "+clSource.name);
+	    		LOG.debug("not scanned comment "+com);	    			    	
+	    		scanComment(com,pkg,pkg);
+		    }		    			    	
+		     
 		}catch(Throwable e) {
 			LOG.error("scan error in "+name+" ("+e+")",e);
 		}
@@ -378,7 +378,7 @@ System.out.println("InitializerDeclaration "+body);
 	//---------------------------------------------------------------------------------------
 	
 	/** scan all comments insode node **/
-	public void scanComments(Node prev,Node now,DocObject parent,ClassDoc clSource) throws Exception {
+	public void scanComments(Node prev,Node now,DocObject parent,ClassDoc clSource, List<Comment> comments) throws Exception {
 		if(comments==null) return ;
 		Iterator<Comment> it=comments.iterator();
 		while(it.hasNext()) { 
@@ -405,8 +405,6 @@ System.out.println("InitializerDeclaration "+body);
 	}
 	
 	//---------------------------------------------------------------------------------------
-
-
 	
 //	/** find start of param **/
 //	private static int findParamStart(String str,int index) {
@@ -419,14 +417,15 @@ System.out.println("InitializerDeclaration "+body);
 //		return -1;
 //	}
 	
-	private void scanComment(Comment c,DocObject parent,ClassDoc clSource) throws Exception {
+	private void scanComment(Comment c,DocObject parent,DocObject clSource) throws Exception {
 		if(c instanceof LineComment) { return ; } // ignore line comments
 		String str=toString(c);
-		parent.setComment(str);
+//		parent.setComment(str);
+		scanComment(str, parent, clSource);
 		c.setEndLine(0); // set comment scanned)
 	}
 	
-	private void scanComment(String str,DocObject parent,ClassDoc clSource) throws Exception {
+	private void scanComment(String str,DocObject parent,DocObject clSource) throws Exception {
 		try {
 			LOG.trace("scanComment "+str);
 //			int index=AnnotationDocScanner.nextAnnotation(str, 0,true);
@@ -470,7 +469,7 @@ System.out.println("InitializerDeclaration "+body);
 		return " at "+cl+"."+name+"("+simpleName+".java:"+line+")";
 	}
 	
-	private void setAnnotations(DocObject source,List<AnnotationExpr> pAnno,ClassDoc clSource) throws Exception {
+	private void setAnnotations(DocObject source,List<AnnotationExpr> pAnno,ClassDoc clSource,List<Comment> comments) throws Exception {
 		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>();
 	    for(int i=0;pAnno!=null && i<pAnno.size();i++) {
 	    	AnnotationExpr anno=pAnno.get(i);
@@ -498,7 +497,7 @@ System.out.println("InitializerDeclaration "+body);
 	    	unit.addAnnotation(as); 
 	    	list.add(as);
 	    	
-    		scanComments(prev,anno, as, clSource); // scan inside comments
+    		scanComments(prev,anno, as, clSource,comments); // scan inside comments
 	    	prev=anno;
 	    }
 	    	    
@@ -536,7 +535,7 @@ System.out.println("InitializerDeclaration "+body);
 	}
 	
 	/** get resolve ful class name of name in source **/
-	private String findClassName(String name,ClassDoc source) {
+	private String findClassName(String name,DocObject source) {
 		if(name==null) return null;
 		else if(name.indexOf('.')!=-1) return name; // name is fulleName
 		
@@ -546,18 +545,23 @@ System.out.println("InitializerDeclaration "+body);
 		}
 
 		dotname="."+name;
-		List<String> imports=source.getImports();
-		for(int i=0;imports!=null && i<imports.size();i++) {
-			if(imports.get(i).endsWith(dotname)) return imports.get(i); // found name in imports
+		if(source instanceof ClassDoc) {
+			List<String> imports=((ClassDoc)source).getImports();
+			for(int i=0;imports!=null && i<imports.size();i++) {
+				if(imports.get(i).endsWith(dotname)) return imports.get(i); // found name in imports
+			}
 		}
 		
 		ClassDoc found=unit.findClass(name);
 		if(found!=null) {
-//System.out.println("x:"+found.typeName);
 			return found.typeName; // found name in all know classes of unit
 		}
 		
-		return source.getTypePackage()+dotname; // decide name is on actual soruce package 
+		if(source instanceof ClassDoc) {
+			return ((ClassDoc)source).getTypePackage()+dotname; // decide name is on actual soruce package
+		}else { 
+			return name;
+		}
 	}
 	
 	private String findComment(CompilationUnit cu,Node actual) {
