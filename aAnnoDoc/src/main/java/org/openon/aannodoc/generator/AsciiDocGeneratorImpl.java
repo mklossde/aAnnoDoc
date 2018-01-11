@@ -1,5 +1,6 @@
 package org.openon.aannodoc.generator;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,10 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	}
 	
 	@Override public void init(SourceAnnotations adoc,Options options) throws IOException {
-		this.adoc=adoc; this.doc=adoc.doc();		
+		if(adoc==null) { throw new IOException("no annotaion doc"); }
+		this.adoc=adoc; 
+		this.doc=adoc.doc();	
+		if(this.doc==null) { throw new IOException("no source found"); }
 		this.options=options;
 		this.filter=options.getFilter();
 	}
@@ -119,13 +123,24 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	protected String toFile(String fileName,String format,boolean setFormat) {
 		if(fileName.equals(aAnnoDoc.OUT_STDOUT)) { return fileName; }
 		
-		String prefix=(String)options.get(Options.OPTION_OUTFILE_PREFIX);
-		if(prefix==null) { prefix="doc"; }
-//		if(prefix==null) { prefix=""; }
+//		String prefix=(String)options.get(Options.OPTION_OUTFILE_PREFIX);
+//		if(prefix==null) { prefix="doc"; }
 		int index=fileName.lastIndexOf('.');
 		if(index==-1) { fileName=fileName+"."+format; }
 		else if(setFormat) { fileName= (fileName.substring(0,index+1))+format; }
-		return  prefix+"/"+fileName;
+		
+		return fileName;
+
+		
+//		// change to dir and return file name (bug in pdf creation of images) **/
+//		File ff=new File(f);
+//		File parent=ff.getParentFile();
+//System.out.println("f:"+ff+" p:"+parent);		
+//		if(parent!=null) { 
+//			System.setProperty("user.dir",parent.getAbsolutePath());
+//LOG.info("change dir to "+parent.getAbsolutePath());					
+//			return ff.getName();
+//		}else { return f; }	
 	}
 	
 	//--------------------------------------------------------------------

@@ -66,6 +66,11 @@ public class AnnotationDocScanner {
 			while(aPos<text.length()) {				
 				int endPos=isNextChar(text,aPos, ')');
 				if(endPos!=-1) { aPos=endPos+1; break; }
+//FIXME: array and none-key definition - WRONG !! 					
+//				int arrayPos=isNextChar(text,aPos, '{');
+//				if(arrayPos!=-1) {				
+//                   aPos=nextChar(text,arrayPos, '}');
+//				}else {
 				aPos=nextKeyStart(text,aPos);					
 				int keyEnd=nextKey(text,aPos);
 				if(keyEnd==-1) { throw new IOException("wrong attribute-key '"+text.substring(nameEnd,aPos)+"'");}

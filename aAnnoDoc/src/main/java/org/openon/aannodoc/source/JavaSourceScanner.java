@@ -209,9 +209,12 @@ public class JavaSourceScanner {
 
 	    	// package------------------------------------------------------------------------------
 		    PackageDeclaration p=cu.getPackage();
-		    String pkgName=toString(p.getName());
-		    LOG.trace("package "+pkgName);
-
+		    String pkgName="";
+		    if(p!=null) { 
+		    	pkgName=toString(p.getName());
+		    	LOG.debug("pkgName {}",pkgName);
+		    }
+		    
 		    if(unit==null) unit=new JarDoc(pkgName); // create unit for this package
 		    PackageDoc pkg=unit.addPackage(pkgName); // add apckage	
 		    
@@ -348,7 +351,7 @@ public class JavaSourceScanner {
 		    // un scanned - comments 	   
 		    for(int i=0;comments!=null && i<comments.size();i++) {
 		    	Comment com=comments.get(i);
-	    		LOG.debug("not scanned comment "+com);	    			    	
+	    		LOG.trace("ignored comment "+com);	    			    	
 	    		scanComment(com,pkg,pkg);
 		    }		    			    	
 		     
@@ -384,7 +387,7 @@ public class JavaSourceScanner {
 		while(it.hasNext()) { 
 	    	Comment com=it.next();
 	    	if((prev==null || com.getBeginLine()>prev.getBeginLine() || (com.getBeginLine()==prev.getBeginLine() && com.getBeginColumn()>prev.getBeginColumn()))
-	    			&& (com.getEndLine()<now.getEndLine() || (com.getEndLine()==now.getEndLine() && com.getEndColumn()<now.getEndColumn()))) {	    		    			    	
+	    			&& (now==null || com.getEndLine()<now.getEndLine() || (com.getEndLine()==now.getEndLine() && com.getEndColumn()<now.getEndColumn()))) {	    		    			    	
 //System.out.println("c:"+com.getBeginLine()+","+com.getBeginColumn()+" p:"+prev.getBeginLine()+","+prev.getBeginColumn()+" n:"+now.getBeginLine()+","+now.getBeginColumn());
 	    		if(!have(prev,com)) {
 	    			scanComment(com,parent,clSource);

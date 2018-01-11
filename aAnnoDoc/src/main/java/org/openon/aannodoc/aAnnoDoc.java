@@ -1,5 +1,6 @@
 package org.openon.aannodoc;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
@@ -172,12 +173,18 @@ public class aAnnoDoc {
 	 */
 	@aDoc(title="Gernator")
 	/** second step - create documenation **/
-	public aAnnoDoc create(Options options) throws IOException {		
-		LOG.info("create AnnoDoc (working dir:{})",Paths.get("").toAbsolutePath());
+	public aAnnoDoc create(Options options) throws IOException {	
+//		String workDir=Paths.get("").toAbsolutePath().toString();
+		String workDir=System.getProperty("user.dir");
+		String outDir=(String)options.get(Options.OPTION_OUT_DIR);
+		if(outDir!=null && outDir.length()>0) { System.setProperty("user.dir",new File(outDir).getAbsolutePath()); }
+		LOG.info("create AnnoDoc (working dir:{})",Paths.get("").toAbsolutePath());				
 		
 		DocGenerator generator=getGenerator(anno,options);
 		generator.init(anno, options);
 		generator.generate();
+		
+		if(outDir!=null && outDir.length()>0) { System.setProperty("user.dir",workDir); }
 		return this;
 	}
 	
@@ -202,7 +209,7 @@ public class aAnnoDoc {
 				}else if(gen.equalsIgnoreCase(GenJavaDoc.NAME)) { return new GenJavaDoc();
 				}else {
 					Class cl=Class.forName(gen);
-					 return (DocGenerator)((Class)generator).newInstance(); 
+					return (DocGenerator)cl.newInstance(); 
 				}
 			}
 			throw new IOException("unokwn generator "+generator);

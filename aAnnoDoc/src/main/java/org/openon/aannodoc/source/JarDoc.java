@@ -1,7 +1,9 @@
 package org.openon.aannodoc.source;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openon.aannodoc.scanner.SourceAnnotations;
@@ -34,7 +36,7 @@ public class JarDoc extends DocObject implements Serializable {
 	public List<PackageDoc> getPackages() { return subPackages; }
 	
 	/** get or add package by name **/
-	public PackageDoc addPackage(String name) {				
+	public PackageDoc addPackage(String name)  throws IOException {				
 		PackageDoc pkg=getPackage(name);
 		if(pkg==null) {
 			pkg=new PackageDoc(name,this);
@@ -45,10 +47,11 @@ public class JarDoc extends DocObject implements Serializable {
 	}
 
 	/** checkName unitName and package name **/
-	protected void correctUnitName(String name) {
+	protected void correctUnitName(String name) throws IOException {
 		String n[]=this.name.split("\\.");
 		String nn[]=name.split("\\.");
-		for(int i=0;i<n.length;i++) {		
+//		if(n.length!=nn.length) { throw new IOException("wrong length this:"+Arrays.toString(n)+" name:"+Arrays.toString(nn)); }
+		for(int i=0;i<n.length && i<nn.length;i++) {		
 			if(!n[i].equals(nn[i])) {		
 				StringBuilder sb=new StringBuilder();
 				for(int t=0;t<i;t++) { if(t>0) { sb.append('.'); } sb.append(n[t]); }

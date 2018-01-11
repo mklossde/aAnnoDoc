@@ -1,0 +1,20 @@
+@aDoc(title="xxx")
+
+aAnnoDoc - Java annotation based documentation
+(Apache License 2.0)
+ 
+DONATE :-) to https://www.paypal.me/openonorg/5
+ (If you like aAnnoDoc please donate via paypal to openonorg. Every $1-$nnn is welcome. )
+
+[plantuml,auth-protocol]
+----
+actor Alice
+control Bob
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: another authentication Response
+----
+
+

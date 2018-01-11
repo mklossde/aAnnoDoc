@@ -1,26 +1,41 @@
 package org.openon.aannodoc.source;
 
 import java.io.Serializable;
+import java.util.Arrays;
+
+import org.openon.aannodoc.annotation.aDoc;
+import org.openon.aannodoc.utils.SourceUtils;
 
 /**
+ * Description of a Java-Type (Method or field)
  * 
  * 	type			class Object 	
- * 	typeName:		name of class (e.g. java.lang.String)
- * 	typePackage		name of class package (e.g. java.lang)
- * 	typeSimpleName	simpel name of class(e.g. String)
  * 
+ * 	typeName:		full type of class including generic (e.g. java.util.List<TestObject2> )
+ *  typeClassName:	full class (e.g. java.util.List)
+ * 	typePackage		name of class package (e.g. java.util)
+ * 	typeSimpleName	simpel name of class(e.g. List)
+ *  typeGeneric		generic part (e.g. TestObject2 )
+ *  
  *  modifiers		java modifier
  *  
  * 
  * 
  *
  */
+@aDoc(title="scanner/TypeDoc")
 public abstract class TypeDoc extends DocObject implements Serializable {
 	private static final long serialVersionUID = 2116349780992234787L;
 	
-	public String typeName; //
+
+	/** java-type of field or java-return-type of method (e.g. public List<String> name > "List<String>" ) **/
+	public String typeName; //	
+	public String typeClassName;
 	public String typePackage;
 	public String typeSimpleName;	
+	/** generic type (e.g. public List<String> name > "String" ) **/
+	public String typeGeneric;
+	
 	
 	protected Class type;
 	
@@ -34,15 +49,17 @@ public abstract class TypeDoc extends DocObject implements Serializable {
 	
 	public void setTypeName(String typeName) {
 		this.typeName=typeName;
-		if(typeName!=null) {
-			int index=typeName.lastIndexOf('.');
-			if(index==-1) { this.typeSimpleName=typeName; typePackage=""; }
-			else {this.typeSimpleName=typeName.substring(index+1); typePackage=typeName.substring(0,index); }
-		}
+		String a[]=SourceUtils.toSimpleName(typeName);	
+		this.typePackage=a[0];this.typeSimpleName=a[1]; this.typeGeneric=a[2];
+		if(typePackage==null || typePackage.length()==0) { typeClassName=typeSimpleName; }
+		else { typeClassName=typePackage+"."+typeSimpleName; }
 	}
-
+	
+	public String getClassName() { return typeClassName; }
 	public String getSimpleName() { return typeSimpleName; }
 	public String getTypePackage() { return typePackage; }
+	public String getGeneric() { return typeGeneric; }
+	
 	public String getTypeName() { return typeName; }
 	/** find java-class for type **/
 	public Class getType() throws Exception {
@@ -50,6 +67,9 @@ public abstract class TypeDoc extends DocObject implements Serializable {
 		type=Class.forName(typeName);
 		return type; 
 	} 
+
+	/** find doc for type **/
+	public TypeDoc getTypeClass() { return (TypeDoc)findClass(typeClassName); }
 	
 	public int getModifiers() { return modifiers; }
 	 

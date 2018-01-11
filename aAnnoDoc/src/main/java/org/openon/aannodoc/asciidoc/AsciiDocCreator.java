@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
+import org.asciidoctor.AttributesBuilder;
 import org.openon.aannodoc.aAnnoDoc;
 import org.asciidoctor.Options;
 import org.asciidoctor.SafeMode;
@@ -71,11 +72,9 @@ public class AsciiDocCreator {
 		Options options=new Options();
 		options.setSafe(SafeMode.UNSAFE);
 		
-//		options.setOption("imagesdir", "C:/Data/ws/gitaAnnoDoc/aAnnoDoc/aAnnoDoc/doc");
-//		options.setOption("imagesoutdir", "C:/Data/ws/gitaAnnoDoc/aAnnoDoc/aAnnoDoc/doc");
-		options.setOption("outputDirectory", "C:/Data/ws/gitaAnnoDoc/aAnnoDoc/aAnnoDoc/doc");	
-		
-		options.setBackend("pdf");
+//		options.setOption("imagesDir", "../images/");
+//		options.setOption("imagesoutdir", "../images/");
+
 		options.setToFile(outputFile);
 			
 		create(adoc,options);
@@ -92,9 +91,12 @@ public class AsciiDocCreator {
 	//-------------------------------------------------------------
 	
 	/** get file and create dirs of parent **/
-	public File getFile(String fileName) {
+	public File getFile(String fileName) throws IOException  {
 		File file=new File(fileName); 
-		file.getParentFile().mkdirs(); // create parent dirs
+		if(file==null) { throw new IOException("no file for "+fileName); }
+		File parent=file.getParentFile();
+//		if(parent==null) { throw new IOException("no parent for "+fileName) ;}
+		if(parent!=null) { parent.mkdirs(); }  // create parent dirs
 		return file;
 	}
 	

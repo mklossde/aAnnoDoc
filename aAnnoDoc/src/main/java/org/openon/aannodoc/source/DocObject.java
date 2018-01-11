@@ -71,6 +71,13 @@ public abstract class DocObject implements Serializable {
 	}
 	
 	//--------------------------------------------------------------------------
+	
+	/** find doc for name **/
+	public DocObject findClass(String name) { JarDoc unit=findJarDoc(); if(unit!=null) { return unit.findClass(name); } else { return null; }}
+	/** find jarDoc/unit **/
+	public JarDoc findJarDoc() { DocObject parent=this.parent; while(parent!=null && !(parent instanceof JarDoc)) { parent=parent.getParent(); } return (JarDoc)parent;}
+	
+	//--------------------------------------------------------------------------
 	// cross link/anker
 	
 	
