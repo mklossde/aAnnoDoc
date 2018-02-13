@@ -147,7 +147,7 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	
 	/** create document and structure **/
 	@Override public void create(String outputName) throws IOException {
-		LOG.info("crreate document {}",outputName);
+		LOG.info("create document {}",outputName);
 		head(outputName);
 		body(outputName);
 		bottom(outputName);		

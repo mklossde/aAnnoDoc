@@ -177,8 +177,13 @@ public class aAnnoDoc {
 //		String workDir=Paths.get("").toAbsolutePath().toString();
 		String workDir=System.getProperty("user.dir");
 		String outDir=(String)options.get(Options.OPTION_OUT_DIR);
-		if(outDir!=null && outDir.length()>0) { System.setProperty("user.dir",new File(outDir).getAbsolutePath()); }
-		LOG.info("create AnnoDoc (working dir:{})",Paths.get("").toAbsolutePath());				
+		if(outDir!=null && outDir.length()>0) {
+			String newWorkDir=new File(outDir).getAbsolutePath();
+			LOG.info("change to ouputDir {} => from {} to {}",outDir,System.getProperty("user.dir"),newWorkDir);
+			System.setProperty("user.dir",newWorkDir); 
+		}
+//		LOG.info("create AnnoDoc (working dir:{})",Paths.get("").toAbsolutePath());
+		LOG.info("create AnnoDoc (working dir:{})",System.getProperty("user.dir"));	
 		
 		DocGenerator generator=getGenerator(anno,options);
 		generator.init(anno, options);

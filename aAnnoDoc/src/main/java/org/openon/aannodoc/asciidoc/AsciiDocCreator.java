@@ -74,7 +74,10 @@ public class AsciiDocCreator {
 		
 //		options.setOption("imagesDir", "../images/");
 //		options.setOption("imagesoutdir", "../images/");
-
+//		options.setOption("outputDirectory", "doc");
+		options.setBackend("pdf");
+		
+//System.out.println("o:"+outputFile);		
 		options.setToFile(outputFile);
 			
 		create(adoc,options);
@@ -97,7 +100,9 @@ public class AsciiDocCreator {
 		File parent=file.getParentFile();
 //		if(parent==null) { throw new IOException("no parent for "+fileName) ;}
 		if(parent!=null) { parent.mkdirs(); }  // create parent dirs
-		return file;
+System.out.println("f:"+file.getAbsolutePath());		
+//		return file;
+		return new File(file.getAbsolutePath());
 	}
 	
 }

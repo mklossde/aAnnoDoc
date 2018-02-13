@@ -79,12 +79,14 @@ public class Options {
 	public Options(String args[]) throws IOException {
 		for(int i=0;args!=null && i<args.length;i++) {
 			String key=args[i]; if(key.startsWith("-")) {key=key.substring(1);} // simple take -file==file
-			if(OPTIONFILE.equals(key)) { readProperties(args[++i]); } // -file PROPERITEFILE  
-			else if(OPTION_SOURCE.equals(key)) { put(OPTION_SOURCE,args[++i]);} // -source SOURCE
-			else if(OPTION_OUTPUT.equals(key)) { put(OPTION_OUTPUT,args[++i]);}
-			else if(OPTION_GENERATOR.equals(key)) { put(OPTION_GENERATOR,args[++i]);}
-			else if(OPTION_FORMAT.equals(key)) { put(OPTION_FORMAT,args[++i]);}
-			else { throw new IOException("unkown arg '"+key+"'"); }
+			if(OPTIONFILE.equals(key)) { readProperties(args[++i]); } // -file PROPERITEFILE			
+//			else if(OPTION_SOURCE.equals(key)) { put(OPTION_SOURCE,args[++i]);} // -source SOURCE
+//			else if(OPTION_OUTPUT.equals(key)) { put(OPTION_OUTPUT,args[++i]);}
+//			else if(OPTION_GENERATOR.equals(key)) { put(OPTION_GENERATOR,args[++i]);}
+//			else if(OPTION_FORMAT.equals(key)) { put(OPTION_FORMAT,args[++i]);}
+//			else if(OPTION_OUT_DIR.equals(key)) { put(OPTION_OUT_DIR,args[++i]);}			
+//			else { throw new IOException("unkown arg '"+key+"'"); }
+			else { put(key,args[++i]); }
 		}
 	}
 		
@@ -105,9 +107,16 @@ public class Options {
 	
 	//-------------------------------------------------------------------------------------------------
 	
+	/** set option **/
 	public void put(String key,Object value) { options.put(key, value); }
+	/** get option **/
 	public Object get(String key) { return options.get(key); }
-	public Object remove(String key) { return options.remove(key); }
+	/** remove key **/
+	public Object remove(String key) { return options.remove(key); }	
+	/** do optiin contaisn key **/
+	public boolean have(String key) { return options.containsKey(key); }
+	/** put if optin is not set **/
+	public void putIfEmpty(String key,Object value) { if(!have(key)) { put(key, value); }}
 	
 	//-------------------------------------------------------------------------------------------------
 	

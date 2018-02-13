@@ -7,7 +7,7 @@
    <parent>
    		<groupId>org.openon.aannodoc</groupId>
    		<artifactId>aAnnoDoc-parent</artifactId>
-   		<version>1.0.0</version>
+   		<version>1.0.0</version> 
   </parent>
 	
   <groupId>org.openon.aannodoc</groupId>
