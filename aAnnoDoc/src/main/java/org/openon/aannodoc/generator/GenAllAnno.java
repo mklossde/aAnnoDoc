@@ -49,7 +49,7 @@ public class GenAllAnno extends AsciiDocGeneratorImpl implements DocGenerator {
 	@aAttribute(title="options/annotations")
 	public Object[] getAnnotations() throws IOException {
 		Object obj=options.get("annotations");
-		if(obj==null) { obj=adoc.listAnnotions(false); }
+		if(obj==null) { obj=annotations.listAnnotions(false); }
 		return ReflectUtil.toArray(obj);
 	}
 	
@@ -79,7 +79,7 @@ public class GenAllAnno extends AsciiDocGeneratorImpl implements DocGenerator {
 		for(int i=0;a!=null && i<a.length;i++) {
 			String annoClassName=toAnnotationName(a[i]);
 			w.title1(annoClassName);
-			List<AnnotationDoc> list=adoc.findAnnotation(annoClassName);
+			List<AnnotationDoc> list=annotations.findAnnotation(annoClassName);
 			Collections.sort(list);
 			for(int t=0;list!=null && t<list.size();t++) {
 				AnnotationDoc ad=list.get(t);

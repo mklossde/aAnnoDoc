@@ -244,8 +244,7 @@ public class aAnnoDoc {
 	 */
 	@aFeature(title="execute/manuel/DocFiles")
 	public aAnnoDoc createDocFiles(String useDocFile,String output,String format) throws IOException  {
-		Options options=new Options(null,output,GENERATOR_ADOC,format);
-options.put(Options.OPTION_OUT_ADOC, "true");		
+		Options options=new Options(null,output,GENERATOR_ADOC,format);	
 		if(useDocFile!=null) { options.put(Options.OPTION_DOCFILE, useDocFile); }
 		return create(options);
 	}

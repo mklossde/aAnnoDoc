@@ -39,6 +39,8 @@ public class PackageDoc extends DocObject implements Serializable {
 	/** get class definitaion by name **/
 	public ClassDoc getClass(String name) {
 		if(name==null) return null;
+		else if(name.endsWith(".class")) { name=name.substring(0,name.length()-6);}		
+		else if(name.endsWith(".java")) { name=name.substring(0,name.length()-5); }
 		for(int i=0;i<classes.size();i++) {
 			ClassDoc cl=classes.get(i);
 			if(cl.equals(name)) return cl;  

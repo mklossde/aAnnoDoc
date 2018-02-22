@@ -105,7 +105,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		List<String> list=new ArrayList<String>();		
 
 		boolean defaultAdded=false;
-		List<AnnotationDoc> l=adoc.findAnnotation(aDoc.class);
+		List<AnnotationDoc> l=annotations.findAnnotation(aDoc.class);
 		for(int i=0;i<l.size();i++) {
 			AnnotationDoc doc=l.get(i);
 			String file=doc.getValueString(aDoc.fFILE);
@@ -140,7 +140,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		
 		if(main!=null) {
 			w.paragraph(AnnoUtils.getDoc(main));
-			List<AnnotationDoc> attr=adoc.findAnnotationIn(main.getParent(),aAttribute.class,aDoc.fGROUP,null);
+			List<AnnotationDoc> attr=annotations.findAnnotationIn(main.getParent(),aAttribute.class,aDoc.fGROUP,null);
 			attribtue("Attributes", attr);
 		}
 	}
@@ -169,7 +169,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 //		if(outputName.equals(aAnnoDoc.DEFAULT_FILE)) { list=adoc.findAnnotation(aDoc.class); }
 //		else { list=adoc.findAnnotation(aDoc.class,"file",outputName); }
 //		if(list==null || list.size()==0) { return ; }
-		List<AnnotationDoc> list=adoc.findAnnotation(cl);
+		List<AnnotationDoc> list=annotations.findAnnotation(cl);
 //TODO:only empty group here
 //		List<AnnotationDoc> list=adoc.findAnnotation(cl,"group",null);
 		return list;
@@ -294,7 +294,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		w.subTitle(title);
 		w.small(AnnoUtils.getValue(doc, aDoc.fSIMPLE)); // simple 
 		infos(doc); // author,date,version,deprecated
-		attribtue(title,adoc.findAnnotation(aAttribute.class, aDoc.fGROUP, title)); // attributes
+		attribtue(title,annotations.findAnnotation(aAttribute.class, aDoc.fGROUP, title)); // attributes
 		w.paragraph(AnnoUtils.getDoc(doc)); // doc
 		w.subTitleEnd();
 	}
@@ -339,7 +339,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 			seq.end();
 		}
 		// atrributes
-		List<AnnotationDoc> attr=adoc.findAnnotation(aAttribute.class, aDoc.fGROUP, title);
+		List<AnnotationDoc> attr=annotations.findAnnotation(aAttribute.class, aDoc.fGROUP, title);
 		attribtue(title,attr);
 		
 		w.paragraph(AnnoUtils.getDoc(doc)); // doc

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -41,6 +42,8 @@ import japa.parser.ast.body.VariableDeclaratorId;
 import japa.parser.ast.comments.Comment;
 import japa.parser.ast.comments.LineComment;
 import japa.parser.ast.expr.AnnotationExpr;
+import japa.parser.ast.expr.ArrayInitializerExpr;
+import japa.parser.ast.expr.BooleanLiteralExpr;
 import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.LiteralExpr;
@@ -63,6 +66,9 @@ public class JavaSourceScanner {
 	private Logger LOG=LoggerFactory.getLogger(JavaSourceScanner.class);
 	
 	public static boolean ANALYSEAT=true;
+	
+//	protected String charset="UTF-8";
+	protected String charset="windows-1252"; //
 	
 	public static String debug=null;
 	
@@ -124,12 +130,14 @@ public class JavaSourceScanner {
 	    	}else if(filter!=null && !filter.scanClass(name)) { // ignroe by fitler
 	    	}else if(name.endsWith(".java")) {
 	    		LOG.debug("scan jar java "+name);	    		
-	    		InputStream in=jar.getInputStream(entry);
+	    		InputStream fin=jar.getInputStream(entry);
+	    		InputStreamReader in=new InputStreamReader(fin,charset);
 	    		readJava(in,name);
 	    		in.close();
 	    	}else if(name.endsWith(".adoc")) {
 	    		LOG.debug("scan jar text "+name);	    		
-	    		InputStream in=jar.getInputStream(entry);
+	    		InputStream fin=jar.getInputStream(entry);
+	    		InputStreamReader in=new InputStreamReader(fin,charset);
 	    		readText(in,name);
 	    		in.close();
 	    	}
@@ -168,7 +176,8 @@ public class JavaSourceScanner {
 	public void readFile(String file) throws IOException  {
 		long start=System.currentTimeMillis();	
 		LOG.trace("start read file {}",file);
-		FileInputStream in = new FileInputStream(file);
+		FileInputStream fin = new FileInputStream(file);
+		InputStreamReader in=new InputStreamReader(fin,charset);
 		try {
 			if(filter!=null && !filter.scanClass(file)) { // ignroe by fitler
 			}else if(file.endsWith(".java")) { readJava(in,file); }
@@ -181,7 +190,7 @@ public class JavaSourceScanner {
 //System.out.println("read file "+file+" in "+(System.currentTimeMillis()-start)+"ms");
 	}
 
-	public void readText(InputStream in,String name) throws IOException  {	
+	public void readText(InputStreamReader in,String name) throws IOException  {	
 		String text=ReflectUtil.read(in);
 				
 		try {
@@ -197,14 +206,15 @@ public class JavaSourceScanner {
 		}		
 	}
 	
-	public void readJava(InputStream in,String name) throws IOException  {	
+	public void readJava(InputStreamReader in,String name) throws IOException  {	
 //if(name.indexOf("ButtonDesign")!=-1) {
 //	System.out.println("ButtonDesign");
 //}
 		this.fileCount++;
 
 		try {
-			cu = JavaParser.parse(in);
+			boolean considerComments=true;			
+			cu = JavaParser.parse(in,considerComments);
 			List<Comment> comments=cu.getComments();
 
 	    	// package------------------------------------------------------------------------------
@@ -475,29 +485,9 @@ public class JavaSourceScanner {
 	private void setAnnotations(DocObject source,List<AnnotationExpr> pAnno,ClassDoc clSource,List<Comment> comments) throws Exception {
 		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>();
 	    for(int i=0;pAnno!=null && i<pAnno.size();i++) {
-	    	AnnotationExpr anno=pAnno.get(i);
-	    	String annoName=toString(anno.getName());
-//System.out.println("annoName:"+annoName);	    	
-	    	AnnotationDoc as=new AnnotationDoc(annoName,findClassName(annoName,clSource),source,clSource,false);    
-	    	clSource.addAllAnnotations(as); 
+	    	AnnotationExpr anno=pAnno.get(i);	    	
+	    	AnnotationDoc as=toAnnotationDoc(source, anno, clSource);
 	    	
-	    	if(anno instanceof NormalAnnotationExpr) {
-	    		NormalAnnotationExpr na=(NormalAnnotationExpr)anno;
-	    		List<MemberValuePair> pairs=na.getPairs();
-	    		for(int t=0;pairs!=null && t<pairs.size();t++) {
-	    			MemberValuePair pair=pairs.get(t);
-	    			String name=pair.getName();
-	    			Object val=toObject(pair.getValue(),clSource);
-	    			as.add(name,val);
-	    			LOG.trace("Annotation param:"+name+"="+val);
-	    		}
-	    	}
-	    	
-//    		if(as.getValueName()==null) as.add(AnnotationDoc.ID, ReflectUtil.removeGetSet(source.getName())); // get name from parent
-//    		if(as.getValuePath()==null) as.add(AnnotationDoc.PATH,shortPath(clSource.getTypePackage()));
-	    	as.setRef(clSource.getTypePackage(), ReflectUtil.removeGetSet(source.getName()));
-	    	
-	    	unit.addAnnotation(as); 
 	    	list.add(as);
 	    	
     		scanComments(prev,anno, as, clSource,comments); // scan inside comments
@@ -505,6 +495,33 @@ public class JavaSourceScanner {
 	    }
 	    	    
 	    source.addAnnotations(list);
+	}
+	
+	private AnnotationDoc toAnnotationDoc(DocObject source,AnnotationExpr anno,ClassDoc clSource) {
+    	String annoName=toString(anno.getName());
+//System.out.println("annoName:"+annoName);	    	
+    	AnnotationDoc as=new AnnotationDoc(annoName,findClassName(annoName,clSource),source,clSource,false);    
+    	clSource.addAllAnnotations(as); 
+    	
+    	if(anno instanceof NormalAnnotationExpr) {
+    		NormalAnnotationExpr na=(NormalAnnotationExpr)anno;
+    		List<MemberValuePair> pairs=na.getPairs();
+    		for(int t=0;pairs!=null && t<pairs.size();t++) {
+    			MemberValuePair pair=pairs.get(t);
+    			String name=pair.getName();
+    			Object val=toObject(pair.getValue(),clSource);
+    			as.add(name,val);
+    			LOG.trace("Annotation param:"+name+"="+val);
+    		}
+    	}
+    	
+//		if(as.getValueName()==null) as.add(AnnotationDoc.ID, ReflectUtil.removeGetSet(source.getName())); // get name from parent
+//		if(as.getValuePath()==null) as.add(AnnotationDoc.PATH,shortPath(clSource.getTypePackage()));
+    	as.setRef(clSource.getTypePackage(), ReflectUtil.removeGetSet(source.getName()));
+    	
+    	unit.addAnnotation(as);     
+    	
+    	return as;
 	}
 	
 	/** TODO: remove base dir from path **/
@@ -515,7 +532,9 @@ public class JavaSourceScanner {
 	public Object toObject(Object obj,ClassDoc clSource) {
 		if(obj==null) { return null;
 		}else if(obj instanceof NullLiteralExpr) {
-			return null;			
+			return null;	
+		}else if(obj instanceof BooleanLiteralExpr) {
+			return ((BooleanLiteralExpr)obj).getValue();
 		}else if(obj instanceof StringLiteralExpr) {
 			String str=((StringLiteralExpr)obj).getValue();
 			return str;
@@ -524,6 +543,18 @@ public class JavaSourceScanner {
 			return str.getData();
 		}else if(obj instanceof UnaryExpr) {
 			return String.valueOf(obj);
+		}else if(obj instanceof ArrayInitializerExpr) {
+			ArrayInitializerExpr a=(ArrayInitializerExpr)obj;
+			List<Expression> exp=a.getValues();
+			List l=new ArrayList();
+			for(int i=0;i<exp.size();i++) {
+				Object o=toObject(exp.get(i),clSource);
+				l.add(o);
+			}
+			return l;
+		}else if(obj instanceof NormalAnnotationExpr) {
+			NormalAnnotationExpr a=(NormalAnnotationExpr)obj;
+			return toAnnotationDoc(clSource, a, clSource);
 			
 		}else if(obj instanceof FieldAccessExpr) {
 			FieldAccessExpr f=(FieldAccessExpr)obj;

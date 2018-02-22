@@ -98,8 +98,8 @@ public class AsciiDocWriter {
 	public AsciiDocWriter orderdSub(Object text) { return list(listDeep++,text); }
 	public AsciiDocWriter orderdEnd() { listDeep--; return this; }
 	
-	public AsciiDocWriter checked(Object text) { return nnl().w("* [X] ").w(text).nl2(); }
-	public AsciiDocWriter checked(int deep,Object text) { return nnl2().w("",deep,"*"," [x] ").w(text).nl2(); }
+	public AsciiDocWriter checked(Object text) { return nnl().w("* [*] ").w(text).nl2(); }
+	public AsciiDocWriter checked(int deep,Object text) { return nnl2().w("",deep,"*"," [*] ").w(text).nl2(); }
 	public AsciiDocWriter unchecked(Object text) { return nnl().w("* [ ] ").w(text).nl2(); }
 	public AsciiDocWriter unchecked(int deep,Object text) { return nnl2().w("",deep,"*"," [ ] ").w(text).nl2(); }
 	

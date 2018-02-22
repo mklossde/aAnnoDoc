@@ -25,9 +25,10 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	public static final String ATR_TITLE="title";
 	public static final String ATR_DESCRIPTION="desciption";
 	
-	
+	/** doc of all scanned soruces **/
 	protected JarDoc doc;
-	protected SourceAnnotations adoc;
+	/** helper dor doc **/
+	protected SourceAnnotations annotations;
 	protected Options options;
 	 
 	protected AsciiDocWriter w;
@@ -38,7 +39,7 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	
 	@Override public void init(SourceAnnotations adoc,Options options) throws IOException {
 		if(adoc==null) { throw new IOException("no annotaion doc"); }
-		this.adoc=adoc; 
+		this.annotations=adoc; 
 		this.doc=adoc.doc();	
 		if(this.doc==null) { throw new IOException("no source found"); }
 		this.options=options;
@@ -86,7 +87,7 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	@aAttribute(title="options/annotations")
 	public Object[] getAnnotations() throws IOException {
 		Object obj=options.get("annotations");
-		if(obj==null) { obj=adoc.listAnnotions(false); }
+		if(obj==null) { obj=annotations.listAnnotions(false); }
 		return ReflectUtil.toArray(obj);
 	}
 	
@@ -167,13 +168,12 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 		String outputFile=outputName;
 		if(outputName.equals(aAnnoDoc.DEFAULT_FILE)) { outputFile=getOutput(); } 
 		AsciiDocCreator cr=new AsciiDocCreator();
-		
-		
-		if(options.get(Options.OPTION_OUT_ADOC)!=null) { 
-			String file=toFile(outputFile,aAnnoDoc.FORMAT_ASCIIDOC,true);
-			LOG.info("write {} format adoc to {}",outputName,file);
-			cr.create(adoc, aAnnoDoc.FORMAT_ASCIIDOC, file);
-		}
+				
+//		if(options.get(Options.OPTION_OUT_ADOC)!=null) { 
+//			String file=toFile(outputFile,aAnnoDoc.FORMAT_ASCIIDOC,true);
+//			LOG.info("write {} format adoc to {}",outputName,file);
+//			cr.create(adoc, aAnnoDoc.FORMAT_ASCIIDOC, file);
+//		}
 		
 		String format=getFormat();
 		String file=toFile(outputFile,format,false);

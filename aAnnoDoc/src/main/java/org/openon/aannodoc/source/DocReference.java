@@ -18,8 +18,9 @@ public class DocReference {
 	}
 	
 	public String resolve()  {
-		ClassDoc cl=unit.findClass(className);
-		if(cl==null) { throw new RuntimeException("unkown class reference "+className); }
+		ClassDoc cl=unit.findClass(className);		
+//		if(cl==null) { throw new RuntimeException("unkown class reference "+className); }
+		if(cl==null) { return toString(); } // can't resolve class return name only
 		FieldDoc f=cl.getField(unit,field);
 		if(f==null) {  
 			throw new RuntimeException("unkown field reference "+field+" in "+className); }

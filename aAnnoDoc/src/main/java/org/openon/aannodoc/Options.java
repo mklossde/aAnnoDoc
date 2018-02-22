@@ -44,8 +44,9 @@ public class Options {
 	public static final String OPTION_FORMAT="format";
 	public static final String OPTION_OUTPUT="output";
 	
-	public static final String OPTION_OUT_ADOC="outadoc";
-	public static final String OPTION_OUT_DIR="outdir"; // change to dir
+//	public static final String OPTION_OUT_ADOC="outadoc";
+	/** output directory - change working directory **/ 
+	public static final String OPTION_OUT_DIR="outdir"; 
 	/** write only docFile - contains file="xxx" in annotation-attribute **/
 	public static final String OPTION_DOCFILE="docfile";
 	

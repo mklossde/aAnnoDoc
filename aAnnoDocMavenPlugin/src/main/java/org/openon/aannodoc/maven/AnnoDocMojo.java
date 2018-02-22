@@ -81,7 +81,7 @@ public class AnnoDocMojo extends AbstractMojo {
 			aAnnoDoc doc=new aAnnoDoc();
 			String javaSourceFileOrDirectory=source;		
 			Options options=new Options(javaSourceFileOrDirectory,outputFile,generator, format);
-			if(outputDir!=null || outputDir.length()>0) { options.put(Options.OPTION_OUT_DIR, outputDir);}
+			if(outputDir!=null && outputDir.length()>0) { options.put(Options.OPTION_OUT_DIR, outputDir);}
 			
 			getLog().info("source: " + source);
 			getLog().info("outputFile: " + outputFile);

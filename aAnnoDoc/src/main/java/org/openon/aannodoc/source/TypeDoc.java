@@ -77,7 +77,8 @@ public abstract class TypeDoc extends DocObject implements Serializable {
 		if(obj==null) return false;
 		else if(obj==this) return true;
 		else if(obj instanceof String) {
-			if(((String)obj).equals(name) || ((String)obj).equals(typeName) || ((String)obj).equals(typeSimpleName)) return true;
+			String s=(String)obj; 
+			if(s.equals(name) || s.equals(typeName) || s.equals(typeSimpleName)) return true;
 			else return false;
 		}else return super.equals(obj);
 	}

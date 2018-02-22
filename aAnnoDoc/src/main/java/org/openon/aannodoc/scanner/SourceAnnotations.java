@@ -154,7 +154,8 @@ public class SourceAnnotations {
 		list.add(anno);
 	}
 	
-	
+	/** get first annotaion of  annotationClass **/
+	public AnnotationDoc getAnnotation(Object annotationClassObject) throws IOException { return getAnnotation(annotationClassObject,null,null); }
 	/** get first annotaion of  annotationClass with key=value **/
 	public AnnotationDoc getAnnotation(Object annotationClassObject,String key,String value) throws IOException {
 		if(unit==null) return null;

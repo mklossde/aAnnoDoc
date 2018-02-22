@@ -2,6 +2,7 @@ package org.openon.aannodoc.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -49,6 +50,17 @@ public class ReflectUtil {
 		}catch(Throwable e) { throw new IOException(e); }		
 		if(cl.isAssignableFrom(obj.getClass())) { return obj; }
 		else { throw new IOException("wrong obj "+obj.getClass()); }
+	}
+	
+	/** read stream as string **/
+	public static String read(Reader in)  throws IOException {
+		StringBuilder result = new StringBuilder();
+	    try {
+	    	char[] buf = new char[1024]; int r = 0;
+	        while ((r = in.read(buf)) != -1) {result.append(new String(buf, 0, r));}
+	    } finally { in.close();}
+		String text=result.toString();
+		return text;
 	}
 	
 	/** read stream as string **/

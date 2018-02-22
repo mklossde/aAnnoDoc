@@ -102,6 +102,8 @@ public class JarDoc extends DocObject implements Serializable {
 	
 	public ClassDoc findClass(String name) {
 		if(name==null) return null;
+		else if(name.endsWith(".class")) { name=name.substring(0,name.length()-6);}		
+		else if(name.endsWith(".java")) { name=name.substring(0,name.length()-5); }
 //		String pkgName=name.substring(0,name.lastIndexOf('.'));
 		for(int i=0;i<subPackages.size();i++) {	
 			PackageDoc pgk=subPackages.get(i);

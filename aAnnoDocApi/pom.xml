@@ -12,7 +12,7 @@
   
   <groupId>org.openon.aannodoc</groupId>
   <artifactId>aAnnoDocApi</artifactId>
-  <version>1.0.2</version>
+  <version>${aannodoc-version}</version>
   <packaging>jar</packaging>
  
   <name>aAnnoDocApi</name>

@@ -10,7 +10,7 @@
   </parent>
   
   <artifactId>aAnnoDocMavenPlugin</artifactId>
-  <version>1.0.2</version>
+  <version>${aannodoc-version}</version>
   <packaging>maven-plugin</packaging>
  
   <name>aAnnoDoc Maven Plugin</name>
@@ -24,7 +24,7 @@
 	<dependency>
 		<groupId>org.openon.aannodoc</groupId>
 		<artifactId>aAnnoDoc</artifactId>
-		<version>1.0.2</version>
+		<version>${aannodoc-version}</version>
 	</dependency>  		 	
 	 	  
 	<!--  Mavin plugin - Mojo -->
@@ -52,6 +52,8 @@
   
   <build>
     <plugins>    
+  
+    
 	     <plugin>
 	        <groupId>org.apache.maven.plugins</groupId>
 	        <artifactId>maven-compiler-plugin</artifactId>
@@ -92,7 +94,8 @@
                 
  	<pluginManagement>
         <plugins>
-            <plugin>
+    
+       <plugin>
                 <groupId>org.eclipse.m2e</groupId>
                 <artifactId>lifecycle-mapping</artifactId>
                 <version>1.0.0</version>
@@ -107,20 +110,40 @@
                                     <goals>
                                         <goal>test-compile</goal>
                                         <goal>compile</goal>
-                                        <goal>helpmojo</goal>
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
                                     <execute />
                                 </action>
                             </pluginExecution>
+                            <pluginExecution>
+                            	<pluginExecutionFilter>
+                            		<groupId>
+                            			org.apache.maven.plugins
+                            		</groupId>
+                            		<artifactId>
+                            			maven-plugin-plugin
+                            		</artifactId>
+                            		<versionRange>[3.5,)</versionRange>
+                            		<goals>
+                            			<goal>descriptor</goal>
+                            			<goal>helpmojo</goal>
+                            		</goals>
+                            	</pluginExecutionFilter>
+                            	<action>
+                            		<ignore></ignore>
+                            	</action>
+                            </pluginExecution>
                         </pluginExecutions>
                     </lifecycleMappingMetadata>
                 </configuration>
             </plugin>
+    
+    
         </plugins>
     </pluginManagement>
           
 	</build>  	  
+  <groupId>org.openon.aannodoc</groupId>
 </project>
 
