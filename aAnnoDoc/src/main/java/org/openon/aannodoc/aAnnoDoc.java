@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
  * @version 1.0.0 - 03.12.2017
  * 
  */
-@aDoc(file="READ.md")
+@aDoc(group="READ.md")
 public class aAnnoDoc {
 	private static final Logger LOG=LoggerFactory.getLogger(aAnnoDoc.class);
 	
