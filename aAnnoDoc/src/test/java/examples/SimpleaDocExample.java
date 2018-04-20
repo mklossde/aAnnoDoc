@@ -23,7 +23,7 @@ import org.openon.aannodoc.annotation.aService;
  * @deprecated This is only a doc example, not for execute
  * 
  */
-@aDoc(title="SimpleExample",file="SimpleaDocExample",date="29.11.2017")
+@aDoc(title="SimpleExample",group="SimpleaDocExample",date="29.11.2017")
 /** This is JavaDoc and will not be included into aDoc-docum et **/
 public class SimpleaDocExample {
 

@@ -25,10 +25,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aApplication {
 	
-	/** attribute to defien a explizit file of documenation this annotatied-documentation will be inserted **/
-	@aAttribute(value="nothing=insert this attribute into default document")
-	String file() default "";
-	
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** 
