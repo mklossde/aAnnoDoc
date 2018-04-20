@@ -1,6 +1,14 @@
 package org.openon.aannodoc.utils;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.openon.aannodoc.annotation.aDoc;
+import org.openon.aannodoc.asciidoc.AsciiDocWriter;
+import org.openon.aannodoc.scanner.SourceAnnotations;
 import org.openon.aannodoc.source.AnnotationDoc;
 import org.openon.aannodoc.source.DocObject;
 import org.openon.aannodoc.source.FieldDoc;
@@ -12,6 +20,11 @@ public class AnnoUtils {
 	public static String getValue(AnnotationDoc doc,String key) {
 		String value=toString(doc.getValue(key),null);
 		return value;
+	}
+	
+	/** get group of annotation **/
+	public static String getGroup(AnnotationDoc doc) {
+		return toString(doc.getValue(aDoc.fGROUP),null);
 	}
 	
 	/** get title of annotation **/
@@ -57,6 +70,33 @@ public class AnnoUtils {
 			return toString(field.getValue(),null);
 		}
 		return null;
+	}
+	
+	//---------------------------------------------------------------------------------
+	
+	/** write table do doc of title for list **/
+	public static void writeTable(AsciiDocWriter w,String title,List<AnnotationDoc> list) throws IOException {
+		if(list==null || list.size()==0) { return ; }
+		
+		List<String> heads=new ArrayList<String>();
+		for(int i=0;i<list.size();i++) {
+			AnnotationDoc doc=list.get(i);
+			Map map=doc.getValues();
+			Iterator<String> keys=map.keySet().iterator();
+			while(keys.hasNext()) {
+				String key=keys.next();
+				if(!heads.contains(key)) { heads.add(key); }
+			}
+		}
+				
+		w.table(title, heads.toArray());
+		for(int i=0;i<list.size();i++) {
+			AnnotationDoc doc=list.get(i);
+			Object cells[]=new Object[heads.size()];
+			for(int t=0;t<heads.size();t++) { cells[t]=doc.getValue(heads.get(t)); }
+			w.tableLine(cells);
+		}
+		w.tableEnd();		
 	}
 	
 	//---------------------------------------------------------------------------------
@@ -138,5 +178,20 @@ public class AnnoUtils {
 		if(sb.length()==0) { return null; }
 		else { return sb.toString(); }
 	}
+	
+	//------------------------------------------------------------------------------------
+	
+	/** get list of all authors in all files **/
+	public static List<String> listAuthors(SourceAnnotations annotations) {
+		List<String> list=new ArrayList<String>();
+		List<AnnotationDoc> l=annotations.findAnnotation("author");
+		for(int i=0;l!=null && i<l.size();i++) {
+			AnnotationDoc doc=l.get(i);
+			String user=doc.getComment();
+			if(!list.contains(user)) { list.add(user); }
+		}
+		return list;
+	}
+	
 	
 }

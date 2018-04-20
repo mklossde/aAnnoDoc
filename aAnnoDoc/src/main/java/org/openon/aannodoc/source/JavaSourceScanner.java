@@ -26,6 +26,7 @@ import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.ImportDeclaration;
 import japa.parser.ast.Node;
 import japa.parser.ast.PackageDeclaration;
+import japa.parser.ast.body.AnnotationDeclaration;
 import japa.parser.ast.body.AnnotationMemberDeclaration;
 import japa.parser.ast.body.BodyDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
@@ -47,10 +48,12 @@ import japa.parser.ast.expr.BooleanLiteralExpr;
 import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.LiteralExpr;
+import japa.parser.ast.expr.MarkerAnnotationExpr;
 import japa.parser.ast.expr.MemberValuePair;
 import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.NormalAnnotationExpr;
 import japa.parser.ast.expr.NullLiteralExpr;
+import japa.parser.ast.expr.SingleMemberAnnotationExpr;
 import japa.parser.ast.expr.StringLiteralExpr;
 import japa.parser.ast.expr.UnaryExpr;
 import japa.parser.ast.type.ClassOrInterfaceType;
@@ -222,7 +225,7 @@ public class JavaSourceScanner {
 		    String pkgName="";
 		    if(p!=null) { 
 		    	pkgName=toString(p.getName());
-		    	LOG.debug("pkgName {}",pkgName);
+		    	LOG.trace("pkgName {}",pkgName);
 		    }
 		    
 		    if(unit==null) unit=new JarDoc(pkgName); // create unit for this package
@@ -338,17 +341,19 @@ public class JavaSourceScanner {
 			    		
 			    	}else if(body instanceof AnnotationMemberDeclaration) {// Annotation 
 			    		AnnotationMemberDeclaration an=(AnnotationMemberDeclaration)body;
-			    		LOG.trace("AnnotationMemberDeclaration "+an.getName());
+			    		LOG.trace("AnnotationMemberDeclaration "+an.getName());			    		
+			    	}else if(body instanceof AnnotationDeclaration) {// Annotation 
+			    		AnnotationDeclaration an=(AnnotationDeclaration)body;
+			    		LOG.trace("AnnotationDeclaration "+an.getName());
+			    		
 			    		
 			    	}else if(body instanceof ClassOrInterfaceDeclaration) { // inner Class
-	//TODO: scan inner class		    		
+//TODO: scan inner class		    		
 			    	}else if(body instanceof EmptyMemberDeclaration) { // ;
-			    	}else if(body instanceof InitializerDeclaration) { // static initialisation 
-//System.out.println("InitializerDeclaration "+body);			    		
+			    	}else if(body instanceof InitializerDeclaration) { // static initialisation 			    		
 			    	}else if(body instanceof EnumDeclaration) { // enum declaration 
 			    		
-			    	//}else LOG.error("unkown body "+body.getClass()+" at "+body.getBeginLine()+" in "+clSource.name);
-			    	}else { LOG.error("unkown body "+body.getClass()+toAtString(body, clSource)); }
+			    	}else { LOG.warn("not parsed body '"+body.getClass()+"' "+toAtString(body, clSource)+" in "+clDeclarion.getName()); }
 			    	prev=body;
 			    }
 
@@ -497,13 +502,14 @@ public class JavaSourceScanner {
 	    source.addAnnotations(list);
 	}
 	
+	public static final String ANNO_VALUE="value";
 	private AnnotationDoc toAnnotationDoc(DocObject source,AnnotationExpr anno,ClassDoc clSource) {
     	String annoName=toString(anno.getName());
 //System.out.println("annoName:"+annoName);	    	
     	AnnotationDoc as=new AnnotationDoc(annoName,findClassName(annoName,clSource),source,clSource,false);    
     	clSource.addAllAnnotations(as); 
     	
-    	if(anno instanceof NormalAnnotationExpr) {
+    	if(anno instanceof NormalAnnotationExpr) { // @ANNO(key="value",..)
     		NormalAnnotationExpr na=(NormalAnnotationExpr)anno;
     		List<MemberValuePair> pairs=na.getPairs();
     		for(int t=0;pairs!=null && t<pairs.size();t++) {
@@ -513,6 +519,15 @@ public class JavaSourceScanner {
     			as.add(name,val);
     			LOG.trace("Annotation param:"+name+"="+val);
     		}
+    	}else if(anno instanceof SingleMemberAnnotationExpr) { // @ANNO("VALUE")
+    		SingleMemberAnnotationExpr na=(SingleMemberAnnotationExpr)anno;
+    		String name=ANNO_VALUE;
+    		Object val=toObject(na.getMemberValue(),clSource);
+    		as.add(name,val);
+    		LOG.trace("Annotation param:"+name+"="+val);
+    	}else if(anno instanceof MarkerAnnotationExpr) { // @ANNO   		
+    	}else {
+    		LOG.warn("unparsed annotion "+anno);
     	}
     	
 //		if(as.getValueName()==null) as.add(AnnotationDoc.ID, ReflectUtil.removeGetSet(source.getName())); // get name from parent

@@ -4,21 +4,21 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Sub-component of aDoc to document application-feature or function
- * 	
+ * Annotation to document a connection/interface to a differnt system/network  
+ * 	e.g. a database-connection, Remote-Rest-Service,  
  * 
  * 
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="generator/AppDoc/aFeature")
+@aDoc(title="generator/AppDoc/aConnection")
 @Retention( RetentionPolicy.RUNTIME ) 
-public @interface aFeature {
+public @interface aInterface {
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/
 	String title() default "";
-
+	
 	/** description (alternative to java-comment) **/
 	String description() default "";
 	/** simple or short information **/

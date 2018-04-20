@@ -129,6 +129,7 @@ public abstract class DocObject implements Serializable {
 	
 	/** get first annotaion with name **/
 	public AnnotationDoc getAnnotation(String name) { 
+		if(name==null) { return null; } else if(name.startsWith("@")) { name=name.substring(1); }
 //		return getAnnotation("name",name); 
 		for(int i=0;annotations!=null && i<annotations.size();i++) {
 			AnnotationDoc anno=annotations.get(i);

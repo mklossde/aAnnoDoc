@@ -47,16 +47,16 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	}
 	
 	@Override public void generate() throws IOException {
-		String outputName=(String)options.get(Options.OPTION_DOCFILE);
-		if(outputName!=null) { 
-			generate(outputName); 
-		}else {
-			List<String> outputs=listOutputs();		
-			for(int i=0;i<outputs.size();i++){ 	
-				outputName=outputs.get(i);
-				generate(outputName);
-			}
-		}
+		String outputName=(String)options.get(Options.OPTION_DOCFILE);		
+//		if(outputName!=null) {  
+		generate(outputName); 
+//		}else {
+//			List<String> outputs=listOutputs();		
+//			for(int i=0;i<outputs.size();i++){ 	
+//				outputName=outputs.get(i);
+//				generate(outputName);
+//			}
+//		}
 	}
 	
 	public void generate(String outputName) throws IOException {
@@ -166,7 +166,7 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 		LOG.trace("document {} adoc: {}",outputName,adoc);	
 		
 		String outputFile=outputName;
-		if(outputName.equals(aAnnoDoc.DEFAULT_FILE)) { outputFile=getOutput(); } 
+		if(outputName==null || outputName.length()==0) { outputFile=getOutput(); } 
 		AsciiDocCreator cr=new AsciiDocCreator();
 				
 //		if(options.get(Options.OPTION_OUT_ADOC)!=null) { 

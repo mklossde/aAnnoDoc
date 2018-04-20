@@ -2,21 +2,24 @@ package org.openon.aannodoc.generator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.openon.aannodoc.Options;
-import org.openon.aannodoc.aAnnoDoc;
+import org.openon.aannodoc.annotation.aApplication;
 import org.openon.aannodoc.annotation.aArchitecture;
 import org.openon.aannodoc.annotation.aAttribute;
 import org.openon.aannodoc.annotation.aBug;
-import org.openon.aannodoc.annotation.aConnection;
+import org.openon.aannodoc.annotation.aVersion;
+import org.openon.aannodoc.annotation.aInterface;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aError;
 import org.openon.aannodoc.annotation.aExample;
 import org.openon.aannodoc.annotation.aFeature;
-import org.openon.aannodoc.annotation.aObject;
+import org.openon.aannodoc.annotation.aField;
+import org.openon.aannodoc.annotation.aBean;
 import org.openon.aannodoc.annotation.aService;
 import org.openon.aannodoc.asciidoc.SequenzDiagramWriter;
 import org.openon.aannodoc.source.AnnotationDoc;
@@ -26,7 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Generator for AnnoDoc-Annotation documents for aDoc-Annoations 
+ * Generator for AnnoDoc-Annotation documents for aDoc-Annotations 
+ * 
+ * \@aApplication - central information about application (unique per group)
  * 
  * \@aDoc builds the base structure of the document by its titles see aDoc 
  * The title may include path information (e.g. title="ExampleDocs/A sub chapter")  
@@ -57,15 +62,16 @@ import org.slf4j.LoggerFactory;
 public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	private static final Logger LOG=LoggerFactory.getLogger(GenAppDoc.class);
 	
-
-	
 	public static final String NAME="AppDoc";
 	
 	public static final String ANNOTATIONS="annotations";
-	
-	
+		
 	public GenAppDoc() { super(); }
 	
+	//-----------------------------------------------------------------------------
+	
+	/** aAplication doc **/
+	protected AnnotationDoc application;
 	
 	//-----------------------------------------------------------------------------
 	// Options
@@ -99,38 +105,38 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		return (String)obj;
 	}
 
-	//---------------------------------------------
-	
-	public List<String> listOutputs() throws IOException {
-		List<String> list=new ArrayList<String>();		
-
-		boolean defaultAdded=false;
-		List<AnnotationDoc> l=annotations.findAnnotation(aDoc.class);
-		for(int i=0;i<l.size();i++) {
-			AnnotationDoc doc=l.get(i);
-			String file=doc.getValueString(aDoc.fFILE);
-			if(file!=null && file.length()>0) { list.add(file); }
-			else if(!defaultAdded) { list.add(aAnnoDoc.DEFAULT_FILE); defaultAdded=true; }	
-		}
-			
-		if(list.size()==0) { list.add(aAnnoDoc.DEFAULT_FILE); }
-		
-		return list;
-	}
+//	---------------------------------------------	
+//	public List<String> listOutputs() throws IOException {
+//		List<String> list=new ArrayList<String>();		
+//
+//		boolean defaultAdded=false;
+//		List<AnnotationDoc> l=annotations.findAnnotation(aDoc.class);
+//		for(int i=0;i<l.size();i++) {
+//			AnnotationDoc doc=l.get(i);
+//			String file=doc.getValueString(aDoc.fFILE);
+//			if(file!=null && file.length()>0) { list.add(file); }
+//			else if(!defaultAdded) { list.add(aAnnoDoc.DEFAULT_FILE); defaultAdded=true; }	
+//		}
+//			
+//		if(list.size()==0) { list.add(aAnnoDoc.DEFAULT_FILE); }
+//		
+//		return list;
+//	}
 	
 	//---------------------------------------------
 	
 	/** document head **/
 	public void head(String outputName) throws IOException {
-		createStructure(outputName);
+		createStructure(outputName);		
 		
-		String title="Docs",author=null,version=null,date=null,depcrecated=null;
-		AnnotationDoc main=getMainDoc(docs);
+		String title="AppDoc",author=null,version=null,date=null,depcrecated=null,copyright=null;
+		application=getMainDoc(docs);
 //System.out.println("d:"+docs);
-		if(main!=null) {
-			title=AnnoUtils.getTitle(main,true);
-			author=AnnoUtils.getAuthor(main, 1);version=AnnoUtils.getVersion(main, 1);
-			date=AnnoUtils.getDate(main, 1); depcrecated=AnnoUtils.getDeprecated(main, 1);
+		if(application!=null) {			
+			title=AnnoUtils.getTitle(application,true);
+			author=AnnoUtils.getAuthor(application, 1);version=AnnoUtils.getVersion(application, 1);
+			date=AnnoUtils.getDate(application, 1); depcrecated=AnnoUtils.getDeprecated(application, 1);
+			copyright=application.getValueString("copyright");
 		}
 		w.title(title,author,null,version); // ,doc.getAnnotation("author"),doc.getAnnotation("date"));
 		
@@ -138,47 +144,18 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		w.nl().w(":last-update-label: "+genLabel).nl();	
 		if(depcrecated!=null) { w.warning(depcrecated); }
 		
-		if(main!=null) {
-			w.paragraph(AnnoUtils.getDoc(main));
-			List<AnnotationDoc> attr=annotations.findAnnotationIn(main.getParent(),aAttribute.class,aDoc.fGROUP,null);
+		if(application!=null) {
+			w.paragraph(AnnoUtils.getDoc(application));
+			List<AnnotationDoc> attr=annotations.findAnnotationIn(application.getParent(),aAttribute.class,aDoc.fGROUP,null);
 			attribtue("Attributes", attr);
 		}
+		
+		w.paragraph(copyright);
 	}
-	
-	/** document bottom **/
-	public void bottom(String outputName) throws IOException {
-//		w.nl2().w(":last-update-label: "+(new Date())+" [<openon.org/aannodoc>] ").nl2();		
-		w.close();
-	}
-	
-	//---------------------------------------------
-	
-	protected Tree<AnnotationDoc> docs;
-	
-	protected void createStructure(String outputName) {
-		List<AnnotationDoc> list=find(aDoc.class);
-		String name=doc.getName();
-		docs=toTree(name,list);
-//System.out.println("d:"+docs);
-	}
-	
-	/** find annotation for doc **/
-	protected List<AnnotationDoc> find(Class cl) { 
-		//TODO: read by file here ?? 
-//		List<AnnotationDoc> list;
-//		if(outputName.equals(aAnnoDoc.DEFAULT_FILE)) { list=adoc.findAnnotation(aDoc.class); }
-//		else { list=adoc.findAnnotation(aDoc.class,"file",outputName); }
-//		if(list==null || list.size()==0) { return ; }
-		List<AnnotationDoc> list=annotations.findAnnotation(cl);
-//TODO:only empty group here
-//		List<AnnotationDoc> list=adoc.findAnnotation(cl,"group",null);
-		return list;
-	}
-	
-	//---------------------------------------------
 	
 	/** document body **/
 	public void body(String outputName) throws IOException {
+		versions();
 		docs(outputName);
 		features(outputName);
 		services(outputName);
@@ -192,6 +169,55 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		objects(outputName);	
 	}
 	
+	/** document bottom **/
+	public void bottom(String outputName) throws IOException {
+//		w.nl2().w(":last-update-label: "+(new Date())+" [<openon.org/aannodoc>] ").nl2();		
+		w.close();
+	}
+	
+	
+	//--------------------------------------------------------------------
+	
+	protected Tree<AnnotationDoc> docs;
+	
+	protected void createStructure(String outputName) {
+		List<AnnotationDoc> list=find(aDoc.class);
+		String name=doc.getName();
+		docs=toTree(name,list);
+//System.out.println("d:"+docs);
+	}
+	
+	//---------------------------------------------
+	
+	/** find annotation for doc **/
+	protected List<AnnotationDoc> find(Class cl) {  return annotations.findAnnotation(cl); }
+	protected List<AnnotationDoc> find(Class cl,String group) {  return annotations.findAnnotation(cl,aDoc.fGROUP,group); }
+	
+	//---------------------------------------------
+	// Versions
+	
+	/** write versions/changes to document **/
+	public void versions() throws IOException {
+		try {
+			if(application==null) { return ; }
+			List<AnnotationDoc> list=(List<AnnotationDoc>)application.getValue(aDoc.fVERSIONS); // get versions from @aAppliction
+			if(list==null) { list=find(aVersion.class); } // get all version in all classes					
+			if(list==null || list.size()==0) { return ; }
+					
+			w.table("Versions", "Version","Date","Title","Author","Description");
+			for(int i=0;i<list.size();i++) {
+				AnnotationDoc doc=list.get(i);
+				w.tableLine(AnnoUtils.getVersion(doc, 1),AnnoUtils.getDate(doc, 1),AnnoUtils.getTitle(doc,true),AnnoUtils.getAuthor(doc),AnnoUtils.getDoc(doc));
+			}
+			w.tableEnd();
+			
+		}catch(Exception e) { throw new IOException("doc changes excetpion "+e,e); } 
+	}
+	
+
+	
+
+	
 	//-----------------------------------------------------------------------------
 	// TODO:
 	
@@ -202,7 +228,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	}
 	
 	public void objects(String outputName) throws IOException {
-		List<AnnotationDoc> list=find(aObject.class);
+		List<AnnotationDoc> list=find(aBean.class);
 		if(list==null || list.size()==0) { return ; }
 		annotationTree(toTree("Objects",list));
 	}
@@ -214,7 +240,20 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	}
 	
 	//-----------------------------------------------------------------------------
-
+	
+	/** write versions/changes to document **/
+	public void fields(String group) throws IOException {
+		List<AnnotationDoc> list=find(aField.class,group);
+		if(list==null || list.size()==0) { return ; }
+		
+//		AnnoUtils.writeTable(w,"Fields",list); 
+		w.table("Fields", "Name","Compute");
+		for(int i=0;i<list.size();i++) {
+			AnnotationDoc doc=list.get(i);
+			w.tableLine(AnnoUtils.getTitle(doc, true),doc.getValue("compute"));
+		}
+		w.tableEnd();	
+	}
 	
 	public void services(String outputName) throws IOException {
 		List<AnnotationDoc> list=find(aService.class);
@@ -225,7 +264,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	}
 	
 	public void connections(String outputName) throws IOException {
-		List<AnnotationDoc> list=find(aConnection.class);
+		List<AnnotationDoc> list=find(aInterface.class);
 		if(list==null || list.size()==0) { return ; }
 //		w.subTitle("Services");
 		annotationTree(toTree("Connections",list));
@@ -323,7 +362,9 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	
 	/** write aDoc Annoation **/
 	public void annotationService(AnnotationDoc doc) throws IOException {
-		String title=AnnoUtils.addString(doc.getValue(aDoc.fTITLE)); //, " ",doc.getValuePath());
+//		String title=AnnoUtils.addString(doc.getValue(aDoc.fTITLE)); //, " ",doc.getValuePath());
+		String title=AnnoUtils.getTitle(doc, true);
+		String group=AnnoUtils.getGroup(doc);
 		w.subTitle(title); 
 		w.small(AnnoUtils.getValue(doc, aDoc.fSIMPLE)); // simple 
 		infos(doc); // author,date,version,deprecated
@@ -339,10 +380,12 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 			seq.end();
 		}
 		// atrributes
-		List<AnnotationDoc> attr=annotations.findAnnotation(aAttribute.class, aDoc.fGROUP, title);
-		attribtue(title,attr);
+		attribtue(title,find(aAttribute.class, group));	
 		
 		w.paragraph(AnnoUtils.getDoc(doc)); // doc
+		
+		fields(group);
+		
 		w.subTitleEnd();
 	}
 	
@@ -392,9 +435,12 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	
 	/** get root Object of tree **/
 	public AnnotationDoc getMainDoc(Tree<AnnotationDoc> tree) {
-		if(tree.getData()!=null) { return tree.getData(); }
-		else if(tree.size()>0 && tree.get(0) instanceof  AnnotationDoc ) { return ((AnnotationDoc)tree.get(0)); }
-		return null; 
+//		if(tree.getData()!=null) { return tree.getData(); }
+//		else if(tree.size()>0 && tree.get(0) instanceof  AnnotationDoc ) { return ((AnnotationDoc)tree.get(0)); }
+//		return doc.getAnnotation(aApplication.class.getSimpleName());
+		List<AnnotationDoc> docs=annotations.findAnnotation(aApplication.class);
+		if(docs!=null && docs.size()>0) { return docs.get(0); }
+		return null;
 	}
 	
 	/** get title of tree **/
@@ -411,13 +457,13 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 			AnnotationDoc a=list.get(i);
 //			String name=a.getValueNameString();
 			String name=AnnoUtils.getTitle(a,false);
-			if(a.getValue(aDoc.fFILE)!=null && tree.getData()==null) {  // with file as primary
-				tree.set(a);
-			}else {
+//			if(a.getValue(aDoc.fFILE)!=null && tree.getData()==null) {  // with file as primary
+//				tree.set(a);
+//			}else {
 				if(filter==null || filter.generateTitle(name,a)) {
 					tree.getTreeOf(name, true, true ).add(list.get(i));
 				}
-			}
+//			}
 		}
 		return tree.sort(null);
 	}

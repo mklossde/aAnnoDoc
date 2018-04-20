@@ -4,21 +4,30 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation to document any data-container like fields/inputs/values/beans/objects of application
- * 	e.g. a field is recevied - computed - and send to backend
+ * Annotation to document a field/object
+ * e.g. a attribute of a method or function
  * 
  * 
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="generator/AppDoc/aObject")
+@aDoc(title="generator/AppDoc/aAttribute")
 @Retention( RetentionPolicy.RUNTIME ) 
-public @interface aObject {
+public @interface aField {
 	/** group this documenation belongs to **/
-	String group() default "";	
-	/** title or subTitle for documentation **/
+	String group() default "";
+	/** name of attribute **/
 	String title() default "";
-
+	 
+	/** default value of attribtue **/
+	String value() default "";
+	
+	/** is this attribute options **/
+	String optional() default "";
+		
+	/** options of attribtues **/
+	String[] options() default {};
+	
 	/** bean or group this field belongs to **/
 	String bean() default "";
 	/** input information about this field **/
@@ -30,7 +39,6 @@ public @interface aObject {
 	
 	/** document hte validation of this field **/
 	String validation() default "";
-	
 	/** define the layer of this field **/
 	String layer() default "";
 	
@@ -39,13 +47,6 @@ public @interface aObject {
 	/** simple or short information **/
 	String simple() default "";
 	
-	/** author of this description **/
-	String author() default "";
-	/** date of this description **/
-	String date() default ""; 
-	/** description belongs to version **/
-	String version() default ""; 
 	/** description is no longer correct **/
 	String deprecated() default ""; 
-	
 }

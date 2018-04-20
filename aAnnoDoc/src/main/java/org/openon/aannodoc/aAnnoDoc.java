@@ -100,7 +100,7 @@ public class aAnnoDoc {
 	/** option-output==stdout = write output to standard-out (console) **/
 	public static final String OUT_STDOUT="stdout";
 	
-	public static final String DEFAULT_FILE="default";
+//	public static final String DEFAULT_FILE="default";
 	
 	protected SourceAnnotations anno;
 
@@ -174,25 +174,18 @@ public class aAnnoDoc {
 	@aDoc(title="Gernator")
 	/** second step - create documenation **/
 	public aAnnoDoc create(Options options) throws IOException {	
-//		String workDir=Paths.get("").toAbsolutePath().toString();
-		String workDir=System.getProperty("user.dir");
-		String outDir=(String)options.get(Options.OPTION_OUT_DIR);
-		if(outDir!=null && outDir.length()>0) {
-			String newWorkDir=new File(outDir).getAbsolutePath();
-			LOG.info("change to ouputDir {} => from {} to {}",outDir,System.getProperty("user.dir"),newWorkDir);
-			System.setProperty("user.dir",newWorkDir); 
-		}
-//		LOG.info("create AnnoDoc (working dir:{})",Paths.get("").toAbsolutePath());
+//		String outDir=(String)options.get(Options.OPTION_OUT_DIR);
+//		String workDir=changeWorkDir(outDir);
 		LOG.info("create AnnoDoc (working dir:{})",System.getProperty("user.dir"));	
-		
+
 		DocGenerator generator=getGenerator(anno,options);
 		generator.init(anno, options);
 		generator.generate();
 		
-		if(outDir!=null && outDir.length()>0) { System.setProperty("user.dir",workDir); }
+//		if(workDir!=null && workDir.length()>0) { System.setProperty("user.dir",workDir); }
 		return this;
 	}
-	
+		
 	/**
 	 * get doc generator
 	 * 
@@ -249,7 +242,6 @@ public class aAnnoDoc {
 		return create(options);
 	}
 
-	
 
 	
 }

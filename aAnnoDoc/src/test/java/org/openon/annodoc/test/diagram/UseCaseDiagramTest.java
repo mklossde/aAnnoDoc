@@ -14,13 +14,13 @@ import org.openon.aannodoc.generator.GenBaseDoc;
 import org.openon.aannodoc.scanner.SourceAnnotations;
 import org.openon.aannodoc.source.JarDoc;
 
-public class SequenceDiagramTest {
+public class UseCaseDiagramTest {
 
 	public static void main(String[] args) throws Exception {
-		SequenceDiagramTest dia=new SequenceDiagramTest();
+		UseCaseDiagramTest dia=new UseCaseDiagramTest();
 		
-		dia.testSystemOut();
-//		dia.test();
+//		dia.testSystemOut();
+		dia.test();
 		System.out.println("end");
 	}
 	
@@ -40,14 +40,16 @@ public class SequenceDiagramTest {
 		wr.close();
 		
 		String adoc=bout.toString();
-		AsciiDocCreator.Adoc2Html(bout.toString(), "doc/SequenzeDiagrammTest.html");
-	}	
+//adoc=":First Actor:\n:Another\nactor: as Men2  \nactor Men3\nactor :Last actor: as Men4\n";		
+//adoc="User -> (Start)\nUser --> (Use the application) : A small label\n\n:Main Admin: ---> (Use the application) : This is\nyet another\nlabel";
+		AsciiDocCreator.Adoc2Html(adoc, "doc/UseCaseDiagrammTest.html");
+	}		
 	
-	public void createDiagram(AsciiDocWriter wr) throws IOException  {
-		SequenzDiagramWriter sqWr=new SequenzDiagramWriter(wr, "mySequenze");
+	public void createDiagram(AsciiDocWriter wr) throws IOException {
+		UseCaseDiagramWriter sqWr=new UseCaseDiagramWriter(wr, "myUseCase");
 		
-		sqWr.to("test", "one", "two");
-		sqWr.from("back","one", "two");
+//		wr.w("\nUser -> (Start)\nUser --> (Use the application) : A small label\n\n:Main Admin: ---> (Use the application) : This is\nyet another\nlabel\n");
+		wr.w("\n:First Actor:\n:Another actor: as Men2  \nactor Men3\nactor :Last actor: as Men4\n");
 		sqWr.end();
 	}
 }

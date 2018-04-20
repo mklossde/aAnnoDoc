@@ -6,7 +6,7 @@ import java.util.Date;
 import org.openon.aannodoc.aAnnoDoc;
 import org.openon.aannodoc.annotation.aAttribute;
 import org.openon.aannodoc.annotation.aBug;
-import org.openon.aannodoc.annotation.aConnection;
+import org.openon.aannodoc.annotation.aInterface;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aError;
 import org.openon.aannodoc.annotation.aFeature;
@@ -97,7 +97,7 @@ public class SimpleaDocExample {
 	}
 	
 	/** read acutal time from system **/
-	@aConnection(title="SystemTime")
+	@aInterface(title="SystemTime")
 	/** a exernal service to get actual time **/
 	public String getTime() {
 		return new Date().toString();

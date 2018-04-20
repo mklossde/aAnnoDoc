@@ -19,6 +19,9 @@ public @interface aBug {
 	/** title or subTitle for documentation **/
 	String title() default "";
 	
+	/** Critical level of bug - value examples are low,medium,high **/
+	String level() default "";
+	
 	/** description (alternative to java-comment) **/
 	String description() default "";
 	

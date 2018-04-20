@@ -1,14 +1,22 @@
 package org.openon.aannodoc.asciidoc;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
 import org.asciidoctor.AttributesBuilder;
 import org.openon.aannodoc.aAnnoDoc;
+import org.openon.aannodoc.utils.DocUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.asciidoctor.Options;
 import org.asciidoctor.SafeMode;
 
@@ -19,16 +27,28 @@ import org.asciidoctor.SafeMode;
  *
  */
 public class AsciiDocCreator {
-
-
+	private static final Logger LOG=LoggerFactory.getLogger(AsciiDocCreator.class);
+	
+	public static final String ENCODE_UTF8="UTF8";
 	
 	protected Asciidoctor asciidoctor;
+	protected String oldWorkDir;
 	
-	public AsciiDocCreator() {
+	public static void createDoc(Object adoc,String format,String outputFile)  throws IOException {
+//		aAnnoDoc.changeWorkDir(outputFile);
+		AsciiDocCreator doc=new AsciiDocCreator();
+		doc.create(adoc, format, outputFile);
+//		aAnnoDoc.replaceWorkDir();
+	}
+	
+	//-----------------------------------------------------------------------------------------
+	
+	public AsciiDocCreator() {}
+	
+	public void init() {
 		asciidoctor = Factory.create();
 		asciidoctor.requireLibrary("asciidoctor-diagram"); // add diagramm functions
 	}
-	
 	
 	public void create(Object adoc,String format,String outputFile) throws IOException {
 		if(format==null || format.length()==0 || format.equals(aAnnoDoc.FORMAT_ASCIIDOC)) { createAdoc(adoc, outputFile); }
@@ -37,24 +57,40 @@ public class AsciiDocCreator {
 		else { throw new IOException("unkown format "+format); }
 	}
 	
+	
 	//-------------------------------------------------------------------------
 	
-	public void createAdoc(Object adoc,Object outputFile) throws IOException {
-		PrintWriter wr;
-		if(outputFile instanceof OutputStream) { wr=new PrintWriter((OutputStream)outputFile); }
-		else if(outputFile instanceof PrintWriter) { wr=(PrintWriter)outputFile; }
-		else if(outputFile instanceof File) { wr=new PrintWriter((File)outputFile);}
-		else if(outputFile instanceof String) {
-			String str=(String)outputFile;
-			if(str.equals(aAnnoDoc.OUT_STDOUT)) { wr=new PrintWriter(System.out); }
-			else { wr=new PrintWriter(getFile(str)); }
-		}else { throw new IOException("unkown outputFile "+outputFile); }
-		
-		if(adoc instanceof String) { wr.write((String)adoc); }
-		else { throw new IOException("unkown adoc "+adoc); }
+	public void createAdoc(Object adoc,Object outputFile) throws IOException {		
+		PrintWriter wr=getWriter(outputFile);
+		if(adoc instanceof String) {
+			wr.write((String)adoc); 
+		}else { 
+			throw new IOException("unkown adoc "+adoc); 
+		}
 		wr.close();
 	}
 	
+	public PrintWriter getWriter(Object outputFile) throws IOException {
+		PrintWriter wr;
+		if(outputFile instanceof OutputStream) { 		
+			wr = new PrintWriter(new OutputStreamWriter((OutputStream)outputFile, ENCODE_UTF8), true);
+		}else if(outputFile instanceof PrintWriter) { 
+			wr=(PrintWriter)outputFile; 
+		}else if(outputFile instanceof File) { 
+			File file=(File)outputFile;
+			File parent=file.getParentFile(); if(!parent.exists()) { parent.mkdirs(); }
+			wr = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), ENCODE_UTF8), true);
+		}else if(outputFile instanceof String) {
+			String str=(String)outputFile;
+			if(str.equals(aAnnoDoc.OUT_STDOUT)) {  
+				wr = new PrintWriter(new OutputStreamWriter(System.out, ENCODE_UTF8), true);
+			}else { 
+//				wr = new PrintWriter(new OutputStreamWriter(new FileOutputStream(getFile(str)), ENCODE_UTF8), true);
+				return getWriter(getFile(str));
+			}
+		}else { throw new IOException("unkown outputFile "+outputFile); }
+		return wr;
+	}	
 
 	
 	public void createHtml(Object adoc,String outputFile) throws IOException {	
@@ -64,26 +100,7 @@ public class AsciiDocCreator {
 		options.setBackend("html");
 		options.setToFile(outputFile);
 		
-		create(adoc,options);
-	}
-	
-	public void createPdf(Object adoc,String outputFile) throws IOException  {	
-		
-		Options options=new Options();
-		options.setSafe(SafeMode.UNSAFE);
-		
-//		options.setOption("imagesDir", "../images/");
-//		options.setOption("imagesoutdir", "../images/");
-//		options.setOption("outputDirectory", "doc");
-		options.setBackend("pdf");
-		
-//System.out.println("o:"+outputFile);		
-		options.setToFile(outputFile);
-			
-		create(adoc,options);
-	}
-	
-	public void create(Object adoc,Options options) throws IOException  {	
+		init();
 		if(adoc instanceof String) {
 			asciidoctor.convert((String)adoc,options);
 		}else if(adoc instanceof File) {
@@ -91,18 +108,80 @@ public class AsciiDocCreator {
 		}else { throw new IOException("unkown adoc "+adoc); }
 	}
 	
+	public void createPdf(Object adoc,String outputFile) throws IOException  {	
+				
+		// get absult fiel here before modify workDir
+		if(adoc instanceof File) { adoc=((File)adoc).getAbsoluteFile(); }
+		
+		
+		File file=getFile(outputFile);
+		File parent=file.getParentFile();
+		if(!parent.exists()) { parent.mkdirs(); }
+		String parentDir=parent.getAbsolutePath();
+		oldWorkDir=DocUtils.changeWorkDir(parentDir);		
+		outputFile=file.getName();
+		LOG.debug("create pdf {} in dir {} (old workDir:{})",outputFile,parentDir,oldWorkDir);
+			
+//		// copy adoc to new workDir 
+//		File newFile=null;
+//		if(adoc instanceof File) {
+//			File orgFile=(File)adoc;
+//			newFile=new File(orgFile.getName());
+//			Files.copy(orgFile.toPath(), newFile.toPath());
+//			adoc=newFile;
+//		}
+		
+		Options options=new Options();
+		options.setSafe(SafeMode.UNSAFE);
+		
+//		options.setOption("imagesDir", "../images/");
+//		options.setOption("imagesoutdir", "../images/");
+//		options.setOption("outputDirectory", "doc");
+		options.setBackend("pdf");		
+		
+//System.out.println("o:"+outputFile);		
+		options.setToFile(outputFile);
+			
+		init();
+		if(adoc instanceof String) {
+			asciidoctor.convert((String)adoc,options);
+		}else if(adoc instanceof File) {
+			asciidoctor.convertFile((File)adoc,options);
+		}else { throw new IOException("unkown adoc "+adoc); }
+		
+//		// remove copy orgfile
+//		if(newFile!=null && newFile.exists()) { newFile.delete(); }
+		// change back to old workDir
+		if(oldWorkDir!=null) { DocUtils.replaceWorkDir(oldWorkDir); }		
+	}
+	
+	
 	//-------------------------------------------------------------
 	
 	/** get file and create dirs of parent **/
 	public File getFile(String fileName) throws IOException  {
 		File file=new File(fileName); 
 		if(file==null) { throw new IOException("no file for "+fileName); }
-		File parent=file.getParentFile();
-//		if(parent==null) { throw new IOException("no parent for "+fileName) ;}
-		if(parent!=null) { parent.mkdirs(); }  // create parent dirs
-System.out.println("f:"+file.getAbsolutePath());		
+//		if(createParent) {
+//			File parent=file.getParentFile();
+//			if(parent!=null) { parent.mkdirs(); }  // create parent dirs
+//		}
 //		return file;
 		return new File(file.getAbsolutePath());
+	}
+	
+	//-------------------------------------------------------------------
+	
+	/** create pdf for adoc **/
+	public static void Adoc2Pdf(Object adoc,String pdfOutputFile) throws IOException {
+		AsciiDocCreator doc=new AsciiDocCreator();
+		doc.createPdf(adoc, pdfOutputFile);	
+	}
+
+	/** create pdf for adoc **/
+	public static void Adoc2Html(Object adoc,String pdfOutputFile) throws IOException {
+		AsciiDocCreator doc=new AsciiDocCreator();
+		doc.createHtml(adoc, pdfOutputFile);	
 	}
 	
 }

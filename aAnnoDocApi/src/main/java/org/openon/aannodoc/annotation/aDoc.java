@@ -22,7 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 @aDoc(title="generator/AppDoc/aDoc")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aDoc {
-	public static final String fFILE="file";
+	
+	// list attribtue-keys of annotations as string (e.g. @aDoc(title="xxx") => fTitle="title") 
 	public static final String fGROUP="group";
 	public static final String fTITLE="title";
 	public static final String fDESCIPTION="description";
@@ -30,6 +31,7 @@ public @interface aDoc {
 	public static final String fAUTHOR="author";
 	public static final String fDATE="date";
 	public static final String fVERSION="version";
+	public static final String fVERSIONS="versions";
 	public static final String fDEPRECATED="deprecated";
 	
 	/** attribute to defien a explizit file of documenation this annotatied-documentation will be inserted **/

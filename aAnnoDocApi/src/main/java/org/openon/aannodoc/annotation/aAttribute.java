@@ -4,7 +4,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation to document a attribute 
+ * Annotation to document a application/service/interfact attribute
  * e.g. a attribute of a method or function
  * 
  * 
@@ -27,6 +27,20 @@ public @interface aAttribute {
 		
 	/** options of attribtues **/
 	String[] options() default {};
+	
+	/** bean or group this field belongs to **/
+	String bean() default "";
+	/** input information about this field **/
+	String input() default "";
+	/** output information about this field **/
+	String output() default "";
+	/** compute information about this field **/
+	String compute() default "";
+	
+	/** document hte validation of this field **/
+	String validation() default "";
+	/** define the layer of this field **/
+	String layer() default "";
 	
 	/** description (alternative to java-comment) **/
 	String description() default "";

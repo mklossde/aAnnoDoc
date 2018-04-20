@@ -57,8 +57,8 @@ public class AnnoDocMojo extends AbstractMojo {
 	@Parameter(property = "annodoc.outputFile", defaultValue = "doc/AnnoDocOutput")
 	private String outputFile;
 	
-	@Parameter(property = "annodoc.outputDir", defaultValue = "")
-	private String outputDir;
+//	@Parameter(property = "annodoc.outputDir", defaultValue = "")
+//	private String outputDir;
 	
 	@Parameter(property = "annodoc.format", defaultValue = "pdf")
 	private String format;
@@ -81,11 +81,11 @@ public class AnnoDocMojo extends AbstractMojo {
 			aAnnoDoc doc=new aAnnoDoc();
 			String javaSourceFileOrDirectory=source;		
 			Options options=new Options(javaSourceFileOrDirectory,outputFile,generator, format);
-			if(outputDir!=null && outputDir.length()>0) { options.put(Options.OPTION_OUT_DIR, outputDir);}
+//			if(outputDir!=null && outputDir.length()>0) { options.put(Options.OPTION_OUT_DIR, outputDir);}
 			
 			getLog().info("source: " + source);
 			getLog().info("outputFile: " + outputFile);
-			getLog().info("outputDir: " + outputDir);
+//			getLog().info("outputDir: " + outputDir);
 			getLog().info("format: " + format);
 			getLog().info("generator: " +generator);
 					

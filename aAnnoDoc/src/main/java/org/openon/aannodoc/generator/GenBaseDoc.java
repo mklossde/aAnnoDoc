@@ -6,7 +6,10 @@ import org.openon.aannodoc.asciidoc.AsciiDocWriter;
 
 public class GenBaseDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 
-	public AsciiDocWriter writer() { return this.w; }
+	public AsciiDocWriter writer() throws IOException {
+		if(this.w==null) { throw new IOException("missing writer"); }
+		return this.w; 
+	}
 	
 	@Override public void head(String outputName) throws IOException {		
 	}

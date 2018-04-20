@@ -43,6 +43,9 @@ public @interface aApplication {
 	/** simple or short information **/
 	String simple() default "";
 	
+	/** copyright information **/
+	String copyright() default "";
+	
 	/** author of this description **/
 	String author() default "";
 	/** date of this description **/
@@ -51,4 +54,8 @@ public @interface aApplication {
 	String version() default ""; 
 	/** description is no longer correct **/
 	String deprecated() default ""; 
+	
+	/** versions of application **/
+	aVersion[] versions() default {};
+	
 }

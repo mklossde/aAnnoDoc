@@ -236,8 +236,10 @@ public class SourceAnnotations {
 	/** get name of annotation for anno **/
 	public String toAnnotationClassName(Object anno) {
 		if(anno==null) { return null; }
-		else if(anno instanceof String) { return (String)anno; }
-		else if(anno instanceof Class) { return ((Class)anno).getSimpleName(); }
+		else if(anno instanceof String) {
+			String name=(String)anno;if(name.startsWith("@")) { name=name.substring(1); }
+			return  name;
+		}else if(anno instanceof Class) { return ((Class)anno).getSimpleName(); }
 		else { return anno.getClass().getSimpleName(); }
 	}
 	

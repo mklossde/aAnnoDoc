@@ -10,7 +10,7 @@
   </parent>
   
   <artifactId>aAnnoDocMavenPlugin</artifactId>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>1.0.5-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
  
   <name>aAnnoDoc Maven Plugin</name>
@@ -22,9 +22,9 @@
 
   <dependencies>
 	<dependency>
-		<groupId>org.openon.aannodoc</groupId>
+		<groupId>${project.groupId}</groupId>
 		<artifactId>aAnnoDoc</artifactId>
-		<version>1.0.4-SNAPSHOT</version>
+		<version>${project.version}</version>
 	</dependency>  		 	
 	 	  
 	<!--  Mavin plugin - Mojo -->

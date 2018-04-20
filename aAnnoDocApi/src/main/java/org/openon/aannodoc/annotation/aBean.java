@@ -4,20 +4,34 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation to document a connection/interface to a differnt system/network  
- * 	e.g. a database-connection, Remote-Rest-Service,  
+ * Annotation to document any data-container like fields/inputs/values/beans/objects of application
+ * 	e.g. a field is recevied - computed - and send to backend
  * 
  * 
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="generator/AppDoc/aConnection")
+@aDoc(title="generator/AppDoc/aObject")
 @Retention( RetentionPolicy.RUNTIME ) 
-public @interface aConnection {
+public @interface aBean {
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/
 	String title() default "";
+
+	
+	/** input information about this bean **/
+	String input() default "";
+	/** output information about this bean **/
+	String output() default "";
+	/** compute information about this bean **/
+	String compute() default "";
+	
+	/** document hte validation of this bean **/
+	String validation() default "";
+	
+	/** define the layer of this bean **/
+	String layer() default "";
 	
 	/** description (alternative to java-comment) **/
 	String description() default "";

@@ -77,10 +77,15 @@ public class AnnotationDocScanner {
 				String attrKey=text.substring(aPos,keyEnd).trim();
 				aPos=nextChar(text,keyEnd, '=');
 				int valEnd=nextKey(text,aPos);
-				if(valEnd==-1) { throw new IOException("wrong attribute-value for "+attrKey);}
-				Object attrVal=toObject(text.substring(aPos,valEnd).trim());
-				aPos=valEnd;			
-//System.out.println("attr:"+attrKey+"="+attrVal+":");					
+				Object attrVal;
+				if(valEnd!=-1) {  
+					attrVal=toObject(text.substring(aPos,valEnd).trim());
+					aPos=valEnd;
+				}else { // value without key 
+					attrVal=toObject(attrKey);
+					attrKey="value";	//TODO: default as value="..."
+					aPos=keyEnd;
+				}												
 				if(attrKey!=null && attrKey.length()>0 && attrVal!=null) {
 					if(attr==null) { attr=new HashMap<String, String>(); }
 					attr.put(attrKey, attrVal);
