@@ -1,0 +1,28 @@
+* mavin-plugin to add AnnoDoc into maven-build-process
+ * 
+ * 
+ * Add Maven-plugin to pom.xml
+ * 
+ * 
+ *   <build>
+ *  		<plugins>
+ * 			<plugin> 
+ *			  <groupId>org.openon</groupId>
+ *			  <artifactId>onAnnoDocMavenPlugin</artifactId>
+ *			  <version>1.0.0</version>
+ *			  <executions>
+ *			    <execution>
+ *			      <phase>install</phase>
+ *			      <goals>
+ *			        <goal>annodoc</goal>
+ *			      </goals>
+ * 			      <configuration> 			      	
+ * 			      	<generator>.....</generator>
+ * 			      	<source>....</source>
+ * 			      	<format>....</format>      
+ *			      </configuration> 
+ *			    </execution>
+ *			  </executions>
+ *			</plugin>
+ *		</plugins>
+ *	</build>
