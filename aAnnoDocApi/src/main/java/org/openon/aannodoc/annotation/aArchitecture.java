@@ -30,6 +30,9 @@ public @interface aArchitecture {
 	/** simple or short information **/
 	String simple() default "";
 	
+	/** layer information **/
+	String layer() default "";
+	
 	/** author of this description **/
 	String author() default "";
 	/** date of this description **/

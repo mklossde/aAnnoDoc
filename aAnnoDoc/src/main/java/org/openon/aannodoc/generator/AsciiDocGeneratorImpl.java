@@ -167,7 +167,7 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 		
 		String outputFile=outputName;
 		if(outputName==null || outputName.length()==0) { outputFile=getOutput(); } 
-		AsciiDocCreator cr=new AsciiDocCreator();
+		AsciiDocCreator cr=new AsciiDocCreator(options.getAsciidoctorAttribtues());
 				
 //		if(options.get(Options.OPTION_OUT_ADOC)!=null) { 
 //			String file=toFile(outputFile,aAnnoDoc.FORMAT_ASCIIDOC,true);

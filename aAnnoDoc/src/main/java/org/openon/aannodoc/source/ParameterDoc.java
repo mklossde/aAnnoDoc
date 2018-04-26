@@ -2,6 +2,10 @@ package org.openon.aannodoc.source;
 
 import java.util.Arrays;
 
+/**
+ * Annotation bases documenation about a parameter-set
+ * 
+ */
 public class ParameterDoc {
 
 	protected String[] names;
@@ -20,8 +24,8 @@ public class ParameterDoc {
 	
 	/** number of parameter **/
 	public int size() { 
-		if(types==null) { return 0; }
-		else { return types.length; } 
+		if(classNames==null) { return 0; }
+		else { return classNames.length; } 
 	}
 
 

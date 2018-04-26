@@ -3,6 +3,10 @@ package org.openon.aannodoc.source;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
+/**
+ * Annoation documenation of a Java-Method
+ *
+ */
 public class MethodDoc extends TypeDoc implements Serializable{
 	private static final long serialVersionUID = -4482749601451320369L;
 
@@ -24,6 +28,9 @@ public class MethodDoc extends TypeDoc implements Serializable{
 //		}catch(NoSuchMethodException e) { throw new IOException("parameter mismatch "+e); }
 		return method;
 	}
+	
+	/** get method parameter **/
+	public ParameterDoc getParameter() { return parameter; }
 	
 	public String toJava() { return toJava(modifiers)+" "+name+"("+(parameter.toJava())+")"; }
 	public String toString() { return "Method "+name; }

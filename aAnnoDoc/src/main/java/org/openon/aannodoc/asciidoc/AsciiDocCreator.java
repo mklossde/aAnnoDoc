@@ -5,20 +5,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
-import org.asciidoctor.AttributesBuilder;
+import org.asciidoctor.Options;
+import org.asciidoctor.SafeMode;
 import org.openon.aannodoc.aAnnoDoc;
 import org.openon.aannodoc.utils.DocUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.asciidoctor.Options;
-import org.asciidoctor.SafeMode;
 
 /**
  * Crate Document with Ascii Doc
@@ -34,6 +32,9 @@ public class AsciiDocCreator {
 	protected Asciidoctor asciidoctor;
 	protected String oldWorkDir;
 	
+	protected Map asciidoctorAttribtues;
+	public static final String ASCIIDOC_ATTR_DOT="dot";
+	
 	public static void createDoc(Object adoc,String format,String outputFile)  throws IOException {
 //		aAnnoDoc.changeWorkDir(outputFile);
 		AsciiDocCreator doc=new AsciiDocCreator();
@@ -41,14 +42,21 @@ public class AsciiDocCreator {
 //		aAnnoDoc.replaceWorkDir();
 	}
 	
+	
 	//-----------------------------------------------------------------------------------------
 	
 	public AsciiDocCreator() {}
+	public AsciiDocCreator(Map asciidoctorAttribtues) { this.asciidoctorAttribtues=asciidoctorAttribtues;}
 	
 	public void init() {
 		asciidoctor = Factory.create();
 		asciidoctor.requireLibrary("asciidoctor-diagram"); // add diagramm functions
 	}
+	
+	/** set attribtus for aciidoctor **/
+	public void setAsciidoctorAttribtues(Map asciidoctorAttribtues) { this.asciidoctorAttribtues=asciidoctorAttribtues; }
+	/** set Graphviz path (path to executable dot.exe) **/ 
+	public void setAttribtueGraphviz(String dotExecutablePath) { if(this.asciidoctorAttribtues==null) { this.asciidoctorAttribtues=new HashMap(); } this.asciidoctorAttribtues.put(ASCIIDOC_ATTR_DOT, dotExecutablePath);}
 	
 	public void create(Object adoc,String format,String outputFile) throws IOException {
 		if(format==null || format.length()==0 || format.equals(aAnnoDoc.FORMAT_ASCIIDOC)) { createAdoc(adoc, outputFile); }
@@ -97,8 +105,13 @@ public class AsciiDocCreator {
 		Options options=new Options();
 		options.setSafe(SafeMode.UNSAFE);
 				
+		
 		options.setBackend("html");
 		options.setToFile(outputFile);
+
+//		Map acciidocAttribtues=new HashMap();
+//		acciidocAttribtues.put(ASCIIDOC_ATTR_DOT, "C:/Data/Programme/graphviz/bin/dot.exe");
+		if(asciidoctorAttribtues!=null) { options.setAttributes(asciidoctorAttribtues); }
 		
 		init();
 		if(adoc instanceof String) {
@@ -133,6 +146,8 @@ public class AsciiDocCreator {
 		
 		Options options=new Options();
 		options.setSafe(SafeMode.UNSAFE);
+		
+		if(asciidoctorAttribtues!=null) { options.setAttributes(asciidoctorAttribtues); }
 		
 //		options.setOption("imagesDir", "../images/");
 //		options.setOption("imagesoutdir", "../images/");
@@ -173,14 +188,14 @@ public class AsciiDocCreator {
 	//-------------------------------------------------------------------
 	
 	/** create pdf for adoc **/
-	public static void Adoc2Pdf(Object adoc,String pdfOutputFile) throws IOException {
-		AsciiDocCreator doc=new AsciiDocCreator();
+	public static void Adoc2Pdf(Object adoc,String pdfOutputFile,Map asciidoctorAttribtues) throws IOException {
+		AsciiDocCreator doc=new AsciiDocCreator(asciidoctorAttribtues);
 		doc.createPdf(adoc, pdfOutputFile);	
 	}
 
 	/** create pdf for adoc **/
-	public static void Adoc2Html(Object adoc,String pdfOutputFile) throws IOException {
-		AsciiDocCreator doc=new AsciiDocCreator();
+	public static void Adoc2Html(Object adoc,String pdfOutputFile,Map asciidoctorAttribtues) throws IOException {
+		AsciiDocCreator doc=new AsciiDocCreator(asciidoctorAttribtues);
 		doc.createHtml(adoc, pdfOutputFile);	
 	}
 	

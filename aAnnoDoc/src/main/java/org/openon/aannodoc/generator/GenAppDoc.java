@@ -21,7 +21,7 @@ import org.openon.aannodoc.annotation.aFeature;
 import org.openon.aannodoc.annotation.aField;
 import org.openon.aannodoc.annotation.aBean;
 import org.openon.aannodoc.annotation.aService;
-import org.openon.aannodoc.asciidoc.SequenzDiagramWriter;
+import org.openon.aannodoc.asciidoc.SequenceDiagramWriter;
 import org.openon.aannodoc.source.AnnotationDoc;
 import org.openon.aannodoc.utils.AnnoUtils;
 import org.openon.aannodoc.utils.Tree;
@@ -373,7 +373,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		String req=AnnoUtils.toString(doc.getValue("request"),null);
 		String res=AnnoUtils.toString(doc.getValue("response"),null);
 		if(req!=null || res!=null) {
-			SequenzDiagramWriter seq=new SequenzDiagramWriter(w);
+			SequenceDiagramWriter seq=new SequenceDiagramWriter(w);
 			seq.start("Service Request-Response");
 			seq.to(req, "Extern",title);
 			seq.from(res, "Extern",title);

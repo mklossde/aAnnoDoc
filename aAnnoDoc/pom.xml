@@ -91,6 +91,14 @@
 		<version>1.5.4</version> 
 	 </dependency>
 	 
+	 <!-- plant uml --> 
+	 <dependency>
+	    <groupId>net.sourceforge.plantuml</groupId>
+	    <artifactId>plantuml</artifactId>
+	    <version>8059</version>
+	    <scope>test</scope>  
+	</dependency>
+
 	<dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>

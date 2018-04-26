@@ -8,7 +8,7 @@ import org.openon.aannodoc.Options;
 import org.openon.aannodoc.aAnnoDoc;
 import org.openon.aannodoc.asciidoc.AsciiDocCreator;
 import org.openon.aannodoc.asciidoc.AsciiDocWriter;
-import org.openon.aannodoc.asciidoc.SequenzDiagramWriter;
+import org.openon.aannodoc.asciidoc.SequenceDiagramWriter;
 import org.openon.aannodoc.asciidoc.UseCaseDiagramWriter;
 import org.openon.aannodoc.generator.GenBaseDoc;
 import org.openon.aannodoc.scanner.SourceAnnotations;
@@ -40,11 +40,11 @@ public class SequenceDiagramTest {
 		wr.close();
 		
 		String adoc=bout.toString();
-		AsciiDocCreator.Adoc2Html(bout.toString(), "doc/SequenzeDiagrammTest.html");
+		AsciiDocCreator.Adoc2Html(bout.toString(), "doc/SequenzeDiagrammTest.html",null);
 	}	
 	
 	public void createDiagram(AsciiDocWriter wr) throws IOException  {
-		SequenzDiagramWriter sqWr=new SequenzDiagramWriter(wr, "mySequenze");
+		SequenceDiagramWriter sqWr=new SequenceDiagramWriter(wr, "mySequenze");
 		
 		sqWr.to("test", "one", "two");
 		sqWr.from("back","one", "two");

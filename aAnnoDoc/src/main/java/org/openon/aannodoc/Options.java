@@ -44,6 +44,8 @@ public class Options {
 	public static final String OPTION_FORMAT="format";
 	public static final String OPTION_OUTPUT="output";
 	
+	public static final String OPTION_AD_GRAPHVIZ="dot"; // asciiDoc Attribute DOC/GRAPHVIZ
+	
 //	public static final String OPTION_OUT_ADOC="outadoc";
 //	/** output directory - change working directory **/ 
 //	public static final String OPTION_OUT_DIR="outdir"; 
@@ -52,12 +54,16 @@ public class Options {
 	
 	/** option map **/
 	protected Map<String,Object> options=new HashMap<String, Object>();
+	/** asciidoctor attribtues **/
+	protected Map asciidoctorAttribtues=new HashMap();
 	
 	/** actual resolved fitler **/
 	protected DocFilter filter;
 	
 	/** instance new option obejct **/
 	public Options() {}
+	
+	public Map getAsciidoctorAttribtues() { return asciidoctorAttribtues; }
 	
 	/** read options from file **/
 	public Options(String propertieFile) throws IOException {
@@ -68,6 +74,9 @@ public class Options {
 	public Options(InputStream propertieStream) throws IOException {
 		readProperties(propertieStream);
 	}
+	
+	/** set aciidoctor attribtue GRAPHVIZ/DOT **/
+	public Options setGraphviz(String dotExecutablePath) { asciidoctorAttribtues.put(OPTION_AD_GRAPHVIZ,dotExecutablePath); return this; }
 	
 	public Options(String soruce,Object outputFile,Object generator,Object format) {
 		put(OPTION_SOURCE,soruce);

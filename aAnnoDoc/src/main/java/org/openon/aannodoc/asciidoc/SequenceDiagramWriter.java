@@ -17,14 +17,16 @@ import org.openon.aannodoc.annotation.aDoc;
  * 
  */
 @aDoc(title="diagram/sequenz diagram")
-public class SequenzDiagramWriter {
+public class SequenceDiagramWriter {
 
 	public static final String plutgin="plantuml";
 	
 	protected AsciiDocWriter wr;
 	
-	public SequenzDiagramWriter(AsciiDocWriter wr)  throws IOException { this(wr,null); }
-	public SequenzDiagramWriter(AsciiDocWriter wr,String title)  throws IOException { 
+	protected String last;
+	
+	public SequenceDiagramWriter(AsciiDocWriter wr)  throws IOException { this(wr,null); }
+	public SequenceDiagramWriter(AsciiDocWriter wr,String title)  throws IOException { 
 		this.wr=wr;
 		if(!wr.e(title)) {start(title); }
 	}
@@ -33,20 +35,20 @@ public class SequenzDiagramWriter {
 	// UML  sequenz diagram
 	
 	/** start sequenz diagram with title of it **/
-	public SequenzDiagramWriter start(String name) throws IOException {
+	public SequenceDiagramWriter start(String name) throws IOException {
 		wr.nnl2().w('[').w(plutgin).w(',').w(name).w(']').nl();
 		wr.w("----").nl();
 		return this;
 	}
 	
 	/** define sequenz point of type [actor,boundary,control,entity,database] **/
-	public SequenzDiagramWriter type(String name,String type,String color) throws IOException {
+	public SequenceDiagramWriter type(String name,String type,String color) throws IOException {
 		wr.nnl().w(type).w(' ').w(name);
 		if(!wr.e(color)) { wr.w(' ').w(color); }
 		wr.nl(); return this;
 	}
 	
-	public SequenzDiagramWriter autonumber(String nrInfo) throws IOException {
+	public SequenceDiagramWriter autonumber(String nrInfo) throws IOException {
 		wr.nnl().w("autonumber"); if(!wr.e(nrInfo)) { wr.w(' ').w(nrInfo); } return this;
 	}
 	
@@ -57,17 +59,25 @@ public class SequenzDiagramWriter {
 	 * @param from - left hand
 	 * @param to - right hand
 	 */
-	public SequenzDiagramWriter sequenz(String title,String from,String style,String to)  throws IOException {
-		wr.w(from);
+	public SequenceDiagramWriter sequenz(Object title,String from,String style,String to)  throws IOException {
+		wr.w(toName(from));
 		if(wr.e(style)) { wr.w(" -> "); } else { wr.w(' ').w(style).w(' '); }
-		wr.w(to).w(": ").w(title).nl();
+		wr.w(toName(to)).w(": ").w(title).nl();
 		return this;
 	}
 	
-	public SequenzDiagramWriter to(String title,String from,String to)  throws IOException { return sequenz(title, from, "->",to);}
-	public SequenzDiagramWriter to(String title,String from,String to,String color)  throws IOException { return sequenz(title, from, "-"+color+">",to);}
-	public SequenzDiagramWriter from(String title,String from,String to)  throws IOException { return sequenz(title, from, "<-",to);}
-	public SequenzDiagramWriter from(String title,String from,String to,String color)  throws IOException { return sequenz(title, from, "<"+color+"-",to);}
+	public String toName(String name) { 
+		if(name==null) { return "NULL"; }
+		return name.replace('-', '_').replace(':', '_').replace(' ', '_');
+	}
+	
+	public SequenceDiagramWriter to(Object title,String to)  throws IOException { sequenz(title, last, "->",to); last=to; return this;}
+	public SequenceDiagramWriter to(Object title,String from,String to)  throws IOException { sequenz(title, from, "->",to); last=to; return this;}
+	public SequenceDiagramWriter to(Object title,String from,String to,String color)  throws IOException { sequenz(title, from, "-"+color+">",to); last=to; return this;}
+	
+	public SequenceDiagramWriter from(Object title,String from)  throws IOException { sequenz(title, from, "<-",last); last=from; return this; }
+	public SequenceDiagramWriter from(Object title,String from,String to)  throws IOException { sequenz(title, from, "<-",to); last=from; return this;}
+	public SequenceDiagramWriter from(Object title,String from,String to,String color)  throws IOException { sequenz(title, from, "<"+color+"-",to); last=from; return this;}
 
 	//		wr.w(from).w(" -> ").w(to).w(": ").w(title).nl();
 //		return this;
@@ -79,7 +89,7 @@ public class SequenzDiagramWriter {
 
 	
 	/** start sequenz diagram **/
-	public SequenzDiagramWriter end()  throws IOException {
+	public SequenceDiagramWriter end()  throws IOException {
 		wr.nnl().w("----").nl();
 		return this;
 		

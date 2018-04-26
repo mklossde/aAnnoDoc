@@ -41,6 +41,25 @@ import org.openon.aannodoc.aAnnoDoc;
  *		</plugins>
  *	</build>
  *	
+ *
+ *
+ *
+GRAPHVIZ SETUP:
+	GRAPHVIZ_HOME	c:\Software\graphviz
+	PATH	[…​];%GRAPHVIZ_HOME%\bin
+ 
+
+GRAPHVIZ MAVEN
+				<configuration>
+					<sourceDirectory>src/main/asciidoc</sourceDirectory>
+					<requires>
+						<require>asciidoctor-diagram</require>
+					</requires>
+					<attributes>
+						<graphvizdot>${project.build.directory}/../graphviz/bin/dot.exe</graphvizdot>
+					</attributes>
+				</configuration>
+				
  * @author Michael
  *
  */
