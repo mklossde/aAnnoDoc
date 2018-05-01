@@ -11,6 +11,7 @@ import org.openon.aannodoc.source.AnnotationDoc;
 import org.openon.aannodoc.source.ClassDoc;
 import org.openon.aannodoc.source.DocObject;
 import org.openon.aannodoc.source.JarDoc;
+import org.openon.aannodoc.utils.AnnoUtils;
 import org.openon.aannodoc.utils.DocFilter;
 
 import java.util.Set;
@@ -159,7 +160,7 @@ public class SourceAnnotations {
 	/** get first annotaion of  annotationClass with key=value **/
 	public AnnotationDoc getAnnotation(Object annotationClassObject,String key,String value) throws IOException {
 		if(unit==null) return null;
-		String annotationClass=toAnnotationClassName(annotationClassObject);
+		String annotationClass=AnnoUtils.toAnnotationClassName(annotationClassObject);
 		if(annotationClass==null || annotationClass.length()==0) {
 			Iterator<String> keys=unit.anno().getAnnotationMap().keySet().iterator();
 			while(keys.hasNext()) {
@@ -182,7 +183,7 @@ public class SourceAnnotations {
 	
 	public List<AnnotationDoc> findAnnotationIn(DocObject doc,Object annotationClassObject,String key,String value) {
 		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>(); 
-		String annotationClass=toAnnotationClassName(annotationClassObject);
+		String annotationClass=AnnoUtils.toAnnotationClassName(annotationClassObject);
 		List sub=doc.listAnnotationType(annotationClass, key, value);
 		if(sub!=null) { list.addAll(sub); }
 		return list;
@@ -192,7 +193,7 @@ public class SourceAnnotations {
 	public List<AnnotationDoc> findAnnotation(Object annotationClassObject,String key,String value) {
 		List<AnnotationDoc> l=new ArrayList<AnnotationDoc>();
 		if(unit==null) return l;
-		String annotationClass=toAnnotationClassName(annotationClassObject);
+		String annotationClass=AnnoUtils.toAnnotationClassName(annotationClassObject);
 		if(annotationClass==null || annotationClass.length()==0) {
 			Iterator<String> keys=unit.anno().getAnnotationMap().keySet().iterator();
 			while(keys.hasNext()) {
@@ -233,15 +234,7 @@ public class SourceAnnotations {
 	
 	//---------------------------------------------------------------------
 	
-	/** get name of annotation for anno **/
-	public String toAnnotationClassName(Object anno) {
-		if(anno==null) { return null; }
-		else if(anno instanceof String) {
-			String name=(String)anno;if(name.startsWith("@")) { name=name.substring(1); }
-			return  name;
-		}else if(anno instanceof Class) { return ((Class)anno).getSimpleName(); }
-		else { return anno.getClass().getSimpleName(); }
-	}
+
 	
 	//---------------------------------------------------------------------
 	

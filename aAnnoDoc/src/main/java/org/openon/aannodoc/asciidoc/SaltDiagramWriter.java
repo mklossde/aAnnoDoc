@@ -17,7 +17,7 @@ public class SaltDiagramWriter {
 	public enum Align { left,center,right; }
 //	public static final String plutgin="plantuml";
 	public static final String salt="salt";
-	public static final String empty="                                                                                                                                                      ";
+	public static final String empty="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ";
 	protected AsciiDocWriter wr;
 	
 	public int index=0,cols=0;
@@ -35,7 +35,7 @@ public class SaltDiagramWriter {
 	public SaltDiagramWriter start(String name) throws IOException {		
 		wr.nnl2().w('[').w(salt).w(',').w(name).w(']').nl();
 		wr.w("----").nl();
-		wr.w("{").nl();
+		wr.w("{+").nl();
 		return this;
 	}
 	
@@ -49,10 +49,14 @@ public class SaltDiagramWriter {
 	}
 	
 	//--------------------------------------------------------------------
-	public SaltDiagramWriter empty() { wr.w("."); return grid(); }	
+	public SaltDiagramWriter empty() { return empty(1); }
+	public SaltDiagramWriter empty(int count) { for(int i=0;i<count;i++) { wr.w(".");grid(); } return this; }	
+	
 	public SaltDiagramWriter text(Object text) { wr.w(text); return grid(); }	
 	public SaltDiagramWriter text(String text,int len,Align align) {
 		if(text==null) { text=""; }if(len<0) { len=text.length(); }
+		
+		if(len>empty.length()) { len=empty.length(); } // simple hack for empty	
 		StringBuilder sb=new StringBuilder(empty.substring(0,len));		
 		if(align==Align.center) { int pos=(len/2)-(text.length()/2); int max=pos+text.length(); if(max>len) { max=len; } sb.replace(pos, max, text); }
 		else if(align==Align.right) { int max=text.length(); if(max>len) { max=len; }  sb.replace(len-max, len, text); }
@@ -160,8 +164,9 @@ public class SaltDiagramWriter {
 	public int menuCount=0;
 	
 	/** write a tab line **/
-	public SaltDiagramWriter menu(String selected,String... entrys) {
-		menu(); for(int i=0;entrys!=null && i<entrys.length;i++) {  menu(entrys[i],selected!=null && selected.equalsIgnoreCase(entrys[i])); } return menuEnd();
+	public SaltDiagramWriter menu(String selected,Object... entrys) {
+		menu(); for(int i=0;entrys!=null && i<entrys.length;i++) {
+			if(entrys[i]!=null) { menu(entrys[i],selected!=null && wr.equlsIgnoreCase(selected,entrys[i])); }} return menuEnd();
 	}
 	public SaltDiagramWriter subMenu(String menu,String selected,String... entrys) {
 		for(int i=0;i<entrys.length;i++) {  wr.nl(); menu(menu,true); 
@@ -173,7 +178,7 @@ public class SaltDiagramWriter {
 	/** star new tab line **/	
 	public SaltDiagramWriter menu() { wr.nnl().w("{* "); return this; }
 	/** write one tab **/
-	public SaltDiagramWriter menu(String entrys,boolean selected) {
+	public SaltDiagramWriter menu(Object entrys,boolean selected) {
 		if(menuCount++>0) { wr.w(" | "); } if(selected) { wr.w("<b>"); } wr.w(entrys); return this;
 	}
 	/** end tab line **/

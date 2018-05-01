@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openon.aannodoc.doc.AnnotationDocScanner;
+import org.openon.aannodoc.utils.AnnoUtils;
 
 
 /**
@@ -128,22 +129,36 @@ public abstract class DocObject implements Serializable {
 	}
 	
 	/** get first annotaion with name **/
-	public AnnotationDoc getAnnotation(String name) { 
-		if(name==null) { return null; } else if(name.startsWith("@")) { name=name.substring(1); }
+	public AnnotationDoc getAnnotation(Object annotationClassObject) { 
+		String annoName=AnnoUtils.toAnnotationClassName(annotationClassObject);
 //		return getAnnotation("name",name); 
 		for(int i=0;annotations!=null && i<annotations.size();i++) {
 			AnnotationDoc anno=annotations.get(i);
-			if(anno.name!=null && anno.name.equals(name)) return anno;
+			if(anno.name!=null && anno.name.equals(annoName)) return anno;
 		}
 		return null;
 	}
 	/** get first annotation with key==value **/
-	public AnnotationDoc getAnnotation(String key,String value) {
+	public AnnotationDoc getAnnotation(Object annotationClassObject,String key,String value) {
+		String annoName=AnnoUtils.toAnnotationClassName(annotationClassObject);
 		for(int i=0;annotations!=null && i<annotations.size();i++) {
 			AnnotationDoc anno=annotations.get(i);
-			if(anno.has(key, value)) return anno;
+			if((annoName==null || annoName.equals(anno.name)) 
+					&& anno.has(key, value)) { return anno; }
 		}
 		return null;
+	}
+	
+	public List<AnnotationDoc> findAnnotation(Object annotationClassObject) { return findAnnotation(annotationClassObject,null,null); }
+	public List<AnnotationDoc> findAnnotation(Object annotationClassObject,String key,String value) {
+		String annoName=AnnoUtils.toAnnotationClassName(annotationClassObject);
+		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>();
+		for(int i=0;annotations!=null && i<annotations.size();i++) {
+			AnnotationDoc anno=annotations.get(i);
+			if((annoName==null || annoName.equals(anno.name)) 
+					&& (key==null || anno.has(key, value))) { list.add(anno); }
+		}
+		return list;
 	}
 	
 	/** get list of all annotations in object **/

@@ -42,6 +42,9 @@ public @interface aApplication {
 	/** copyright information **/
 	String copyright() default "";
 	
+	/** name of web context root **/
+	String contextRoot() default "";
+	
 	/** author of this description **/
 	String author() default "";
 	/** date of this description **/
@@ -50,6 +53,8 @@ public @interface aApplication {
 	String version() default ""; 
 	/** description is no longer correct **/
 	String deprecated() default ""; 
+	
+
 	
 	/** versions of application **/
 	aVersion[] versions() default {};

@@ -10,13 +10,15 @@ import java.lang.reflect.Method;
 public class MethodDoc extends TypeDoc implements Serializable{
 	private static final long serialVersionUID = -4482749601451320369L;
 
-	protected ParameterDoc parameter;
+	protected ParametersDoc parameter;
 	protected transient Method method;
 	
-	public MethodDoc(String name,String typeName,ParameterDoc parameter,DocObject parent,ClassDoc clSource)  { 
+	public MethodDoc(String name,String typeName,DocObject parent,ClassDoc clSource)  { 
 		super(name,typeName,parent,clSource); 
-		this.parameter=parameter;
+		
 	}
+	
+	public void setParameter(ParametersDoc parameter) { this.parameter=parameter; }
 	
 	public Method getMethod() throws Exception  {
 		if(this.method!=null) { return this.method; }
@@ -30,7 +32,7 @@ public class MethodDoc extends TypeDoc implements Serializable{
 	}
 	
 	/** get method parameter **/
-	public ParameterDoc getParameter() { return parameter; }
+	public ParametersDoc getParameter() { return parameter; }
 	
 	public String toJava() { return toJava(modifiers)+" "+name+"("+(parameter.toJava())+")"; }
 	public String toString() { return "Method "+name; }

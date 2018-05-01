@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.openon.aannodoc.utils.AnnoUtils;
+import org.openon.aannodoc.utils.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +45,8 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	/** is this a inline annotation (a annotation like author which is uses inside a comment) **/
 	public boolean inline=false;
 	
-	public String refName,refPath;
+	/** paren name/path of this annotation **/
+	public String parentName,parentPath;
 	
 	/** atttribute values **/
 	private Map<String,Object> values=new HashMap<String, Object>();
@@ -59,6 +62,8 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	public AnnotationDoc(String name,String fullName,DocObject parent,ClassDoc clSource,boolean inline) { 
 		super(name,fullName,parent,clSource);
 		this.inline=inline;
+		this.parentName= ReflectUtil.removeGetSet(parent.getName());
+		this.parentPath=clSource.getTypePackage();
 	}
 	
 	//-----------------------------------------------------------------
@@ -70,10 +75,10 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 //TODO: how to identify new/date of annotation
 	public boolean isNewer(long time) { return true; }
 	
-	public void setRef(String refPath,String refName) { this.refName=refName; this.refPath=refPath; }
+	public void setParent(String parentPath,String parentName) { this.parentName=parentName; this.parentPath=parentPath; }
 
 	/** get name of parent this annotation referenced to (e.g. name of method(without get/set)/field/class) **/
-	public String getRef() {  return refName; }
+	public String getRef() {  return parentName; }
 //		if(parent==null) { return null; } else { return parent.getName(); }}
 	
 	/** get inline annotation author (\@author MYNAME) **/
@@ -154,6 +159,9 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 		else if(obj instanceof DocReference) { return ((DocReference)obj).resolve(); }
 		else { return String.valueOf(obj); }
 	}
+	/** get value as integer **/
+	public int getValueIntger(String key,int def) { return AnnoUtils.toInteger(values.get(key), def); }
+	
 	
 	//-----------------------------------------------------------------
 	
@@ -162,6 +170,10 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 		if(key==null || values==null) return false;
 		if(value==null) return values.containsKey(key);
 		Object obj=values.get(key);
+		if(value.equals(obj)) { return true; }
+		if(obj instanceof DocReference) { 
+			obj=((DocReference)obj).resolve(); }
+//		if(value instanceof DocReference) { value=((DocReference)value).resolve(); }
 		return value.equals(obj);
 	}
 	
@@ -193,6 +205,14 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	
 	//-----------------------------------------------------------------
 	
+	public boolean equals(Object obj) {
+		if(obj instanceof AnnotationDoc) {
+//			String s=AnnoU((AnnotationDoc)obj).getValueString("name");
+			String s1=AnnoUtils.getValueOrName(this, "name");			
+			String s2=AnnoUtils.getValueOrName((AnnotationDoc)obj, "name");
+			return s1!=null && s1.equals(s2);
+		}else return super.equals(obj);
+	}
 	
 	@Override public String toString() { 
 		return "Annotation "+name+" "+values;  

@@ -68,6 +68,8 @@ import japa.parser.ast.type.ReferenceType;
 public class JavaSourceScanner {
 	private Logger LOG=LoggerFactory.getLogger(JavaSourceScanner.class);
 	
+	public static final String ANNO_VALUE="value";
+	
 	public static boolean ANALYSEAT=true;
 	
 //	protected String charset="UTF-8";
@@ -330,8 +332,11 @@ public class JavaSourceScanner {
 			    		
 			    	}else if(body instanceof MethodDeclaration) {// Method	
 			    		MethodDeclaration method=(MethodDeclaration)body;
-			    		ParameterDoc params=getParams(method,clSource);
-			    		MethodDoc mc=new MethodDoc(method.getName(), toString(method.getType()), params,clSource, clSource);
+			    		
+			    		MethodDoc mc=new MethodDoc(method.getName(), toString(method.getType()), clSource, clSource);
+			    		ParametersDoc params=getParams(method,mc,clSource); 
+			    		mc.setParameter(params);
+			    		
 			    		LOG.trace("MethodDeclaration "+method.getName());
 			    		setAnnotations(mc, method.getAnnotations(), clSource,comments);
 			    		mc.modifiers=method.getModifiers();
@@ -371,18 +376,33 @@ public class JavaSourceScanner {
 		    }		    			    	
 		     
 		}catch(Throwable e) {
+			e.printStackTrace();
 			LOG.error("scan error in "+name+" ("+e+")",e);
 		}
 	}	
 	
-	protected ParameterDoc getParams(MethodDeclaration method,ClassDoc clSource) {		
+	protected ParametersDoc getParams(MethodDeclaration method,MethodDoc methodDoc,ClassDoc clSource) {
 		List<Parameter> parameter=method.getParameters();
 //		List<TypeParameter> parameter2=method.getTypeParameters();
-		if(parameter==null) { return new ParameterDoc(0); }
+		if(parameter==null) { return new ParametersDoc(methodDoc,clSource,0); }
 		
-		ParameterDoc doc=new ParameterDoc(parameter.size());
+		ParametersDoc doc=new ParametersDoc(methodDoc,clSource,parameter.size());
 		for(int i=0;i<parameter.size();i++) {
 			Parameter p=parameter.get(i);
+			List<AnnotationExpr> annos=p.getAnnotations();
+			if(annos!=null) {				
+				List<AnnotationDoc> annoList=new ArrayList();
+				ParameterDoc param=doc.get(i);
+				for(int t=0;annos!=null && t<annos.size();t++) {	
+					AnnotationDoc anno=toAnnotationDoc(param, annos.get(t), clSource);
+			    	clSource.addAllAnnotations(anno);  // class add annotation
+			    	unit.addAnnotation(anno);  // unit add annotation
+			    	doc.addAllAnnotations(anno); // param add anoation
+					annoList.add(anno);					
+					
+				}
+				doc.set(i, annoList);
+			}
 			VariableDeclaratorId var=p.getId();
 			String name=var.getName();
 //			Type type=p.getType();
@@ -492,7 +512,8 @@ public class JavaSourceScanner {
 	    for(int i=0;pAnno!=null && i<pAnno.size();i++) {
 	    	AnnotationExpr anno=pAnno.get(i);	    	
 	    	AnnotationDoc as=toAnnotationDoc(source, anno, clSource);
-	    	
+	    	clSource.addAllAnnotations(as);  // class add annotation
+	    	unit.addAnnotation(as);  // unit add annotation
 	    	list.add(as);
 	    	
     		scanComments(prev,anno, as, clSource,comments); // scan inside comments
@@ -502,12 +523,13 @@ public class JavaSourceScanner {
 	    source.addAnnotations(list);
 	}
 	
-	public static final String ANNO_VALUE="value";
-	private AnnotationDoc toAnnotationDoc(DocObject source,AnnotationExpr anno,ClassDoc clSource) {
-    	String annoName=toString(anno.getName());
-//System.out.println("annoName:"+annoName);	    	
-    	AnnotationDoc as=new AnnotationDoc(annoName,findClassName(annoName,clSource),source,clSource,false);    
-    	clSource.addAllAnnotations(as); 
+	
+	
+	private AnnotationDoc toAnnotationDoc(DocObject parent,AnnotationExpr anno,ClassDoc clSource) {
+    	String annoName=toString(anno.getName());	
+    	String annoFullName=findClassName(annoName,clSource);
+    	AnnotationDoc as=new AnnotationDoc(annoName,annoFullName,parent,clSource,false);        	
+//    	as.setParent(clSource.getTypePackage(), ReflectUtil.removeGetSet(source.getName()));
     	
     	if(anno instanceof NormalAnnotationExpr) { // @ANNO(key="value",..)
     		NormalAnnotationExpr na=(NormalAnnotationExpr)anno;
@@ -529,13 +551,7 @@ public class JavaSourceScanner {
     	}else {
     		LOG.warn("unparsed annotion "+anno);
     	}
-    	
-//		if(as.getValueName()==null) as.add(AnnotationDoc.ID, ReflectUtil.removeGetSet(source.getName())); // get name from parent
-//		if(as.getValuePath()==null) as.add(AnnotationDoc.PATH,shortPath(clSource.getTypePackage()));
-    	as.setRef(clSource.getTypePackage(), ReflectUtil.removeGetSet(source.getName()));
-    	
-    	unit.addAnnotation(as);     
-    	
+    	     	
     	return as;
 	}
 	
@@ -569,7 +585,10 @@ public class JavaSourceScanner {
 			return l;
 		}else if(obj instanceof NormalAnnotationExpr) {
 			NormalAnnotationExpr a=(NormalAnnotationExpr)obj;
-			return toAnnotationDoc(clSource, a, clSource);
+			AnnotationDoc as=toAnnotationDoc(clSource, a, clSource);
+	    	clSource.addAllAnnotations(as);  // class add annotation
+	    	unit.addAnnotation(as);  // unit add annotation
+	    	return as;
 			
 		}else if(obj instanceof FieldAccessExpr) {
 			FieldAccessExpr f=(FieldAccessExpr)obj;
@@ -577,6 +596,12 @@ public class JavaSourceScanner {
 			String className=findClassName(f.getScope().toString(), clSource);
 			return new DocReference(className,f.getField(),this.unit);			
 
+		}else if(obj instanceof NameExpr) {
+			NameExpr exp=(NameExpr)obj;
+//			String className=findClassName(exp.getName(), clSource);
+			String className=clSource.getClassName();
+			return new DocReference(className,exp.getName(),this.unit);
+			
 		}else {
 //System.out.println("unkown "+obj.getClass()); 			
 			return String.valueOf(obj);

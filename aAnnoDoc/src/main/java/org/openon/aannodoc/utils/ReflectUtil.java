@@ -164,4 +164,10 @@ public class ReflectUtil {
 		}	
 		return map;
 	}	
+	
+	public static String toName(String methodName) {
+		if(methodName==null || methodName.length()<3) { return methodName; }
+		else if(methodName.startsWith("get") || methodName.startsWith("set")) { return methodName.substring(3); }
+		else { return methodName; }
+	}
 }

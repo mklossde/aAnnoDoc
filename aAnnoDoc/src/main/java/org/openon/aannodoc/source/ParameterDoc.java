@@ -1,73 +1,47 @@
 package org.openon.aannodoc.source;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Annotation bases documenation about a parameter-set
  * 
  */
-public class ParameterDoc {
+public class ParameterDoc extends DocObject {
 
-	protected String[] names;
-	protected String[] classNames;
-	protected Class[] types;
+	protected String name;
+	protected String className;
+	protected Class type;
+	protected List<AnnotationDoc> paramAnnotations;
 	
-	public ParameterDoc(int size) {		
-		names=new String[size];
-		classNames=new String[size];
+	public ParameterDoc(DocObject parent,DocObject group) {super("Parameter", parent, group);}
+	public ParameterDoc(DocObject parent,DocObject group,String name,String className,Class type,List<AnnotationDoc> paramAnnotations) {
+		super("Parameter", parent, group);
+		this.name=name; this.className=className; this.type=type; this.paramAnnotations=paramAnnotations;
 	}
 	
-	protected void set(int index,String className,String name) { 
-		classNames[index]=className; 
-		names[index]=name;
-	} 
-	
-	/** number of parameter **/
-	public int size() { 
-		if(classNames==null) { return 0; }
-		else { return classNames.length; } 
-	}
-
-
-	
-	public String getName(int index) {
-		return names[index];
-	}
-
-	public String[] getNames() { return names; }
-	
-	public String getClassName(int index) {
-		return classNames[index];
+	public String getName() {
+		return name;
 	}
 	
-	public String[] getClassNames() { return classNames;}
+	public String getClassName() {
+		return className;
+	}
 	
 	//----------------------------------------------------------------------
 	// find class for types
 	
-	public Class getType(int index) throws Exception {
-		return getTypes()[index];
-	}
-	
-	public Class[] getTypes() throws Exception { 
-		if(types!=null) { return types; }
-		types=new Class[classNames.length];
-		for(int i=0;i<types.length;i++) {
-			types[i]=Class.forName(classNames[i]);
-		}
-		return types;
+	public Class getType() throws Exception { 
+		if(type!=null) { return type; }
+		type=Class.forName(className);
+		return type;
 	}
 	
 	//----------------------------------------------------------------------
 	
-	public String toJava() { 
-		StringBuilder sb=new StringBuilder();
-		for(int i=0;i<names.length;i++) {
-			sb.append(types[i]+" "+names[i]);
-		}
-		return sb.toString();
+	public String toString() {
+		return className+" "+name;
 	}
-	public String toString() { return "Paramerts "+Arrays.toString(names); }
 }
 
 	

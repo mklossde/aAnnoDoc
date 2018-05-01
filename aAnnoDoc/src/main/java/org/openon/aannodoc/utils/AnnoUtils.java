@@ -11,11 +11,19 @@ import org.openon.aannodoc.asciidoc.AsciiDocWriter;
 import org.openon.aannodoc.scanner.SourceAnnotations;
 import org.openon.aannodoc.source.AnnotationDoc;
 import org.openon.aannodoc.source.DocObject;
+import org.openon.aannodoc.source.DocReference;
 import org.openon.aannodoc.source.FieldDoc;
 import org.openon.aannodoc.source.TypeDoc;
 
 public class AnnoUtils {
 
+	/** get attribute-value of annotation or name of parent (class/method/field) **/
+	public static String getValueOrName(AnnotationDoc doc,String key) {
+		String value=toString(doc.getValue(key),null);
+		if(value==null) { value=ReflectUtil.toName(doc.getParent().getName()); }
+		return value;
+	}
+	
 	/** get attribute-value of annotation **/
 	public static String getValue(AnnotationDoc doc,String key) {
 		String value=toString(doc.getValue(key),null);
@@ -30,7 +38,7 @@ public class AnnoUtils {
 	/** get title of annotation **/
 	public static String getTitle(AnnotationDoc doc,boolean removePath) {
 		String title=toString(doc.getValue(aDoc.fTITLE),null);
-		if(title==null) { title=doc.getParent().getName(); }
+		if(title==null) { title=ReflectUtil.toName(doc.getParent().getName()); }
 		if(title!=null && removePath) { int index=title.lastIndexOf('/'); if(index!=-1) { title=title.substring(index+1); } }
 		return title;
 	}
@@ -101,6 +109,19 @@ public class AnnoUtils {
 	
 	//---------------------------------------------------------------------------------
 	
+	
+	/** get name of annotation for anno **/
+	public static String toAnnotationClassName(Object anno) {
+		if(anno==null) { return null; }
+		else if(anno instanceof String) {
+			String name=(String)anno;if(name.startsWith("@")) { name=name.substring(1); }
+			return  name;
+		}else if(anno instanceof Class) { return ((Class)anno).getSimpleName(); }
+		else { return anno.getClass().getSimpleName(); }
+	}
+	
+	//---------------------------------------------------------------------------------
+	
 	/** get doc of DocObject **/
 	public static String getDoc(DocObject doc) {
 		if(doc==null) { return null; }
@@ -159,7 +180,21 @@ public class AnnoUtils {
 	
 	public static String toString(Object obj,String def) {
 		if(obj==null) { return def; }
-		return String.valueOf(obj);
+		else if(obj instanceof DocReference) {
+			DocReference ref=(DocReference)obj;
+			return ref.resolve();
+		}else {	return String.valueOf(obj); }
+	}
+	
+	public static int toInteger(Object obj,int def) {
+		try {
+			if(obj==null) { return def; }
+			else if(obj instanceof Integer) { return (Integer)obj; }
+			String str=String.valueOf(obj);
+			return Integer.parseInt(str);
+		}catch(Exception e) { return def; }
+		
+		
 	}
 	
 	//---------------------------------------------------------------------------------

@@ -82,6 +82,7 @@ public class AsciiDocWriter {
 	public AsciiDocWriter subTitle(Object text) { return title(titleDeep++, text); }
 	public AsciiDocWriter subTitleEnd() { titleDeep--; return this; }
 	
+	public AsciiDocWriter list() { return nnl2().w("* "); }
 	public AsciiDocWriter list(Object text) { return nnl2().w("* ").w(text).nl2(); }
 	public AsciiDocWriter list2(Object text) { return list(2,text); }
 	public AsciiDocWriter list3(Object text) { return list(3,text); }
@@ -109,7 +110,12 @@ public class AsciiDocWriter {
 	public AsciiDocWriter reference(Object text) { return w("<<").w(text).w(">>"); }
 	
 	public AsciiDocWriter table(Object title,Object... heads) { nnl2().w(".table ").w(title).nl().w("|===").nl();for(int i=0;heads!=null && i<heads.length;i++) { w("|").w(heads[i]); } return nl(); }
-	public AsciiDocWriter tableLine(Object... cells) { nnl(); for(int i=0;cells!=null && i<cells.length;i++) { w("|").w(cells[i]); } return nl(); } 
+	public AsciiDocWriter tableLine(Object... cells) { nnl(); for(int i=0;cells!=null && i<cells.length;i++) { w("|").w(cells[i]); } return nl(); }
+	/** table line ONLY if ANY CELL NOT NULL **/
+	public AsciiDocWriter tableLineNN(Object... cells) { 
+		for(int t=0;cells!=null && t<cells.length;t++) { if(cells[t]==null) { return this; }}
+		nnl(); for(int i=0;cells!=null && i<cells.length;i++) { w("|").w(cells[i]); } return nl(); 
+	}
 	public AsciiDocWriter tableEnd() { return nnl().wnl("|==="); }
 	
 	public AsciiDocWriter include(String file) { return include(file,null); }
@@ -168,6 +174,8 @@ public class AsciiDocWriter {
 		return this;
 	}
 	public String valueOf(Object o) { return String.valueOf(o); }
+	public boolean equlsIgnoreCase(Object a,Object b) { if(a==null || b==null) {return false; }return String.valueOf(a).equalsIgnoreCase(String.valueOf(b)); }
+	
 	//---------------------------------------------------------------------------------------------------------
 
 	public void flush() { wr.flush(); }
@@ -184,6 +192,8 @@ public class AsciiDocWriter {
 		else { return "AsciiWriter "+wr; }
 	}
 	
+	
+
 	//----------------------------------------------------------------------------
 	
 	/** is empty **/
