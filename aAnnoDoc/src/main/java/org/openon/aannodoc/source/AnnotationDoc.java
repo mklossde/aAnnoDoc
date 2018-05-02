@@ -155,13 +155,10 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	public String getValueString(String key) { 
 		if(values==null) { return null; }
 		Object obj=values.get(key);
-		if(obj==null) { return null; }
-		else if(obj instanceof DocReference) { return ((DocReference)obj).resolve(); }
-		else { return String.valueOf(obj); }
+		return AnnoUtils.toString(obj, null);
 	}
 	/** get value as integer **/
 	public int getValueIntger(String key,int def) { return AnnoUtils.toInteger(values.get(key), def); }
-	
 	
 	//-----------------------------------------------------------------
 	
