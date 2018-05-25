@@ -50,10 +50,25 @@ public class UseCaseDiagramTest {
 	}		
 	
 	public void createDiagram(AsciiDocWriter wr) throws IOException {
-		UseCaseDiagramWriter sqWr=new UseCaseDiagramWriter(wr, "myUseCase");
+		UseCaseDiagramWriter dia=new UseCaseDiagramWriter(wr, "myUseCase");
 		
 //		wr.w("\nUser -> (Start)\nUser --> (Use the application) : A small label\n\n:Main Admin: ---> (Use the application) : This is\nyet another\nlabel\n");
-		wr.w("\n:First Actor:\n:Another actor: as Men2  \nactor Men3\nactor :Last actor: as Men4\n");
-		sqWr.end();
+//		wr.w("\n:First Actor:\n:Another actor: as Men2  \nactor Men3\nactor :Last actor: as Men4\n");
+		dia.usecase("1");dia.usecase("2");
+		dia.actor("A","test1");dia.actor("B","Person");
+		dia.link("A", "1");dia.link("A", "2",2,"example");
+		dia.extend("A", "B", 3, "child");
+		dia.noteTo("A", "Parent",dia.LEFT);
+		dia.noteAs("X","SimpleNote");
+		dia.line("X","A");
+		dia.line("1","X");
+		
+		dia.rectangle("Infos");
+		dia.usecase("3");dia.usecase("4");
+		dia.connect("3","4",1,"Hallo","<",dia.LINE,">");
+		dia.rectangleEnd();
+		
+		dia.line("3", "2");
+		dia.end();
 	}
 }

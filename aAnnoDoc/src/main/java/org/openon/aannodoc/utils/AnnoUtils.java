@@ -260,7 +260,20 @@ public class AnnoUtils {
 	}	
 	
 	//---------------------------------------------------------------------------------
-
+	/** get array of o **/
+	public static Object[] toArray(Object o) { 
+		if(o instanceof Object[]) { return ((Object[])o); }
+		else if(o instanceof List) { return ((List)o).toArray(); }
+		else if(o!=null) { return new Object[]{o}; }
+		else { return null; }
+	}
+	/** get string array for o**/
+	public static String[] toArrayString(Object o) {
+		Object a[]=toArray(o); if(a==null) {return null; }
+		String s[]=new String[a.length];
+		for(int i=0;i<a.length;i++) { s[i]=AnnoUtils.toString(a[i],null); }
+		return s;
+	}
 	
 	public static String toString(Object obj,String def) {
 		if(obj==null) { return def; }
