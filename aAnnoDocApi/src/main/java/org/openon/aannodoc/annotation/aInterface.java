@@ -33,4 +33,7 @@ public @interface aInterface {
 	/** description is no longer correct **/
 	String deprecated() default ""; 
 	
+	/** internal group - for java below 1.7 **/
+	public  @interface aInterfaces { aInterface[] value() default {}; }
+	
 }

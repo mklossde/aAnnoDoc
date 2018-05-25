@@ -34,4 +34,7 @@ public @interface aBug {
 	String author() default "";
 	/** date of this description **/
 	String date() default ""; 
+	
+	/** internal group - for java below 1.7 **/
+	public  @interface aBugs { aBug[] value() default {}; }
 }

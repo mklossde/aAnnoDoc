@@ -34,4 +34,7 @@ public @interface aExample {
 	String version() default ""; 
 	/** description is no longer correct **/
 	String deprecated() default ""; 
+	
+	/** internal group - for java below 1.7 **/
+	public  @interface aExamples { aExample[] value() default {}; }
 }

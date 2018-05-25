@@ -59,6 +59,7 @@ public class AsciiDocCreator {
 	public void setAttribtueGraphviz(String dotExecutablePath) { if(this.asciidoctorAttribtues==null) { this.asciidoctorAttribtues=new HashMap(); } this.asciidoctorAttribtues.put(ASCIIDOC_ATTR_DOT, dotExecutablePath);}
 	
 	public void create(Object adoc,String format,String outputFile) throws IOException {
+		new File(outputFile).getParentFile().mkdirs(); // create all dirs to doc
 		if(format==null || format.length()==0 || format.equals(aAnnoDoc.FORMAT_ASCIIDOC)) { createAdoc(adoc, outputFile); }
 		else if(format.equals(aAnnoDoc.FORMAT_PDF)) { createPdf(adoc, outputFile); }
 		else if(format.equals(aAnnoDoc.FORMAT_HTML)) { createHtml(adoc, outputFile); }
@@ -103,9 +104,8 @@ public class AsciiDocCreator {
 	
 	public void createHtml(Object adoc,String outputFile) throws IOException {	
 		Options options=new Options();
-		options.setSafe(SafeMode.UNSAFE);
-				
-		
+		options.setSafe(SafeMode.UNSAFE);					
+
 		options.setBackend("html");
 		options.setToFile(outputFile);
 
@@ -196,6 +196,7 @@ public class AsciiDocCreator {
 	/** create pdf for adoc **/
 	public static void Adoc2Html(Object adoc,String pdfOutputFile,Map asciidoctorAttribtues) throws IOException {
 		AsciiDocCreator doc=new AsciiDocCreator(asciidoctorAttribtues);
+		new File(pdfOutputFile).getParentFile().mkdirs(); // create all dirs to doc
 		doc.createHtml(adoc, pdfOutputFile);	
 	}
 	

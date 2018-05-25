@@ -47,4 +47,7 @@ public @interface aBean {
 	/** description is no longer correct **/
 	String deprecated() default ""; 
 	
+	/** internal group - for java below 1.7 **/
+	public  @interface aBeans { aBean[] value() default {}; }
+	
 }

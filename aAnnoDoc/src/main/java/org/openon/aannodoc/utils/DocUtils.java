@@ -1,6 +1,7 @@
 package org.openon.aannodoc.utils;
 
 import java.io.File;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,11 @@ import org.slf4j.LoggerFactory;
 public class DocUtils {
 	private static final Logger LOG=LoggerFactory.getLogger(DocUtils.class);
 	
+	/** is obejct as string empty **/
+	public static boolean e(Object o) {
+		String s=Objects.toString(o,null);
+		return s==null || s.length()==0;
+	}
 	
 	//------------------------------------------------------------------------------------------
 	

@@ -4,40 +4,33 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation to document a service which is called from other application
- * 	e.g. a rest service inside this application
+ * Annotation to document a change of a problem 
+ * 
  * 
  * 
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="generator/AppDoc/aService")
+@aDoc(title="generator/AppDoc/aChange")
 @Retention( RetentionPolicy.RUNTIME ) 
-public @interface aService {
+public @interface aChange {
 	/** group this documenation belongs to **/
 	String group() default "";	
 	/** title or subTitle for documentation **/
 	String title() default "";
-	
+		
 	/** description (alternative to java-comment) **/
 	String description() default "";
-	/** simple or short information **/
-	String simple() default "";
 	
-	/** request of service **/
-	String request() default "";
-	/** resonse of service **/
-	String response() default "";
+	/** informaiton about a todo **/
+	String todo() default "";
+
 	
 	/** author of this description **/
 	String author() default "";
 	/** date of this description **/
 	String date() default ""; 
-	/** description belongs to version **/
-	String version() default ""; 
-	/** description is no longer correct **/
-	String deprecated() default ""; 
 	
 	/** internal group - for java below 1.7 **/
-	public  @interface aServices { aService[] value() default {}; }
+	public  @interface aChanges { aChange[] value() default {}; }
 }

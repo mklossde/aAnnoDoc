@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Michael Kloss - mk@almi.de
  *
  */
-@aDoc(title="generator/AppDoc/aBug")
+@aDoc(title="annotation/aVersion")
 @Retention( RetentionPolicy.RUNTIME ) 
 public @interface aVersion {
 	/** group this documenation belongs to **/
@@ -21,15 +21,24 @@ public @interface aVersion {
 	
 	/** version this change describe **/
 	String version() default "";
+	/** date of this description **/
+	String date() default ""; 
 	
 	/** description (alternative to java-comment) **/
 	String description() default "";
 		
 	/** author of this description **/
 	String author() default "";
-	/** date of this description **/
-	String date() default ""; 
+	/** approved of version **/
+	String approved() default "";
 	
+	/** information about release of this version **/
+	String released() default "";
 	/** description is no longer correct **/
-	String deprecated() default ""; 
+	String deprecated() default "";
+	
+	
+	/** internal group - for java below 1.7 **/
+	public  @interface aVersions { aVersion[] value() default {}; }
+
 }

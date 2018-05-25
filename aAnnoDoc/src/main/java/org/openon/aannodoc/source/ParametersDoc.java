@@ -43,7 +43,11 @@ public class ParametersDoc extends DocObject {
 		return params[index].name;
 	}
 
-//	public String[] getNames() { return names; }
+	public String[] getNames() {
+		String names[]=new String[params.length];
+		for(int i=0;i<params.length;i++) { names[i]=getName(i); }		
+		return names; 
+	}
 	
 	public String getClassName(int index) {
 		return params[index].className;

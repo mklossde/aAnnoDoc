@@ -70,6 +70,9 @@ public class JavaSourceScanner {
 	
 	public static final String ANNO_VALUE="value";
 	
+//	public static final String IMPLEMENT_FILES=".adoc$";
+	public static final String IMPLEMENT_FILES=".sdoc$"; // sdoc = sourceDoc
+	
 	public static boolean ANALYSEAT=true;
 	
 //	protected String charset="UTF-8";
@@ -139,7 +142,7 @@ public class JavaSourceScanner {
 	    		InputStreamReader in=new InputStreamReader(fin,charset);
 	    		readJava(in,name);
 	    		in.close();
-	    	}else if(name.endsWith(".adoc")) {
+	    	}else if(name.matches(IMPLEMENT_FILES)) {
 	    		LOG.debug("scan jar text "+name);	    		
 	    		InputStream fin=jar.getInputStream(entry);
 	    		InputStreamReader in=new InputStreamReader(fin,charset);
@@ -186,7 +189,7 @@ public class JavaSourceScanner {
 		try {
 			if(filter!=null && !filter.scanClass(file)) { // ignroe by fitler
 			}else if(file.endsWith(".java")) { readJava(in,file); }
-			else if(file.endsWith(".adoc")) { readText(in,file); }
+			else if(file.matches(IMPLEMENT_FILES)) { readText(in,file); }
 			else { throw new IOException("unkown file type "+file); }
 		}finally{
 			if(in!=null) { in.close(); }
@@ -211,6 +214,9 @@ public class JavaSourceScanner {
 		}		
 	}
 	
+	/** actual list of comments in unit **/
+	protected List<Comment> comments;
+	
 	public void readJava(InputStreamReader in,String name) throws IOException  {	
 //if(name.indexOf("ButtonDesign")!=-1) {
 //	System.out.println("ButtonDesign");
@@ -220,7 +226,7 @@ public class JavaSourceScanner {
 		try {
 			boolean considerComments=true;			
 			cu = JavaParser.parse(in,considerComments);
-			List<Comment> comments=cu.getComments();
+			comments=cu.getComments();
 
 	    	// package------------------------------------------------------------------------------
 		    PackageDeclaration p=cu.getPackage();
@@ -381,7 +387,7 @@ public class JavaSourceScanner {
 		}
 	}	
 	
-	protected ParametersDoc getParams(MethodDeclaration method,MethodDoc methodDoc,ClassDoc clSource) {
+	protected ParametersDoc getParams(MethodDeclaration method,MethodDoc methodDoc,ClassDoc clSource) throws Exception {
 		List<Parameter> parameter=method.getParameters();
 //		List<TypeParameter> parameter2=method.getTypeParameters();
 		if(parameter==null) { return new ParametersDoc(methodDoc,clSource,0); }
@@ -394,7 +400,7 @@ public class JavaSourceScanner {
 				List<AnnotationDoc> annoList=new ArrayList();
 				ParameterDoc param=doc.get(i);
 				for(int t=0;annos!=null && t<annos.size();t++) {	
-					AnnotationDoc anno=toAnnotationDoc(param, annos.get(t), clSource);
+					AnnotationDoc anno=toAnnotationDoc(param, annos.get(t), clSource,comments);
 			    	clSource.addAllAnnotations(anno);  // class add annotation
 			    	unit.addAnnotation(anno);  // unit add annotation
 			    	doc.addAllAnnotations(anno); // param add anoation
@@ -511,21 +517,29 @@ public class JavaSourceScanner {
 		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>();
 	    for(int i=0;pAnno!=null && i<pAnno.size();i++) {
 	    	AnnotationExpr anno=pAnno.get(i);	    	
-	    	AnnotationDoc as=toAnnotationDoc(source, anno, clSource);
+	    	
+	    	AnnotationDoc as=toAnnotationDoc(source, anno, clSource,comments);
+	    	
 	    	clSource.addAllAnnotations(as);  // class add annotation
 	    	unit.addAnnotation(as);  // unit add annotation
 	    	list.add(as);
 	    	
-    		scanComments(prev,anno, as, clSource,comments); // scan inside comments
+//	    	scanComments(prev,anno, as, clSource,comments); // scan inside comments
+    		
 	    	prev=anno;
 	    }
 	    	    
 	    source.addAnnotations(list);
 	}
 	
+	private AnnotationDoc toAnnotationDoc(DocObject source,AnnotationExpr anno,ClassDoc clSource,List<Comment> comments) throws Exception {
+		AnnotationDoc as=toAnnotationDoc(source, anno, clSource);
+		scanComments(prev,anno, as, clSource,comments); // scan inside comments
+		return as;
+	}
 	
-	
-	private AnnotationDoc toAnnotationDoc(DocObject parent,AnnotationExpr anno,ClassDoc clSource) {
+	/** create annotation **/
+	private AnnotationDoc toAnnotationDoc(DocObject parent,AnnotationExpr anno,ClassDoc clSource) throws Exception{
     	String annoName=toString(anno.getName());	
     	String annoFullName=findClassName(annoName,clSource);
     	AnnotationDoc as=new AnnotationDoc(annoName,annoFullName,parent,clSource,false);        	
@@ -551,7 +565,7 @@ public class JavaSourceScanner {
     	}else {
     		LOG.warn("unparsed annotion "+anno);
     	}
-    	     	
+    	     	    	
     	return as;
 	}
 	
@@ -560,7 +574,7 @@ public class JavaSourceScanner {
 		return path;
 	}
 	
-	public Object toObject(Object obj,ClassDoc clSource) {
+	public Object toObject(Object obj,ClassDoc clSource) throws Exception {
 		if(obj==null) { return null;
 		}else if(obj instanceof NullLiteralExpr) {
 			return null;	
@@ -584,8 +598,8 @@ public class JavaSourceScanner {
 			}
 			return l;
 		}else if(obj instanceof NormalAnnotationExpr) {
-			NormalAnnotationExpr a=(NormalAnnotationExpr)obj;
-			AnnotationDoc as=toAnnotationDoc(clSource, a, clSource);
+			NormalAnnotationExpr a=(NormalAnnotationExpr)obj;	
+			AnnotationDoc as=toAnnotationDoc(clSource, a, clSource, comments);
 	    	clSource.addAllAnnotations(as);  // class add annotation
 	    	unit.addAnnotation(as);  // unit add annotation
 	    	return as;

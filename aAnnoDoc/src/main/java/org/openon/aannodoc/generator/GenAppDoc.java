@@ -130,7 +130,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		createStructure(outputName);		
 		
 		String title="AppDoc",author=null,version=null,date=null,depcrecated=null,copyright=null;
-		application=getMainDoc(docs);
+		application=getMainDoc();
 //System.out.println("d:"+docs);
 		if(application!=null) {			
 			title=AnnoUtils.getTitle(application,true);
@@ -433,11 +433,8 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		
 	//------------------------------------------------------------------
 	
-	/** get root Object of tree **/
-	public AnnotationDoc getMainDoc(Tree<AnnotationDoc> tree) {
-//		if(tree.getData()!=null) { return tree.getData(); }
-//		else if(tree.size()>0 && tree.get(0) instanceof  AnnotationDoc ) { return ((AnnotationDoc)tree.get(0)); }
-//		return doc.getAnnotation(aApplication.class.getSimpleName());
+	/** get root Object **/
+	public AnnotationDoc getMainDoc() {
 		List<AnnotationDoc> docs=annotations.findAnnotation(aApplication.class);
 		if(docs!=null && docs.size()>0) { return docs.get(0); }
 		return null;

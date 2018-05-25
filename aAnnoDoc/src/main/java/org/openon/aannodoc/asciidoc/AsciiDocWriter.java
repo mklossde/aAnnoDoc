@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Objects;
 
 /**
  * http://asciidoctor.org/docs/asciidoc-syntax-quick-reference/#section-titles
@@ -151,15 +152,17 @@ public class AsciiDocWriter {
 	public AsciiDocWriter nl() { w(NL); return this; }
 	public AsciiDocWriter nl2() { w(NL).w(NL); return this; }
 	
-	public AsciiDocWriter w(Object t) { if(t!=null) { w(String.valueOf(t)); } return this; }
+	public AsciiDocWriter w(Object t) { if(t!=null) { w(toString(t)); } return this; }
+	public AsciiDocWriter wTrim(Object t) { if(t!=null) { w(toTrim(t)); } return this; }
 	/** write with nl **/
-	public AsciiDocWriter wnl(Object t) { if(t!=null) { w(String.valueOf(t)).nnl(); } return this; }
-	public AsciiDocWriter wnl2(Object t) { if(t!=null) { w(String.valueOf(t)).nnl2(); } return this; }
+	public AsciiDocWriter wnl(Object t) { if(t!=null) { w(toString(t)).nnl(); } return this; }
+	public AsciiDocWriter wnl2(Object t) { if(t!=null) { w(toString(t)).nnl2(); } return this; }
 	
 	//---------------------------------------------------------------------------------------------------------
 	/** write if rule **/
 	public AsciiDocWriter wIf(boolean rule,Object... texts) { if(rule) { w(texts); } return this;}
-	public AsciiDocWriter w(String before,int count,String body,String after) { w(before) ;for(int i=0;i<count;i++) { w(body); } w(after); return this; }
+	public AsciiDocWriter wIf(boolean rule,String before,Object body,String after) { if(!rule || e(body)) {return this;} w(before); wTrim(body); return w(after); }
+	public AsciiDocWriter w(String before,int count,String body,String after) { w(before) ;for(int i=0;i<count;i++) { w(body.trim()); } w(after); return this; }
 
 	public AsciiDocWriter w(Object... t) { for(int i=0;t!=null && i<t.length;i++) { w((String)valueOf(t[i]));} return this; }
 	//---------------------------------------------------------------------------------------------------------
@@ -173,8 +176,8 @@ public class AsciiDocWriter {
 		}
 		return this;
 	}
-	public String valueOf(Object o) { return String.valueOf(o); }
-	public boolean equlsIgnoreCase(Object a,Object b) { if(a==null || b==null) {return false; }return String.valueOf(a).equalsIgnoreCase(String.valueOf(b)); }
+	public String valueOf(Object o) { return toString(o); }
+	public boolean equlsIgnoreCase(Object a,Object b) { if(a==null || b==null) {return false; }return toString(a).equalsIgnoreCase(toString(b)); }
 	
 	//---------------------------------------------------------------------------------------------------------
 
@@ -194,14 +197,15 @@ public class AsciiDocWriter {
 	
 	
 
-	//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------	
+	/** get string or empty **/
+	public String toString(Object o) { return Objects.toString(o,null); }
+	public String toString(Object o,String def) { return Objects.toString(o,def); } //if(o==null) { return ""; } else { return o.toString(); }}
+	/** get trimmed string **/
+	public String toTrim(Object o) {if(o==null) { return null; } else { return String.valueOf(o).trim(); }}
 	
 	/** is empty **/
 	public boolean e(Object o) {
-		if(o==null) { return true; }
-//		else if(o instanceof String && ((String)o).length()==0) { return true; }
-//		else { return false; }
-		String str=o.toString().trim();
-		return str.length()==0;
+		return o==null || toTrim(o).length()==0;
 	}
 }

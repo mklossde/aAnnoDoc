@@ -2,11 +2,18 @@ package org.openon.aannodoc.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.openon.aannodoc.annotation.aBug;
+import org.openon.aannodoc.annotation.aBug.aBugs;
+import org.openon.aannodoc.annotation.aChange;
+import org.openon.aannodoc.annotation.aChange.aChanges;
 import org.openon.aannodoc.annotation.aDoc;
+import org.openon.aannodoc.annotation.aFeature;
+import org.openon.aannodoc.annotation.aFeature.aFeatures;
 import org.openon.aannodoc.asciidoc.AsciiDocWriter;
 import org.openon.aannodoc.scanner.SourceAnnotations;
 import org.openon.aannodoc.source.AnnotationDoc;
@@ -17,6 +24,48 @@ import org.openon.aannodoc.source.TypeDoc;
 
 public class AnnoUtils {
 
+	/** add all, not doubleto list, create list if need  **/
+	public static List add(List list,Object o) {		
+		if(o==null) { return list; }
+		if(o instanceof List) { for(int i=0;i<((List)o).size();i++) { list=add(list,((List)o).get(i)); }} 
+		else if(o instanceof Object[]) { for(int i=0;i<((Object[])o).length;i++) { list=add(list,((Object[])o)[i]); }}
+		else {
+			for(int i=0;list!=null && i<list.size();i++) { Object a=list.get(i); if(a==o) { return list; }}
+			if(list==null) { list=new ArrayList(); }
+			list.add(o);
+		}
+		return list;
+	}
+	
+	//------------------------------------------------------------------------------------
+	
+	/** find alls changes **/
+	public static List<AnnotationDoc> findChanges(SourceAnnotations annoations,String version,String dateFrom,String dateTo) {
+		return findAnnotation(annoations, aChange.class, aChanges.class, version, dateFrom, dateTo);
+	}
+	
+	/** find alls features **/
+	public static List<AnnotationDoc> findFeatures(SourceAnnotations annoations,String version,String dateFrom,String dateTo) {
+		return findAnnotation(annoations, aFeature.class, aFeatures.class, version, dateFrom, dateTo);
+	}
+	
+	public static List<AnnotationDoc> findBugs(SourceAnnotations annoations,String version,String dateFrom,String dateTo) {
+		return findAnnotation(annoations, aBug.class, aBugs.class, version, dateFrom, dateTo);
+	}
+	
+	public static List<AnnotationDoc> findAnnotation(SourceAnnotations annoations,Class an,Class anGroup,String version,String dateFrom,String dateTo) {
+		List list=new ArrayList();	
+		if(version!=null) { list=AnnoUtils.add(list,annoations.findAnnotation(an, anGroup, aDoc.fVERSION, version)); }
+		if(dateFrom!=null || dateTo!=null) {
+			Comparator comp=annoations.newComparatorDate(aDoc.fDATE, dateFrom, dateTo);
+			AnnoUtils.add(list,annoations.findAnnotation(an, anGroup, comp)); 
+		}
+		return list;
+		
+	}
+	
+	//------------------------------------------------------------------------------------
+	
 	/** get attribute-value of annotation or name of parent (class/method/field) **/
 	public static String getValueOrName(AnnotationDoc doc,String key) {
 		String value=toString(doc.getValue(key),null);
@@ -36,10 +85,21 @@ public class AnnoUtils {
 	}
 	
 	/** get title of annotation **/
+	public static String getTitle(AnnotationDoc doc) { return getTitle(doc, true); }
 	public static String getTitle(AnnotationDoc doc,boolean removePath) {
 		String title=toString(doc.getValue(aDoc.fTITLE),null);
-		if(title==null) { title=ReflectUtil.toName(doc.getParent().getName()); }
-		if(title!=null && removePath) { int index=title.lastIndexOf('/'); if(index!=-1) { title=title.substring(index+1); } }
+		if(title==null && doc.isInline()) { // title of inline doc from comment
+			title=doc.getComment();
+		}else {
+			if(title==null) { title=ReflectUtil.toName(doc.getParent().getName()); }
+			if(title!=null && removePath) { int index=title.lastIndexOf('/'); if(index!=-1) { title=title.substring(index+1); } }
+		}
+		
+		if(title!=null) { 
+			title=title.trim(); 
+			int ret=title.indexOf('\n'); if(ret>5) { title=title.substring(0,ret); }
+			if(title.length()>50) { title=title.substring(0,50)+"..."; }
+		}
 		return title;
 	}
 	
@@ -65,6 +125,7 @@ public class AnnoUtils {
 	
 	public static final String getDate(AnnotationDoc doc,int deep) {
 		String date=toString(doc.getValue(aDoc.fDATE),null);
+//		if(date==null) { return getDate((DocObject)doc,deep-1); } else { return date; }
 		return date;
 	}
 	
@@ -80,6 +141,9 @@ public class AnnoUtils {
 		return null;
 	}
 	
+	/** get parameter (key) of annoation as string, or null for empty **/ 
+	public static final String get(AnnotationDoc doc,String key) { return toString(doc.getValue(key),null); }
+		
 	//---------------------------------------------------------------------------------
 	
 	/** write table do doc of title for list **/
@@ -103,6 +167,26 @@ public class AnnoUtils {
 			Object cells[]=new Object[heads.size()];
 			for(int t=0;t<heads.size();t++) { cells[t]=doc.getValue(heads.get(t)); }
 			w.tableLine(cells);
+		}
+		w.tableEnd();		
+	}
+	 
+	/** write all parameter as table **/
+	public static void writeTable(AsciiDocWriter w,String title,AnnotationDoc doc) throws IOException {
+		if(doc==null) { return ; }
+		
+		List<String> heads=new ArrayList<String>();
+		Map map=doc.getValues();
+		Iterator<String> keys=map.keySet().iterator();
+		while(keys.hasNext()) {
+			String key=keys.next();
+			if(!heads.contains(key)) { heads.add(key); }
+		}
+				
+		w.table(title);
+		Object cells[]=new Object[heads.size()];
+		for(int t=0;t<heads.size();t++) {
+			w.tableLine(heads.get(t),doc.getValue(heads.get(t)));
 		}
 		w.tableEnd();		
 	}
@@ -182,7 +266,7 @@ public class AnnoUtils {
 		if(obj==null) { return def; }
 		else if(obj instanceof DocReference) {
 			DocReference ref=(DocReference)obj;
-			return ref.resolve();
+			return ref.resolve();		
 		}else {	return String.valueOf(obj); }
 	}
 	

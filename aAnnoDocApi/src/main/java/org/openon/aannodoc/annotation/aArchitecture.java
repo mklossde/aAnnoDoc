@@ -40,5 +40,8 @@ public @interface aArchitecture {
 	/** description belongs to version **/
 	String version() default ""; 
 	/** description is no longer correct **/
-	String deprecated() default ""; 
+	String deprecated() default "";
+	
+	/** internal group - for java below 1.7 **/
+	public  @interface aArchitectures { aArchitecture[] value() default {}; }
 }

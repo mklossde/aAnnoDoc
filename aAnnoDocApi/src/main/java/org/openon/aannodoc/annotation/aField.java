@@ -49,4 +49,7 @@ public @interface aField {
 	
 	/** description is no longer correct **/
 	String deprecated() default ""; 
+	
+	/** internal group - for java below 1.7 **/
+	public  @interface aFields { aField[] value() default {}; }
 }

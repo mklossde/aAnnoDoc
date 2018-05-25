@@ -33,7 +33,10 @@ public @interface aDoc {
 	public static final String fVERSION="version";
 	public static final String fVERSIONS="versions";
 	public static final String fDEPRECATED="deprecated";
-	
+	public static final String fRELEASED="released";
+	public static final String fAPPROVED="approved";
+	public static final String fLEVEL="level";
+	public static final String fFIX="fix";
 	
 	/** group this documenation belongs to **/
 	String group() default "";	
@@ -57,4 +60,7 @@ public @interface aDoc {
 	String version() default ""; 
 	/** description is no longer correct **/
 	String deprecated() default ""; 
+	
+	/** internal group - for java below 1.7 **/
+	public  @interface aDocs { aDoc[] value() default {}; }
 }

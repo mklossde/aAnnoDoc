@@ -33,4 +33,7 @@ public @interface aFeature {
 	/** description is no longer correct **/
 	String deprecated() default ""; 
 	
+	/** internal group of featured - for java below 1.7 **/
+	public  @interface aFeatures { aFeature[] value() default {}; }
+	
 }

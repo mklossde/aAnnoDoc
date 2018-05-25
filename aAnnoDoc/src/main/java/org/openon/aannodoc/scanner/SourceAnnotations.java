@@ -2,7 +2,12 @@ package org.openon.aannodoc.scanner;
 
 import java.io.IOException;
 import java.text.Annotation;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -13,6 +18,9 @@ import org.openon.aannodoc.source.DocObject;
 import org.openon.aannodoc.source.JarDoc;
 import org.openon.aannodoc.utils.AnnoUtils;
 import org.openon.aannodoc.utils.DocFilter;
+
+import japa.parser.ast.visitor.EqualsVisitor;
+import net.sourceforge.plantuml.Log;
 
 import java.util.Set;
 
@@ -190,7 +198,7 @@ public class SourceAnnotations {
 	}
 	
 	/** list of annotations, in all classes, with a key==value **/
-	public List<AnnotationDoc> findAnnotation(Object annotationClassObject,String key,String value) {
+	public List<AnnotationDoc> findAnnotation(Object annotationClassObject,Comparator matcher) {
 		List<AnnotationDoc> l=new ArrayList<AnnotationDoc>();
 		if(unit==null) return l;
 		String annotationClass=AnnoUtils.toAnnotationClassName(annotationClassObject);
@@ -198,18 +206,83 @@ public class SourceAnnotations {
 			Iterator<String> keys=unit.anno().getAnnotationMap().keySet().iterator();
 			while(keys.hasNext()) {
 				String k=keys.next();
-				if(k!=null && k.length()>0) l.addAll(findAnnotation(k,key,value));
+				if(k!=null && k.length()>0) l.addAll(findAnnotation(k,matcher));
 			}
 		}else {
 			List<AnnotationDoc> list=unit.anno().findAnnotation(annotationClass);
 			for(int i=0;list!=null && i<list.size();i++) {
 				AnnotationDoc an=list.get(i);
-				if(key==null) { l.add(an); }
-				else if(an.has(key,value)) { l.add(an); }
+				if(matcher==null) { l.add(an); } else if(matcher.equals(an)) { l.add(an); }
 			}					
 		}
 		return l;
 	}
+	
+	/** list of annotations, in all classes, with a key==value **/
+	public List<AnnotationDoc> findAnnotation(Object annotationClassObject,final String key,final String value) {
+//		List<AnnotationDoc> l=new ArrayList<AnnotationDoc>();
+//		if(unit==null) return l;
+//		String annotationClass=AnnoUtils.toAnnotationClassName(annotationClassObject);
+//		if(annotationClass==null || annotationClass.length()==0) {
+//			Iterator<String> keys=unit.anno().getAnnotationMap().keySet().iterator();
+//			while(keys.hasNext()) {
+//				String k=keys.next();
+//				if(k!=null && k.length()>0) l.addAll(findAnnotation(k,key,value));
+//			}
+//		}else {
+//			List<AnnotationDoc> list=unit.anno().findAnnotation(annotationClass);
+//			for(int i=0;list!=null && i<list.size();i++) {
+//				AnnotationDoc an=list.get(i);
+//				if(key==null) { l.add(an); }
+//				else if(an.has(key,value)) { l.add(an); }
+//			}					
+//		}
+//		return l;
+		return findAnnotation(annotationClassObject,newComparatorKeyValue(key,value)); 
+	}
+	
+	public DateFormat df=new SimpleDateFormat("dd.MM.YYYY");
+	 
+	public long toTime(String date) {
+		if(date==null || date.length()==0) { return -1; }	
+		try {
+			return df.parse(date).getTime();
+		}catch(Exception e) { Log.error("parse date exception "+date); return -1; }
+	}		
+	
+	/** create key,value comparator **/
+	public Comparator newComparatorKeyValue(final String key,final String value) {
+		if(key==null) { return null; }
+		return new Comparator<AnnotationDoc>() {@Override public int compare(AnnotationDoc a,AnnotationDoc b) { return 0; } @Override public boolean equals(Object an) { return ((AnnotationDoc)an).has(key,value); }};
+	}
+	public Comparator newComparatorDate(final String key, final String from,final String to) {
+		final long f=toTime(from),t=toTime(to);
+		return new Comparator<AnnotationDoc>() { @Override public int compare(AnnotationDoc a,AnnotationDoc b) { return 0; }
+			@Override public boolean equals(Object an) {
+				String d=((AnnotationDoc)an).getValueString(key); long l=toTime(d);	
+//System.out.println("compare "+from+" >= "+d+" <= "+to+" "+an);				
+				return l!=-1 && (f==-1 || l>=f) && (t==-1 || l<=t);
+		}};		
+	}
+	public List<AnnotationDoc> findAnnotation(Class cl,Class groupCl,String key,String value) {
+		return findAnnotation(cl,groupCl,newComparatorKeyValue(key,value));
+	}
+	
+	/** find annotations and group of annoatations **/
+	public List<AnnotationDoc> findAnnotation(Class cl,Class groupCl,Comparator matcher) {
+//		List<AnnotationDoc> list=findAnnotation(cl,key,value);
+		List<AnnotationDoc> list=findAnnotation(cl,matcher);
+		if(groupCl==null) { return list; }
+//		List<AnnotationDoc> groups=findAnnotation(groupCl,key,value);
+		List<AnnotationDoc> groups=findAnnotation(groupCl,matcher);
+		for(int i=0;i<groups.size();i++) {
+			AnnotationDoc group=groups.get(i);
+			List<AnnotationDoc> sub=(List<AnnotationDoc>)group.getValue("value");
+			if(sub!=null) { list.addAll(sub); }
+		}
+		return list;
+	}
+	
 	
 	/** wind annotation wich are newer then days **/
 	public List<AnnotationDoc> findNewAnnotation(String annotationClass,long newerThendays) {

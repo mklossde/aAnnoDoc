@@ -49,4 +49,7 @@ public @interface aAttribute {
 	
 	/** description is no longer correct **/
 	String deprecated() default ""; 
+	
+	/** internal group - for java below 1.7 **/
+	public  @interface aAttributes { aAttribute[] value() default {}; }
 }
