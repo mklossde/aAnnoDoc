@@ -11,8 +11,7 @@ public class AsciiDocTranslate {
 	public static void main(String[] args) throws Exception {
 		AsciiDocCreator adoc=new AsciiDocCreator();
 		
-		String file="C:/Users/cq2klos/cobaannodoc/CobaAnnoDoc/doc/test.txt";
-//		String file="doc/test.txt";
+		String file="doc/test.txt";
 //		String file="ex/article.txt";
 //		String file="ex/asciidoc.txt";
 		

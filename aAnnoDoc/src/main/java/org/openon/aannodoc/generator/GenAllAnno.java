@@ -3,6 +3,7 @@ package org.openon.aannodoc.generator;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -85,9 +86,10 @@ public class GenAllAnno extends AsciiDocGeneratorImpl implements DocGenerator {
 				AnnotationDoc ad=list.get(t);
 				w.title2(ad.getName()+" "+ad.getRef());
 				w.reference(ad.getClassDoc().getTypeName());
-				Map<String,Object> values=ad.getValues();
-				for (Entry<String, Object> e: values.entrySet()) {
-					w.label(e.getKey(),e.getValue());
+				Iterator<String> it=ad.getValueKeys();
+				while(it.hasNext()) {
+					String key=it.next(),value=ad.getValueString(key);
+					w.label(key,value);
 				}
 				w.paragraph(ad.getComment());
 				

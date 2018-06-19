@@ -1,8 +1,12 @@
 package org.openon.aannodoc.utils;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +26,47 @@ import org.openon.aannodoc.source.DocReference;
 import org.openon.aannodoc.source.FieldDoc;
 import org.openon.aannodoc.source.TypeDoc;
 
+import net.sourceforge.plantuml.Log;
+
 public class AnnoUtils {
+
+	public static void sortDate(List<AnnotationDoc> list) {
+		Comparator comp=newComparatorDate(aDoc.fDATE, null, null);
+		Collections.sort(list,comp);
+	}
+	
+	//---------
+	
+	public static DateFormat df=new SimpleDateFormat("dd.MM.yyyy");
+	
+	public static Comparator<AnnotationDoc> newComparatorDate(final String key,final String from,final String to) {
+		final long f=toTime(from),t=toTime(to);
+		return new Comparator<AnnotationDoc>() { 
+			@Override public int compare(AnnotationDoc a,AnnotationDoc b) { // for sort
+				String da=((AnnotationDoc)a).getValueString(key); long la=toTime(da);
+				String db=((AnnotationDoc)b).getValueString(key); long lb=toTime(db);
+				return Long.compare(lb,la);
+			}
+			@Override public boolean equals(Object an) { // for find 
+				String d=((AnnotationDoc)an).getValueString(key); long l=toTime(d);	
+//System.out.println("compare "+from+" >= "+d+" <= "+to+" "+an);	
+				if(l==-1) { return false; }
+				else if((f==-1 || l>f) && (t==-1 || l<=t)) {return true;
+				}else { return false; }
+		}};	
+	}	
+	
+	public static long toTime(String date) {
+		if(date==null || date.length()==0) { return -1; }	
+		try {
+			Date d=df.parse(date);					
+			long l=d.getTime();
+//System.out.println("d:"+date+" => "+l+" x:"+new Date(l)+" d:"+d);			
+			return l;
+		}catch(Exception e) { Log.error("parse date exception "+date); return -1; }
+	}	
+	
+	//------------------------------------------------------------------------------------
 
 	/** add all, not doubleto list, create list if need  **/
 	public static List add(List list,Object o) {		
@@ -57,9 +101,9 @@ public class AnnoUtils {
 		List list=new ArrayList();	
 		if(version!=null) { list=AnnoUtils.add(list,annoations.findAnnotation(an, anGroup, aDoc.fVERSION, version)); }
 		if(dateFrom!=null || dateTo!=null) {
-			Comparator comp=annoations.newComparatorDate(aDoc.fDATE, dateFrom, dateTo);
+			Comparator comp=newComparatorDate(aDoc.fDATE, dateFrom, dateTo);
 			AnnoUtils.add(list,annoations.findAnnotation(an, anGroup, comp)); 
-		}
+		}		
 		return list;
 		
 	}
@@ -68,26 +112,26 @@ public class AnnoUtils {
 	
 	/** get attribute-value of annotation or name of parent (class/method/field) **/
 	public static String getValueOrName(AnnotationDoc doc,String key) {
-		String value=toString(doc.getValue(key),null);
+		String value=doc.getValueString(key);
 		if(value==null) { value=ReflectUtil.toName(doc.getParent().getName()); }
 		return value;
 	}
 	
 	/** get attribute-value of annotation **/
 	public static String getValue(AnnotationDoc doc,String key) {
-		String value=toString(doc.getValue(key),null);
+		String value=doc.getValueString(key);
 		return value;
 	}
 	
 	/** get group of annotation **/
 	public static String getGroup(AnnotationDoc doc) {
-		return toString(doc.getValue(aDoc.fGROUP),null);
+		return doc.getValueString(aDoc.fGROUP);
 	}
 	
 	/** get title of annotation **/
-	public static String getTitle(AnnotationDoc doc) { return getTitle(doc, true); }
+	public static String getTitle(AnnotationDoc doc) { return getTitle(doc, false); }
 	public static String getTitle(AnnotationDoc doc,boolean removePath) {
-		String title=toString(doc.getValue(aDoc.fTITLE),null);
+		String title=doc.getValueString(aDoc.fTITLE);
 		if(title==null && doc.isInline()) { // title of inline doc from comment
 			title=doc.getComment();
 		}else {
@@ -104,34 +148,34 @@ public class AnnoUtils {
 	}
 	
 	public static final String getVersion(AnnotationDoc doc,int deep) {
-		String version=toString(doc.getValue(aDoc.fVERSION),null);
+		String version=doc.getValueString(aDoc.fVERSION);
 		if(version==null) { return getVersion((DocObject)doc,deep-1); } else { return version; }
 	}
 	
 	public static final String getAuthor(AnnotationDoc doc,int deep) {
-		String author=toString(doc.getValue(aDoc.fAUTHOR),null);
+		String author=doc.getValueString(aDoc.fAUTHOR);
 		if(author==null) { return getAuthor((DocObject)doc,deep-1); } else { return author; }
 	}
 	
 	public static final String getAuthor(AnnotationDoc doc) {
-		String author=toString(doc.getValue(aDoc.fAUTHOR),null);
+		String author=doc.getValueString(aDoc.fAUTHOR);
 		return author;
 	}
 	
 	public static final String getDeprecated(AnnotationDoc doc,int deep) {
-		String dep=toString(doc.getValue(aDoc.fDEPRECATED),null);
+		String dep=doc.getValueString(aDoc.fDEPRECATED);
 		if(dep==null) { return getDeprecated((DocObject)doc,deep-1); } else { return dep; }
 	}
 	
 	public static final String getDate(AnnotationDoc doc,int deep) {
-		String date=toString(doc.getValue(aDoc.fDATE),null);
+		String date=doc.getValueString(aDoc.fDATE);
 //		if(date==null) { return getDate((DocObject)doc,deep-1); } else { return date; }
 		return date;
 	}
 	
 	/** get default-attribute or field-value **/
 	public static final String getDefaultOrValue(AnnotationDoc doc) {
-		String value=toString(doc.getValue("value"),null);
+		String value=doc.getValueString("value");
 		if(value!=null && value.length()>0) { return value; }
 		Object parent=doc.getParent();
 		if(parent instanceof FieldDoc) {
@@ -142,7 +186,7 @@ public class AnnoUtils {
 	}
 	
 	/** get parameter (key) of annoation as string, or null for empty **/ 
-	public static final String get(AnnotationDoc doc,String key) { return toString(doc.getValue(key),null); }
+	public static final String get(AnnotationDoc doc,String key) { return doc.getValueString(key); }
 		
 	//---------------------------------------------------------------------------------
 	
@@ -153,8 +197,7 @@ public class AnnoUtils {
 		List<String> heads=new ArrayList<String>();
 		for(int i=0;i<list.size();i++) {
 			AnnotationDoc doc=list.get(i);
-			Map map=doc.getValues();
-			Iterator<String> keys=map.keySet().iterator();
+			Iterator<String> keys=doc.getValueKeys();
 			while(keys.hasNext()) {
 				String key=keys.next();
 				if(!heads.contains(key)) { heads.add(key); }
@@ -165,7 +208,7 @@ public class AnnoUtils {
 		for(int i=0;i<list.size();i++) {
 			AnnotationDoc doc=list.get(i);
 			Object cells[]=new Object[heads.size()];
-			for(int t=0;t<heads.size();t++) { cells[t]=doc.getValue(heads.get(t)); }
+			for(int t=0;t<heads.size();t++) { cells[t]=doc.getValueString(heads.get(t)); }
 			w.tableLine(cells);
 		}
 		w.tableEnd();		
@@ -176,8 +219,7 @@ public class AnnoUtils {
 		if(doc==null) { return ; }
 		
 		List<String> heads=new ArrayList<String>();
-		Map map=doc.getValues();
-		Iterator<String> keys=map.keySet().iterator();
+		Iterator<String> keys=doc.getValueKeys();
 		while(keys.hasNext()) {
 			String key=keys.next();
 			if(!heads.contains(key)) { heads.add(key); }
@@ -186,7 +228,7 @@ public class AnnoUtils {
 		w.table(title);
 		Object cells[]=new Object[heads.size()];
 		for(int t=0;t<heads.size();t++) {
-			w.tableLine(heads.get(t),doc.getValue(heads.get(t)));
+			w.tableLine(heads.get(t),doc.getValueString(heads.get(t)));
 		}
 		w.tableEnd();		
 	}
@@ -211,7 +253,7 @@ public class AnnoUtils {
 		if(doc==null) { return null; }
 		String text=doc.getComment();
 		// add descibtoon of annotation **/
-		if(doc instanceof AnnotationDoc) { text=addString(text, ((AnnotationDoc)doc).getValue(aDoc.fDESCIPTION));}
+		if(doc instanceof AnnotationDoc) { text=addString(text, ((AnnotationDoc)doc).getValueString(aDoc.fDESCIPTION));}
 		if(text==null) { return null; }
 		text=removeLeadingSpace(text);
 		text=removeBackslash(text);
@@ -284,10 +326,10 @@ public class AnnoUtils {
 	}
 	
 	public static int toInteger(Object obj,int def) {
-		try {
+		try {			
+			if(obj instanceof Integer) { return (Integer)obj; }
+			String str=toString(obj,null);
 			if(obj==null) { return def; }
-			else if(obj instanceof Integer) { return (Integer)obj; }
-			String str=String.valueOf(obj);
 			return Integer.parseInt(str);
 		}catch(Exception e) { return def; }
 		

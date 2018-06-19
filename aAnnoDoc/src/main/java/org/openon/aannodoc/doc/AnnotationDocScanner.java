@@ -27,24 +27,16 @@ public class AnnotationDocScanner {
 	/** is this scann inline **/
 	protected boolean inline=false;
 	protected int minAnnoPos=1;
-	
+		
 	/** instance new scanner for text **/
 	public AnnotationDocScanner(String text,boolean inline) { this.text=text; this.inline=inline; pos=0; }
 	
-	//------------------------------------------------------------------------------
-	
-//	public static void main(String[] args) throws Exception { 
-//		String text=ReflectUtil.read(new FileInputStream("C:/Data/ws/gitaAnnoDoc/aAnnoDoc/aAnnoDoc/src/main/java/org/openon/aannodoc/aAnnoDoc.adoc"));
-//		AnnotationDocScanner a=new AnnotationDocScanner(text,false);
-//		AnnotationDoc doc=a.nextAnnotation();
-//		while(doc!=null) {
-//			System.out.println("############################################################################");
-//System.out.println("doc:"+doc);			
-//			doc=a.nextAnnotation();
-//		}
-//		System.out.println("end");
-//	}
-//	
+	/** get comment before first annotation **/
+	public String getComment() {
+		int firstAnno=nextAnnotationStart(0);
+		if(firstAnno==-1) { return this.text; }
+		return this.text.substring(0,firstAnno);
+	}
 	//------------------------------------------------------------------------------
 	
 	/** get next annotation (unitl null return=no more annotations in text) **/

@@ -94,7 +94,7 @@ public class SourceAnnotations {
 		List<Object> list=new ArrayList<Object>();
 		List<AnnotationDoc> annos=listAnnotation(className, annotationClass, null, null,true);
 		for (AnnotationDoc aDoc : annos) {
-			Object val=aDoc.getValue(key);
+			Object val=aDoc.getValueObject(key);
 			if(val!=null && !list.contains(val)) list.add(val);
 		}
 		return list;
@@ -241,29 +241,29 @@ public class SourceAnnotations {
 		return findAnnotation(annotationClassObject,newComparatorKeyValue(key,value)); 
 	}
 	
-	public DateFormat df=new SimpleDateFormat("dd.MM.YYYY");
-	 
-	public long toTime(String date) {
-		if(date==null || date.length()==0) { return -1; }	
-		try {
-			return df.parse(date).getTime();
-		}catch(Exception e) { Log.error("parse date exception "+date); return -1; }
-	}		
+//	public DateFormat df=new SimpleDateFormat("dd.MM.YYYY");
+//	 
+//	public long toTime(String date) {
+//		if(date==null || date.length()==0) { return -1; }	
+//		try {
+//			return df.parse(date).getTime();
+//		}catch(Exception e) { Log.error("parse date exception "+date); return -1; }
+//	}		
 	
 	/** create key,value comparator **/
 	public Comparator newComparatorKeyValue(final String key,final String value) {
 		if(key==null) { return null; }
 		return new Comparator<AnnotationDoc>() {@Override public int compare(AnnotationDoc a,AnnotationDoc b) { return 0; } @Override public boolean equals(Object an) { return ((AnnotationDoc)an).has(key,value); }};
 	}
-	public Comparator newComparatorDate(final String key, final String from,final String to) {
-		final long f=toTime(from),t=toTime(to);
-		return new Comparator<AnnotationDoc>() { @Override public int compare(AnnotationDoc a,AnnotationDoc b) { return 0; }
-			@Override public boolean equals(Object an) {
-				String d=((AnnotationDoc)an).getValueString(key); long l=toTime(d);	
-//System.out.println("compare "+from+" >= "+d+" <= "+to+" "+an);				
-				return l!=-1 && (f==-1 || l>=f) && (t==-1 || l<=t);
-		}};		
-	}
+//	public Comparator newComparatorDate(final String key, final String from,final String to) {
+//		final long f=toTime(from),t=toTime(to);
+//		return new Comparator<AnnotationDoc>() { @Override public int compare(AnnotationDoc a,AnnotationDoc b) { return 0; }
+//			@Override public boolean equals(Object an) {
+//				String d=((AnnotationDoc)an).getValueString(key); long l=toTime(d);	
+////System.out.println("compare "+from+" >= "+d+" <= "+to+" "+an);				
+//				return l!=-1 && (f==-1 || l>=f) && (t==-1 || l<=t);
+//		}};		
+//	}
 	public List<AnnotationDoc> findAnnotation(Class cl,Class groupCl,String key,String value) {
 		return findAnnotation(cl,groupCl,newComparatorKeyValue(key,value));
 	}
@@ -277,7 +277,7 @@ public class SourceAnnotations {
 		List<AnnotationDoc> groups=findAnnotation(groupCl,matcher);
 		for(int i=0;i<groups.size();i++) {
 			AnnotationDoc group=groups.get(i);
-			List<AnnotationDoc> sub=(List<AnnotationDoc>)group.getValue("value");
+			List<AnnotationDoc> sub=(List<AnnotationDoc>)group.getValueObject("value");
 			if(sub!=null) { list.addAll(sub); }
 		}
 		return list;

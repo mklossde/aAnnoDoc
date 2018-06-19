@@ -15,7 +15,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention( RetentionPolicy.RUNTIME )
 /**
  * 
- * @author cq2klos
+ * 
  *
  */
 public @interface aArchitecture {

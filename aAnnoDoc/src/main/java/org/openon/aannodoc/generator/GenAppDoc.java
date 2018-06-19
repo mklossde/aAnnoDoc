@@ -200,7 +200,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	public void versions() throws IOException {
 		try {
 			if(application==null) { return ; }
-			List<AnnotationDoc> list=(List<AnnotationDoc>)application.getValue(aDoc.fVERSIONS); // get versions from @aAppliction
+			List<AnnotationDoc> list=(List<AnnotationDoc>)application.getValueObject(aDoc.fVERSIONS); // get versions from @aAppliction
 			if(list==null) { list=find(aVersion.class); } // get all version in all classes					
 			if(list==null || list.size()==0) { return ; }
 					
@@ -250,7 +250,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		w.table("Fields", "Name","Compute");
 		for(int i=0;i<list.size();i++) {
 			AnnotationDoc doc=list.get(i);
-			w.tableLine(AnnoUtils.getTitle(doc, true),doc.getValue("compute"));
+			w.tableLine(AnnoUtils.getTitle(doc, true),doc.getValueString("compute"));
 		}
 		w.tableEnd();	
 	}
@@ -370,8 +370,8 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		infos(doc); // author,date,version,deprecated
 
 		// request && response
-		String req=AnnoUtils.toString(doc.getValue("request"),null);
-		String res=AnnoUtils.toString(doc.getValue("response"),null);
+		String req=doc.getValueString("request");
+		String res=doc.getValueString("response");
 		if(req!=null || res!=null) {
 			SequenceDiagramWriter seq=new SequenceDiagramWriter(w);
 			seq.start("Service Request-Response");
@@ -398,11 +398,13 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	
 	/** write unkown Annoation **/
 	public void annotationUnkown(AnnotationDoc doc) {
-		String title=AnnoUtils.addString(doc.getValue(aDoc.fTITLE)); //, " ",doc.getValuePath());
+		String title=AnnoUtils.addString(doc.getValueString(aDoc.fTITLE)); //, " ",doc.getValuePath());
 		w.subTitle(title);
 //		attribtue(title,adoc.findAnnotation(aAttribute.class, aDoc.fGROUP, title));
-		Map<String,Object> values=doc.getValues();
-		for (Entry<String,Object> it : values.entrySet()) {w.tableLine(it.getKey(), it.getValue());}
+//		Map<String,Object> values=doc.getValues();		
+//		for (Entry<String,Object> it : values.entrySet()) {w.tableLine(it.getKey(), it.getValue());}
+		Iterator<String> it=doc.getValueKeys();
+		while(it.hasNext()) { String key=it.next(),value=doc.getValueString(key);w.tableLine(key,value);}
 		w.table("Annoation Attrbutes", "name","value");
 		
 		w.tableEnd();

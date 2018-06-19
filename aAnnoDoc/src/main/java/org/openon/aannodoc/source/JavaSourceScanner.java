@@ -425,11 +425,12 @@ public class JavaSourceScanner {
 	public void scanComments(Node prev,Node now,DocObject parent,ClassDoc clSource, List<Comment> comments) throws Exception {
 		if(comments==null) return ;
 		Iterator<Comment> it=comments.iterator();
+		int nowLine=now.getBeginLine();
 		while(it.hasNext()) { 
-	    	Comment com=it.next();
-	    	if((prev==null || com.getBeginLine()>prev.getBeginLine() || (com.getBeginLine()==prev.getBeginLine() && com.getBeginColumn()>prev.getBeginColumn()))
-	    			&& (now==null || com.getEndLine()<now.getEndLine() || (com.getEndLine()==now.getEndLine() && com.getEndColumn()<now.getEndColumn()))) {	    		    			    	
-//System.out.println("c:"+com.getBeginLine()+","+com.getBeginColumn()+" p:"+prev.getBeginLine()+","+prev.getBeginColumn()+" n:"+now.getBeginLine()+","+now.getBeginColumn());
+	    	Comment com=it.next(); int comStart=com.getBeginLine(), comEnd=com.getEndLine();   	
+//	    	if((prev==null || com.getBeginLine()>prev.getBeginLine() || (com.getBeginLine()==prev.getBeginLine() && com.getBeginColumn()>prev.getBeginColumn()))
+//	    			&& (now==null || com.getEndLine()<now.getEndLine() || (com.getEndLine()==now.getEndLine() && com.getEndColumn()<now.getEndColumn()))) {	    		    			    	
+	    	if(comEnd<=nowLine && (prev==null || prev.getEndColumn()>=comStart)) { 	
 	    		if(!have(prev,com)) {
 	    			scanComment(com,parent,clSource);
 	    			it.remove(); // remove from list
@@ -450,21 +451,9 @@ public class JavaSourceScanner {
 	
 	//---------------------------------------------------------------------------------------
 	
-//	/** find start of param **/
-//	private static int findParamStart(String str,int index) {
-//		while(index!=-1 && index<str.length()) {
-//			char c=str.charAt(index);
-//			if(Character.isWhitespace(c)) index++;
-//			else if(c=='(') return index;
-//			else return -1;
-//		}
-//		return -1;
-//	}
-	
 	private void scanComment(Comment c,DocObject parent,DocObject clSource) throws Exception {
 		if(c instanceof LineComment) { return ; } // ignore line comments
 		String str=toString(c);
-//		parent.setComment(str);
 		scanComment(str, parent, clSource);
 		c.setEndLine(0); // set comment scanned)
 	}
@@ -472,18 +461,11 @@ public class JavaSourceScanner {
 	private void scanComment(String str,DocObject parent,DocObject clSource) throws Exception {
 		try {
 			LOG.trace("scanComment "+str);
-//			int index=AnnotationDocScanner.nextAnnotation(str, 0,true);
 			AnnotationDocScanner aDocScanner=new AnnotationDocScanner(str,true);			
-			parent.setComment(str);
-			
-			// find JavaDoc Annotions
-//			while(index!=-1 && index<str.length()) {
-//			AnnotationDocScanner annoObject=AnnotationDocScanner.scan(str,index);
-//			if(annoObject!=null) {
-//			AnnotationDoc anno=new AnnotationDoc(annoObject.name,findClassName(annoObject.name,clSource), parent, clSource,true);
-//			anno.add(annoObject.attr);
-//			anno.comment=annoObject.value;
+//			parent.setComment(str);
+			parent.setComment(aDocScanner.getComment()); // get comment before first annotation
 
+			
 			AnnotationDoc anno=aDocScanner.nextAnnotation();
 			while(anno!=null) {
 					anno.setTypeName(findClassName(anno.name,clSource));
@@ -495,8 +477,6 @@ public class JavaSourceScanner {
 					parent.addAllAnnotations(anno); // add annotation to parent
 				
 					anno=aDocScanner.nextAnnotation();
-//					index=annoObject.pos;
-//				}else { index=str.length(); }
 			}
 		}catch(Exception e) {LOG.error(e.getMessage(),e);}
 		
@@ -534,7 +514,7 @@ public class JavaSourceScanner {
 	
 	private AnnotationDoc toAnnotationDoc(DocObject source,AnnotationExpr anno,ClassDoc clSource,List<Comment> comments) throws Exception {
 		AnnotationDoc as=toAnnotationDoc(source, anno, clSource);
-		scanComments(prev,anno, as, clSource,comments); // scan inside comments
+//		scanComments(prev,anno, as, clSource,comments); // scan inside comments
 		return as;
 	}
 	
@@ -544,6 +524,7 @@ public class JavaSourceScanner {
     	String annoFullName=findClassName(annoName,clSource);
     	AnnotationDoc as=new AnnotationDoc(annoName,annoFullName,parent,clSource,false);        	
 //    	as.setParent(clSource.getTypePackage(), ReflectUtil.removeGetSet(source.getName()));
+    	scanComments(prev,anno, as, clSource,comments); // scan inside comments
     	
     	if(anno instanceof NormalAnnotationExpr) { // @ANNO(key="value",..)
     		NormalAnnotationExpr na=(NormalAnnotationExpr)anno;

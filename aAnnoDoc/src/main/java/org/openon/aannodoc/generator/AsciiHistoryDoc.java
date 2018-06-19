@@ -46,8 +46,8 @@ public class AsciiHistoryDoc extends AsciiDocGeneratorImpl implements DocGenerat
 		String genLabel=(String)options.get("genlabel"); if(genLabel==null) { genLabel="aAnnoDoc created on"; }
 		w.nl().w(":last-update-label: "+genLabel).nl();	
 		if(depcrecated!=null) { w.warning(depcrecated); }		
-		// App Doc
-		w.paragraph(AnnoUtils.getDoc(application)); 
+		// App Doc		
+		w.literalBlock(AnnoUtils.getDoc(application)); 
 		// Copyright
 		w.paragraph(copyright);
 	}
@@ -83,7 +83,7 @@ public class AsciiHistoryDoc extends AsciiDocGeneratorImpl implements DocGenerat
 		try {
 			if(application==null) { return ; }
 			// get versions from @aAppliction
-			versions=(List<AnnotationDoc>)application.getValue(aDoc.fVERSIONS); 
+			versions=(List<AnnotationDoc>)application.getValueObject(aDoc.fVERSIONS); 
 			//  find all @aVersion in all classes	
 			versionList=versions=annotations.findAnnotation(aVersion.class); 
 			if(versions==null) { this.versions=versionList; versionList=null; }  // without versions in @aAppliction =>	user versionList			
@@ -94,6 +94,8 @@ public class AsciiHistoryDoc extends AsciiDocGeneratorImpl implements DocGenerat
 			for(int i=0;onlyReleased && i<versions.size();i++) {
 				if(AnnoUtils.get(versions.get(i),aDoc.fRELEASED)!=null) { onlyReleased=true; } 
 			}
+			
+			AnnoUtils.sortDate(versionList);
 			
 			w.table("Versions", "Version","Date","Title","Author","Approved","Released","Deprecated");
 			for(int i=0;i<versions.size();i++) {
@@ -126,16 +128,16 @@ public class AsciiHistoryDoc extends AsciiDocGeneratorImpl implements DocGenerat
 	public void writeVersion(AnnotationDoc version,String fromDate) throws IOException {
 		String ver=AnnoUtils.getVersion(version, 1);
 		String toDate=version.getValueString(aDoc.fDATE);
-		
+			
 		w.subTitle("Version "+ver);
 		w.italic(AnnoUtils.getDate(version,1)+" "+AnnoUtils.getTitle(version));		
 //		w.warning(AnnoUtils.get(version, aDoc.fDEPRECATED));		
-		w.paragraph(AnnoUtils.getDoc(version));
+		w.literalBlock(AnnoUtils.getDoc(version));
 		
 //		AnnoUtils.writeTable(w, "Informations", version);						
 	
 		w.table("Changes");
-		List<AnnotationDoc> features=AnnoUtils.findFeatures(annotations, ver,fromDate,toDate);
+		List<AnnotationDoc> features=AnnoUtils.findFeatures(annotations, ver,fromDate,toDate);		
 		for(int i=0;features!=null && i<features.size();i++) { w.tableLine("Feature",AnnoUtils.getDate(features.get(i),1),AnnoUtils.getTitle(features.get(i))); }
 		List<AnnotationDoc> changes=AnnoUtils.findChanges(annotations, ver,fromDate,toDate);
 		for(int i=0;changes!=null && i<changes.size();i++) { w.tableLine("Change",AnnoUtils.getDate(changes.get(i),1),AnnoUtils.getTitle(changes.get(i))); }

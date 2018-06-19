@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
@@ -145,19 +146,18 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	}
 	
 	/** get("value'):	get any attribute (e.g. aTag (test='qwert') ) **/
-	public Object getValue(String key) { 
+	public Object getValueObject(String key) { 
 		if(values==null) { return null; }
 		return values.get(key); 
 	}
 	/** getValues():	get all values as Map String,Object  **/
-	public Map<String,Object> getValues() { return values; }
+//	public Map<String,Object> getValues() { return values; }
+	public Iterator<String> getValueKeys() { return values.keySet().iterator(); }
 	/** get resolved value as string **/
 	public String getValueString(String key) { 
 		if(values==null) { return null; }
 		Object obj=values.get(key);
-		if(obj==null) { return null; }
-		else if(obj instanceof DocReference) { return ((DocReference)obj).resolve(); }
-		else { return AnnoUtils.toString(obj, null); }
+		return AnnoUtils.toString(obj, null); 
 		
 	}
 	/** get value as integer **/
@@ -179,7 +179,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	
 	/** do annotation havae attribute-value name=value **/
 	public boolean is(String valueName,String value) {
-		return Objects.equals(value, getValue(valueName));
+		return Objects.equals(value, getValueString(valueName));
 	}
 	
 //	public boolean equals(Object obj) {
