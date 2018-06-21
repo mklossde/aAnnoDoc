@@ -249,7 +249,8 @@ public class AnnoUtils {
 	//---------------------------------------------------------------------------------
 	
 	/** get doc of DocObject **/
-	public static String getDoc(DocObject doc) {
+	public static String getDoc(DocObject doc) { return getComment(doc); } 
+	public static String getComment(DocObject doc) {
 		if(doc==null) { return null; }
 		String text=doc.getComment();
 		// add descibtoon of annotation **/
@@ -275,29 +276,29 @@ public class AnnoUtils {
 	
 	public static final String getAuthor(DocObject doc,int deep) {
 		if(doc==null || deep<0) { return null; }
-		String author=doc.getAuthor();
-		if(author==null) { author=getAuthor(doc.getParent(),deep-1); }
+//		String author=doc.getAuthor();
+		String author=getAuthor(doc.getParent(),deep-1); 
 		return author;
 	}	
 		
 	public static final String getVersion(DocObject doc,int deep) {
 		if(doc==null || deep<0) { return null; }
-		String version=doc.getVersion();
-		if(version==null) { version=getVersion(doc.getParent(),deep-1); }
+//		String version=doc.getVersion();
+		String version=getVersion(doc.getParent(),deep-1); 
 		return version;
 	}	
 	
 	public static final String getDeprecated(DocObject doc,int deep) {
 		if(doc==null || deep<0) { return null; }
-		String dep=doc.getDeprecated();
-		if(dep==null) { dep=getDeprecated(doc.getParent(),deep-1); }
+//		String dep=doc.getDeprecated();
+		String dep=getDeprecated(doc.getParent(),deep-1); 
 		return dep;
 	}
 	
 	public static final String getLineAnnotation(DocObject doc,String key,int deep) {
 		if(doc==null || deep<0) { return null; }
-		String version=doc.getCommentAnnotationValue(key);
-		if(version==null) { version=getLineAnnotation(doc.getParent(),key,deep-1); }
+//		String version=doc.getCommentAnnotationValue(key);
+		String version=getLineAnnotation(doc.getParent(),key,deep-1); 
 		return version;
 	}	
 	

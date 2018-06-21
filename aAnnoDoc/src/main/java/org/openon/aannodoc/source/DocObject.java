@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.openon.aannodoc.doc.AnnotationDocScanner;
 import org.openon.aannodoc.utils.AnnoUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -18,6 +20,8 @@ import org.openon.aannodoc.utils.AnnoUtils;
  *
  */
 public abstract class DocObject implements Serializable {
+	private static final Logger LOG=LoggerFactory.getLogger(DocObject.class);
+	
 	private static final long serialVersionUID = -7225995181546556626L;
 
 	public DocObject group;
@@ -26,7 +30,7 @@ public abstract class DocObject implements Serializable {
 	
 	public DocObject parent;
 	public String name;
-	public String comment;
+	protected String comment;
 		
 	public List<AnnotationDoc> annotations=new ArrayList<AnnotationDoc>();
 	
@@ -42,34 +46,38 @@ public abstract class DocObject implements Serializable {
 	
 	public void setComment(String comment) {
 		if(comment==null || comment.length()==0) { return ; }
-		if(this.comment==null) {
+		if(this.comment==null || this.comment.length()==0) {
 			this.comment=comment; 
 		}else {
+			LOG.warn("double set comment old:'{}' and new:'{}' to {}",this.comment,comment,this);
 			this.comment=this.comment+"\n"+comment;
 		}
 	}
 	
+	public String getComment() { return comment; }
+	
 	public void addAllAnnotations(AnnotationDoc anno) { annotations.add(anno);}
 	public void addAnnotations(List<AnnotationDoc> annos) { annotations.addAll(annos); }
 
-	//--------------------------------------------------------------------------
-	/** get inline annotation author (\@author MYNAME) **/
-	public String getAuthor() { return getCommentAnnotationValue("author"); }
-	/** get inline annotation version (\@version VERSION) **/
-	public String getVersion() { return getCommentAnnotationValue("version"); }
-	/** get inline annotation deprecated (\@deprecated DEPRECATED) **/
-	public String getDeprecated() { return getCommentAnnotationValue("deprecated"); }
+//	//--------------------------------------------------------------------------
+//	/** get inline annotation author (\@author MYNAME) **/
+//	public String getAuthor() { return getCommentAnnotationValue("author"); }
+//	/** get inline annotation version (\@version VERSION) **/
+//	public String getVersion() { return getCommentAnnotationValue("version"); }
+//	/** get inline annotation deprecated (\@deprecated DEPRECATED) **/
+//	public String getDeprecated() { return getCommentAnnotationValue("deprecated"); }
 	
-	public String getCommentAnnotationValue(String key) {
-		if(comment==null) { return null; }
-		String k="@"+key+" ";
-		int index=comment.indexOf(k);
-		if(index==-1) { return null; }
-		int start=index+k.length();
-		int end=AnnotationDocScanner.findValueEnd(comment,start);
-		if(end==-1) { return null; }
-		return comment.substring(start,end); 
-	}
+//	public String getCommentAnnotationValue(String key) {
+//		if(comment==null) { return null; }
+//		String k="@"+key+" ";
+//		int index=comment.indexOf(k);
+//		if(index==-1) { return null; }
+//		int start=index+k.length();
+//		int end=AnnotationDocScanner.findValueEnd(comment,start);
+//		if(end==-1) { return null; }
+//		return comment.substring(start,end); 
+//	}
+
 	
 	//--------------------------------------------------------------------------
 	
@@ -100,7 +108,7 @@ public abstract class DocObject implements Serializable {
 	
 	//--------------------------------------------------------------------------
 	
-	public String getComment() { return comment; }
+
 	
 		
 	//--------------------------------------------------------------------------

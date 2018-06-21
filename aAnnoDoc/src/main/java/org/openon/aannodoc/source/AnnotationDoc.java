@@ -56,7 +56,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	public AnnotationDoc(String name,Map<String,Object> values,String comment,boolean inline) { 
 		super(name, null, null, null);
 		this.values=values;		
-		this.comment=comment;
+		setComment(comment);
 		this.inline=inline;
 	}
 		
@@ -82,10 +82,10 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	public String getRef() {  return parentName; }
 //		if(parent==null) { return null; } else { return parent.getName(); }}
 	
-	/** get inline annotation author (\@author MYNAME) **/
-	public String getAuthor() { String value=super.getAuthor(); if(value==null && parent!=null) { value=parent.getAuthor(); } return value; }
-	/** get inline annotation version (\@version VERSION) **/
-	public String getVersion() {  String value=super.getVersion(); if(value==null && parent!=null) { value=parent.getVersion(); } return value; }
+//	/** get inline annotation author (\@author MYNAME) **/
+//	public String getAuthor() { String value=super.getAuthor(); if(value==null && parent!=null) { value=parent.getAuthor(); } return value; }
+//	/** get inline annotation version (\@version VERSION) **/
+//	public String getVersion() {  String value=super.getVersion(); if(value==null && parent!=null) { value=parent.getVersion(); } return value; }
 	
 	
 	

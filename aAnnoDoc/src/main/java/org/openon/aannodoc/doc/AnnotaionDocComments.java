@@ -24,7 +24,7 @@ public class AnnotaionDocComments {
 	
 	/** parse the comment, resolve all links and show as html **/
 	public String comment(DocObject doc,int deep) {
-		String com=doc.comment;			
+		String com=doc.getComment();			
 		if(RESOLVE_REFERENCES) {
 			com=resolve(com,"@"+AnnotationDocDefinition.DOC_INCLUDE,1,deep);		
 			com=resolve(com,"@"+AnnotationDocDefinition.DOC_SEE,1,deep);

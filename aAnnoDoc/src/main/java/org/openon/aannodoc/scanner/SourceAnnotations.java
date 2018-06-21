@@ -108,10 +108,11 @@ public class SourceAnnotations {
 		if(cs==null) return null;
 		return listAnnotation(cs, annotationClass, key, value, deep);	
 	}
-		
-	public List<AnnotationDoc> listAnnotation(ClassDoc cs,String annotationClass){return listAnnotation(cs, annotationClass, null, null, true); }
 	
-	public List<AnnotationDoc> listAnnotation(ClassDoc cs,String annotationClass,String key,String value,boolean deep) {
+	
+	public List<AnnotationDoc> listAnnotation(ClassDoc cs,String annotationClass){return listAnnotation(cs, annotationClass, null, null, true); }
+	public List<AnnotationDoc> listAnnotation(ClassDoc cs,String annotationClass,boolean icludeInheritance){return listAnnotation(cs, annotationClass, null, null, icludeInheritance); }
+	public List<AnnotationDoc> listAnnotation(ClassDoc cs,String annotationClass,String key,String value,boolean icludeInheritance) {
 		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>();
 		if(cs==null) return list;
 		List<AnnotationDoc> all=cs.getAnnotationsInClass();
@@ -123,11 +124,11 @@ public class SourceAnnotations {
 			}
 		}
 		
-		if(deep) {		
+		if(icludeInheritance) {		
 			// include extends 
 			String extendName=cs.getExtends();
 			if(extendName!=null) {
-				List<AnnotationDoc> extendList=listAnnotation(extendName, annotationClass, key, value, deep);
+				List<AnnotationDoc> extendList=listAnnotation(extendName, annotationClass, key, value, icludeInheritance);
 				for(int i=0;extendList!=null && i<extendList.size();i++) {
 					AnnotationDoc sc=extendList.get(i);
 					addAnnotation(list,sc);
@@ -136,7 +137,7 @@ public class SourceAnnotations {
 				
 			List<String> prevList=cs.getImplements();
 			for(int i=0;prevList!=null && i<prevList.size();i++) {
-				List<AnnotationDoc> extendList=listAnnotation(prevList.get(i), annotationClass, key, value, deep);
+				List<AnnotationDoc> extendList=listAnnotation(prevList.get(i), annotationClass, key, value, icludeInheritance);
 				for(int t=0;extendList!=null && t<extendList.size();t++) {
 					AnnotationDoc sc=extendList.get(t);
 					addAnnotation(list,sc);
