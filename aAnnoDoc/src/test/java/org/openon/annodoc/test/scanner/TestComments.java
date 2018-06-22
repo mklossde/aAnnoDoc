@@ -33,7 +33,7 @@ public class TestComments {
 		Assert.assertNotNull(clDoc);
 		Assert.assertEquals("TestCommentsObj", clDoc.getComment());
 		
-		FieldDoc fDoc; AnnotationDoc aDoc;
+		FieldDoc fDoc; AnnotationDoc aDoc; List<AnnotationDoc> list;
 		
 		fDoc=clDoc.getField(unit, "aktion");
 		Assert.assertNotNull(fDoc);	
@@ -63,13 +63,40 @@ public class TestComments {
 		aDoc=fDoc.getAnnotation(aDocs.class);
 		Assert.assertNotNull(aDoc);
 		Assert.assertEquals("aDocs", aDoc.getComment());
+		list=(List<AnnotationDoc>)aDoc.getValueObject("value");
+		Assert.assertNotNull(list); 
+		Assert.assertEquals(3, list.size());
+		aDoc=list.get(0); Assert.assertNotNull(aDoc);Assert.assertEquals("one", aDoc.getComment());
+		aDoc=list.get(1); Assert.assertNotNull(aDoc);Assert.assertEquals("two", aDoc.getComment());
+		aDoc=list.get(2); Assert.assertNotNull(aDoc);Assert.assertEquals("three", aDoc.getComment());
 		
-		List<AnnotationDoc> list=clDoc.findAnnotation(aDoc.class);
-		for(int i=0;i<list.size();i++) {
-			AnnotationDoc a=list.get(i);	
-			String d=AnnoUtils.getComment(a);
-System.out.println("d:"+d);			
-		}
+		// Komments in one line------------------------------------------
+		fDoc=clDoc.getField(unit, "line");
+		Assert.assertNotNull(fDoc);	
+		Assert.assertEquals("line", fDoc.getComment());
+		aDoc=fDoc.getAnnotation(aDoc.class);
+		Assert.assertNotNull(aDoc);
+		Assert.assertEquals("aDocLine", aDoc.getComment());
+		
+		fDoc=clDoc.getField(unit, "docsLine");
+		Assert.assertNotNull(fDoc);	
+		Assert.assertEquals("docsLine", fDoc.getComment());
+		aDoc=fDoc.getAnnotation(aDocs.class);
+		Assert.assertNotNull(aDoc);
+		Assert.assertEquals("aDocsLine", aDoc.getComment());
+		list=(List<AnnotationDoc>)aDoc.getValueObject("value");
+		Assert.assertNotNull(list); 
+		Assert.assertEquals(3, list.size());
+		aDoc=list.get(0); Assert.assertNotNull(aDoc);Assert.assertEquals("oneLine", aDoc.getComment());
+		aDoc=list.get(1); Assert.assertNotNull(aDoc);Assert.assertEquals("twoLine", aDoc.getComment());
+		aDoc=list.get(2); Assert.assertNotNull(aDoc);Assert.assertEquals("threeLine", aDoc.getComment());
+		
+//		List<AnnotationDoc> list=clDoc.findAnnotation(aDoc.class);
+//		for(int i=0;i<list.size();i++) {
+//			AnnotationDoc a=list.get(i);	
+//			String d=AnnoUtils.getComment(a);
+//System.out.println("d:"+d);			
+//		}
 	}
 	
 	

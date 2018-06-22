@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openon.aannodoc.utils.AnnoUtils;
+
 public class ClassDoc extends TypeDoc implements Serializable {
 	private static final long serialVersionUID = 5724507364403134031L;
 	
@@ -36,10 +38,10 @@ public class ClassDoc extends TypeDoc implements Serializable {
 		return parentList; 
 	}
 			
-//	public List listAnnotation(String annotation) { 
-//		if(group instanceof UnitSource) ((UnitSource)group).l
-//		else return null;
-//	}
+	public String getAuthor() { return AnnoUtils.getAuthor(this,0); }
+	public String getVersion() { return AnnoUtils.getVersion(this,0); }
+	public String getDeprecated() { return AnnoUtils.getDeprecated(this,0); }
+
 	//------------------------------------------------------------------
 	
 	public PackageDoc getPackage() { return pkg; }

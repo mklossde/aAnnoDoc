@@ -10,7 +10,7 @@
   </parent>
   
   <artifactId>aAnnoDocMavenPlugin</artifactId>
-  <version>1.0.9</version>
+  <version>1.0.10</version>
   <packaging>maven-plugin</packaging>
  
   <name>aAnnoDoc Maven Plugin</name>

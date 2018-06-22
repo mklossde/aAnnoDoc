@@ -40,7 +40,9 @@ import japa.parser.ast.body.Parameter;
 import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.body.VariableDeclarator;
 import japa.parser.ast.body.VariableDeclaratorId;
+import japa.parser.ast.comments.BlockComment;
 import japa.parser.ast.comments.Comment;
+import japa.parser.ast.comments.JavadocComment;
 import japa.parser.ast.comments.LineComment;
 import japa.parser.ast.expr.AnnotationExpr;
 import japa.parser.ast.expr.ArrayInitializerExpr;
@@ -226,8 +228,10 @@ public class JavaSourceScanner {
 		try {
 			boolean considerComments=true;			
 			cu = JavaParser.parse(in,considerComments);
+//TODO: JavaParserBug: comments with some conent will not be doubled add. ?? why ??
 			comments=cu.getComments();
-//JavaParserBug: comments with some conent will not be doubled add. ?? why ??
+			Iterator<Comment> it=comments.iterator();
+			while(it.hasNext()) { if(!useComment(it.next())) { it.remove(); } } // remove unused comments (e.g. line commends) 
 			
 	    	// package------------------------------------------------------------------------------
 		    PackageDeclaration p=cu.getPackage();
@@ -250,9 +254,9 @@ public class JavaSourceScanner {
 				ClassDoc clSource=pkg.addClass(sourceName); // add Class	  
 			    LOG.trace("class "+sourceName);
 			    clSource.pkgComment=findComment(prev,cu,p,comments); // package comment in class 
-//			    pkg.setComment(clSource.pkgComment); // pacakge comment in package	
-			    
-			    scanComments(prev,p, pkg, clSource,comments); // scan inside comments
+//			    pkg.setComment(clSource.pkgComment); // pacakge comment in package				    
+//			    scanComments(prev,p, pkg, clSource,comments); // scan inside comments
+//			    scanComments(prev, p, clSource, clSource, comments);
 			    
 		    	// import------------------------------------------------------------------------------
 			    prev=p;
@@ -271,7 +275,7 @@ public class JavaSourceScanner {
 			    //class annotations		   
 			    setAnnotations(prev,clSource,clDeclarion.getAnnotations(),clSource,comments);  
 //			    clSource.setComment(toString(clDeclarion.getComment())); //getJavaDoc());		  
-				setComment(clSource,clDeclarion.getComment());
+				setComment(clSource,clDeclarion.getComment(),clSource);
 				
 			    clSource.modifiers=clDeclarion.getModifiers(); // modifierers		    		    
 			    
@@ -425,12 +429,86 @@ public class JavaSourceScanner {
 	}
 	
 	//---------------------------------------------------------------------------------------
+
+	
+	private String findComment(Node prev,CompilationUnit cu,Node actual,List<Comment> comments) {
+		if(comments==null) { return null; }
+		Node previus=prev;
+		StringBuffer sb=new StringBuffer();		
+		Iterator<Comment> it=comments.iterator();
+	    while(it!=null && it.hasNext()) {
+	    	Comment c=it.next();
+	    	String str=toString(c);	    	
+	    	if(previus==null || c.getBeginLine()>previus.getEndLine() || (c.getBeginLine()==previus.getEndLine() && c.getBeginColumn()>previus.getEndColumn())) {
+	    		if(actual==null || c.getEndLine()<actual.getBeginLine() || (c.getEndLine()==actual.getBeginLine() && c.getEndColumn()>actual.getBeginColumn())) {
+	    			it.remove(); // reomve comment 
+	    			if(str!=null && str.length()>0) {  
+	    				if(sb.length()>0) sb.append("\n");
+	    				sb.append(str);
+	    				it=null; // only first comment
+	    			}
+	    			
+	    		}
+	    	}
+	    }	    
+	    return sb.toString();
+	}
+	
+	
+	/** scan all comments insode node **/
+	public void scanComments(Node prev,Node now,DocObject parent,ClassDoc clSource, List<Comment> comments) throws Exception {
+		if(comments==null) return ;
+		Iterator<Comment> it=comments.iterator();
+		int nowLine=now.getBeginLine(),nowCol=now.getBeginColumn();
+		int prevLine=-1,prevCol=-1; if(prev!=null) { prevLine=prev.getBeginLine(); prevCol=prev.getBeginColumn(); } //PROBLEM class begin=ClassBegin,end=ClassEnd
+		while(it.hasNext()) { 
+	    	Comment c=it.next(); int comStart=c.getBeginLine(), comEnd=c.getEndLine(),comEndCol=c.getEndColumn();  	
+	    	if(prevLine==-1 || (c.getBeginLine()>prevLine || (c.getBeginLine()==prevLine && c.getBeginColumn()>prevCol))) {
+//	    		if(actual==null || c.getEndLine()<actual.getBeginLine() || (c.getEndLine()==actual.getBeginLine() && c.getEndColumn()>actual.getBeginColumn())) {
+	    		if(comEnd<nowLine || ( comEnd==nowLine && comEndCol<=nowCol)) {
+//	    		if(comEnd<=nowLine) { // FIXME: always takes comment that are above this 
+		    		if(!have(prev,c) && useComment(c)) {
+		    			scanComment(c,parent,clSource);
+		    			it.remove(); // remove from list
+		    		}
+	    		}
+	    	}	
+	    }
+	}
+
+	private void scanComment(Comment c,DocObject parent,DocObject clSource) throws Exception {
+		if(c instanceof LineComment) { return ; } // ignore line comments
+		String str=toString(c);
+		scanComment(str, parent, clSource);
+		c.setEndLine(0); // set comment scanned)
+	}
+	
+//TODO: hack find comment in prev and ignore it 
+	public boolean have(Node prev,Comment com) {
+		if(prev==null) { return false; }
+		List<Comment> cc=prev.getOrphanComments();
+		for(int i=0;cc!=null && i<cc.size();i++) {
+			if(cc.get(i)==com) { return true; }
+		}
+		return false;
+	}
+	
+	/** use comment or ignore **/
+	public boolean useComment(Comment c) {
+		if(c==null) { return false; }
+		else if(c.getContent()==null || c.getContent().trim().length()==0) { return false; } // remove empty
+		else if(c instanceof BlockComment) { return false; } // ignore blocks
+//		if(c instanceof JavadocComment) { return true; }
+		return true;
+	}
 	
 	/** set comment to object **/
-	protected void setComment(DocObject clDoc,Comment cDoc) throws Exception {	
+	protected void setComment(DocObject clDoc,Comment cDoc,DocObject clSource) throws Exception {	
 		if(cDoc==null) { return ; }
-		String comment=toString(cDoc);
-		clDoc.setComment(comment);
+//		String comment=toString(cDoc);
+//		clDoc.setComment(comment);
+		scanComment(cDoc, clDoc, clSource);
+		
 		// remove seted commet from list
 		Iterator<Comment> it=comments.iterator();
 		while(it!=null && it.hasNext()) { 
@@ -442,47 +520,10 @@ public class JavaSourceScanner {
 		}
 	}
 	
-	
-	/** scan all comments insode node **/
-	public void scanComments(Node prev,Node now,DocObject parent,ClassDoc clSource, List<Comment> comments) throws Exception {
-		if(comments==null) return ;
-		Iterator<Comment> it=comments.iterator();
-		int nowLine=now.getBeginLine(); 
-		int prevLine=-1; if(prev!=null) { prevLine=prev.getBeginLine(); } //PROBLEM class begin=ClassBegin,end=ClassEnd
-		while(it.hasNext()) { 
-	    	Comment com=it.next(); int comStart=com.getBeginLine(), comEnd=com.getEndLine();   	
-//	    	if((prev==null || com.getBeginLine()>prev.getBeginLine() || (com.getBeginLine()==prev.getBeginLine() && com.getBeginColumn()>prev.getBeginColumn()))
-//	    			&& (now==null || com.getEndLine()<now.getEndLine() || (com.getEndLine()==now.getEndLine() && com.getEndColumn()<now.getEndColumn()))) {	    		    			    	
-//	    	if(comEnd<=nowLine && (prevEnd==-1 || prevEnd>=comStart)) {
-	    	if(comEnd<=nowLine) { // FIXME: always takes comment that are above this 
-	    		if(!have(prev,com)) {
-	    			scanComment(com,parent,clSource);
-	    			it.remove(); // remove from list
-	    		}
-	    	}
-	    }
-	}
-
-//TODO: hack find comment in prev and ignore it 
-	public boolean have(Node prev,Comment com) {
-		if(prev==null) { return false; }
-		List<Comment> cc=prev.getOrphanComments();
-		for(int i=0;cc!=null && i<cc.size();i++) {
-			if(cc.get(i)==com) { return true; }
-		}
-		return false;
-	}
-	
 	//---------------------------------------------------------------------------------------
 	
 
-	
-	private void scanComment(Comment c,DocObject parent,DocObject clSource) throws Exception {
-		if(c instanceof LineComment) { return ; } // ignore line comments
-		String str=toString(c);
-		scanComment(str, parent, clSource);
-		c.setEndLine(0); // set comment scanned)
-	}
+
 	
 	private void scanComment(String str,DocObject parent,DocObject clSource) throws Exception {
 		try {
@@ -664,28 +705,6 @@ public class JavaSourceScanner {
 		}else { 
 			return name;
 		}
-	}
-	
-	private String findComment(Node prev,CompilationUnit cu,Node actual,List<Comment> comments) {
-		if(comments==null) { return null; }
-		Node previus=prev;
-		StringBuffer sb=new StringBuffer();		
-		Iterator<Comment> it=comments.iterator();
-	    while(it!=null && it.hasNext()) {
-	    	Comment c=it.next();
-	    	if(previus==null || c.getBeginLine()>previus.getEndLine() || (c.getBeginLine()==previus.getEndLine() && c.getBeginColumn()>previus.getEndColumn())) {
-	    		if(actual==null || c.getEndLine()<actual.getBeginLine() || (c.getEndLine()==actual.getBeginLine() && c.getEndColumn()>actual.getBeginColumn())) {		    		
-		    		String str=toString(c);
-		    		if(str!=null && str.length()>0) { 
-		    			if(sb.length()>0) sb.append("\n");
-		    			sb.append(str);
-		    			it.remove(); 
-		    			it=null; // only first comment
-		    		}
-	    		}
-	    	}
-	    }	    
-	    return sb.toString();
 	}
 	
 	private String toString(Object obj) {

@@ -274,32 +274,26 @@ public class AnnoUtils {
 	
 	//---------------------------------------------------------------------------------
 	
-	public static final String getAuthor(DocObject doc,int deep) {
-		if(doc==null || deep<0) { return null; }
-//		String author=doc.getAuthor();
-		String author=getAuthor(doc.getParent(),deep-1); 
-		return author;
-	}	
+	public static final String getAuthor(DocObject doc) { return get(doc,"author",99); }
+	public static final String getAuthor(DocObject doc,int deep) {   return get(doc,"author",deep); }
 		
-	public static final String getVersion(DocObject doc,int deep) {
-		if(doc==null || deep<0) { return null; }
-//		String version=doc.getVersion();
-		String version=getVersion(doc.getParent(),deep-1); 
-		return version;
-	}	
+	public static final String getVersion(DocObject doc) { return get(doc,"version",99 ); }
+	public static final String getVersion(DocObject doc,int deep) { return get(doc,"version",deep); }
 	
-	public static final String getDeprecated(DocObject doc,int deep) {
-		if(doc==null || deep<0) { return null; }
-//		String dep=doc.getDeprecated();
-		String dep=getDeprecated(doc.getParent(),deep-1); 
-		return dep;
-	}
+	public static final String getDeprecated(DocObject doc) {  return get(doc,"deprecated",99); }
+	public static final String getDeprecated(DocObject doc,int deep) {  return get(doc,"deprecated",deep); }
 	
-	public static final String getLineAnnotation(DocObject doc,String key,int deep) {
+	public static final String get(DocObject doc,String key,int deep) {
 		if(doc==null || deep<0) { return null; }
-//		String version=doc.getCommentAnnotationValue(key);
-		String version=getLineAnnotation(doc.getParent(),key,deep-1); 
-		return version;
+		String value=null;
+		if(doc instanceof AnnotationDoc) { 
+			if(doc.getName().equalsIgnoreCase(key)) { value=doc.getComment(); }
+		}else {
+			AnnotationDoc aDoc=doc.getAnnotation(key); 
+			if(aDoc!=null) { value=aDoc.getComment(); }
+		}
+		if(value!=null) { value=value.trim(); return value; }
+		return get(doc.getParent(),key,deep-1); 
 	}	
 	
 	//---------------------------------------------------------------------------------
