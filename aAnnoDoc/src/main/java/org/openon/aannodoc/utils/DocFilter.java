@@ -30,6 +30,10 @@ public class DocFilter {
 	//-------------------------------------------------------------------------------
 	// Scan
 	
+	public boolean scanDir(String javaSourceDir) {
+		return true; 
+	}
+	
 	/** 
 	 * called before a class is scanned 
 	 * 

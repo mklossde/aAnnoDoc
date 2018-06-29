@@ -39,7 +39,7 @@ public class SimpleaDocExample {
 	/** this is the java-doc of main-method - which create the aDoc documenation of this file **/
 	public static void main(String[] args) throws IOException {
 		new aAnnoDoc()
-			.scan("src/test/java"+"/examples"+"/SimpleaDocExample.java",null)
+			.scan("src/test/java"+"/examples"+"/SimpleaDocExample.java",null,null)
 			.createDocFiles("SimpleaDocExample", null,aAnnoDoc.FORMAT_HTML);
 	}
 	

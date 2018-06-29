@@ -8,13 +8,21 @@ import org.openon.aannodoc.annotation.aDoc.aDocs;
 /**TestCommentsObj**/
 //ignore this inline comment
 public class TestCommentsObj {
-
+	
+	/** this is not used **/
+	private String getValue() {
+		/** ignore this internal without ref**/
+		return null;
+	}
+	
 	// ignore this inline comment 
 	/* ttt */
 	/**aDoc**/
 	@aDoc
 	/**aktion**/ 
 	private String aktion;
+	
+	//----------------------------------------------------------------------
 	
 	/**aDoc2**/
 	@aDoc()

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.openon.aannodoc.Options;
 import org.openon.aannodoc.doc.AnnotationDocScanner;
 import org.openon.aannodoc.utils.DocFilter;
 import org.openon.aannodoc.utils.ReflectUtil;
@@ -82,10 +83,12 @@ public class JavaSourceScanner {
 	
 	public static String debug=null;
 	
-	private JarDoc unit;
+	private Options options;
+	
+	private JarDoc unit;	
 	
 	private CompilationUnit cu;
-	
+
 //	private Node prev=null;
 
 	protected DocFilter filter;
@@ -95,28 +98,29 @@ public class JavaSourceScanner {
 		
 	//----------------------------------------------------------------------------------------------
 	
-	protected static JarDoc scanPackage(String dir,DocFilter filter) throws Exception {
-		JavaSourceScanner scnnner=new JavaSourceScanner(filter);
+	protected static JarDoc scanPackage(String dir,DocFilter filter,Options options) throws Exception {
+		JavaSourceScanner scnnner=new JavaSourceScanner(filter,options);
 		scnnner.readDir(dir);
 		return scnnner.getUnit();
 	}
 	
-	protected static JarDoc scanSource(String file,DocFilter filter) throws Exception {
-		JavaSourceScanner scnnner=new JavaSourceScanner(filter);
+	protected static JarDoc scanSource(String file,DocFilter filter,Options options) throws Exception {
+		JavaSourceScanner scnnner=new JavaSourceScanner(filter,options);
 		scnnner.readFile(file);
 		return scnnner.getUnit();
 	}
 	
-	protected static JarDoc scanJar(String jarPath,DocFilter filter) throws Exception  {
-		JavaSourceScanner scnnner=new JavaSourceScanner(filter);
+	protected static JarDoc scanJar(String jarPath,DocFilter filter,Options options) throws Exception  {
+		JavaSourceScanner scnnner=new JavaSourceScanner(filter,options);
 		scnnner.readJar(jarPath);
 		return scnnner.getUnit();
 	}
 	
 	//----------------------------------------------------------------------------------------------
 	
-	public JavaSourceScanner(DocFilter filter) {		
+	public JavaSourceScanner(DocFilter filter,Options options) {		
 		this.filter=filter;
+		this.options=options;
 //TODO: create a list of all classes in java.lang.*				
 		defaultClass.put("String","java.lang,String");
 	}
@@ -137,7 +141,7 @@ public class JavaSourceScanner {
 	    	JarEntry entry=entries.nextElement();
 	    	String name = entry.getName();
 	    	if(entry.isDirectory()) {    	    		
-	    	}else if(filter!=null && !filter.scanClass(name)) { // ignroe by fitler
+	    	}else if(filter!=null && !filter.scanDir(name)) { // ignroe by fitler
 	    	}else if(name.endsWith(".java")) {
 	    		LOG.debug("scan jar java "+name);	    		
 	    		InputStream fin=jar.getInputStream(entry);
@@ -173,7 +177,7 @@ public class JavaSourceScanner {
 		File files[]=file.listFiles();
 		for(int i=0;files!=null && i<files.length;i++) {
 			File f=files[i];
-			if(filter!=null && !filter.scanClass( f.getPath())) { // ignroe by fitler
+			if(filter!=null && !filter.scanDir( f.getPath())) { // ignroe by fitler
 			}else if(f.isFile() && f.getName().endsWith(".java")) { 
 				readFile(f.getPath());
 			}else if(f.isDirectory()){
@@ -205,12 +209,12 @@ public class JavaSourceScanner {
 				
 		try {
 			String pkgName=name,clName=name;
-			if(unit==null) unit=new JarDoc(pkgName); // create unit for this package
+			if(unit==null) unit=new JarDoc(pkgName,options); // create unit for this package
 			PackageDoc pkg=unit.addPackage(pkgName); // add apckage	
 			ClassDoc clSource=pkg.addClass(clName); // add Class	
 			DocObject parent=clSource;
 //FIXME: read file here !!!!			
-			scanComment(text, parent, clSource);
+			scanComment(text, parent, clSource,true);
 		}catch(Throwable e) {
 			LOG.error("scan error in "+name+" ("+e+")",e);
 		}		
@@ -241,7 +245,7 @@ public class JavaSourceScanner {
 		    	LOG.trace("pkgName {}",pkgName);
 		    }
 		    
-		    if(unit==null) unit=new JarDoc(pkgName); // create unit for this package
+		    if(unit==null) unit=new JarDoc(pkgName,options); // create unit for this package
 		    PackageDoc pkg=unit.addPackage(pkgName); // add apckage	
 		    
 		    Node prev=null;
@@ -275,7 +279,7 @@ public class JavaSourceScanner {
 			    //class annotations		   
 			    setAnnotations(prev,clSource,clDeclarion.getAnnotations(),clSource,comments);  
 //			    clSource.setComment(toString(clDeclarion.getComment())); //getJavaDoc());		  
-				setComment(clSource,clDeclarion.getComment(),clSource);
+				setComment(clSource,clDeclarion.getComment(),clSource,true);
 				
 			    clSource.modifiers=clDeclarion.getModifiers(); // modifierers		    		    
 			    
@@ -387,7 +391,7 @@ public class JavaSourceScanner {
 		    for(int i=0;comments!=null && i<comments.size();i++) {
 		    	Comment com=comments.get(i);
 	    		LOG.trace("ignored comment "+com);	    			    	
-	    		scanComment(com,pkg,pkg);
+	    		scanComment(com,pkg,pkg,true);
 		    }		    			    	
 		     
 		}catch(Throwable e) {
@@ -455,31 +459,36 @@ public class JavaSourceScanner {
 	}
 	
 	
-	/** scan all comments insode node **/
+	/** scan all comments inside node **/
 	public void scanComments(Node prev,Node now,DocObject parent,ClassDoc clSource, List<Comment> comments) throws Exception {
 		if(comments==null) return ;
-		Iterator<Comment> it=comments.iterator();
-		int nowLine=now.getBeginLine(),nowCol=now.getBeginColumn();
+		
+		int nowLine=now.getBeginLine(),nowCol=now.getBeginColumn(),nowEndLine=now.getEndLine(),nowEndCol=now.getEndColumn();
 		int prevLine=-1,prevCol=-1; if(prev!=null) { prevLine=prev.getBeginLine(); prevCol=prev.getBeginColumn(); } //PROBLEM class begin=ClassBegin,end=ClassEnd
+		Iterator<Comment> it=comments.iterator();
 		while(it.hasNext()) { 
-	    	Comment c=it.next(); int comStart=c.getBeginLine(), comEnd=c.getEndLine(),comEndCol=c.getEndColumn();  	
+	    	Comment c=it.next(); 
+	    	int comStart=c.getBeginLine(), comEnd=c.getEndLine(),comEndCol=c.getEndColumn();  	
 	    	if(prevLine==-1 || (c.getBeginLine()>prevLine || (c.getBeginLine()==prevLine && c.getBeginColumn()>prevCol))) {
-//	    		if(actual==null || c.getEndLine()<actual.getBeginLine() || (c.getEndLine()==actual.getBeginLine() && c.getEndColumn()>actual.getBeginColumn())) {
 	    		if(comEnd<nowLine || ( comEnd==nowLine && comEndCol<=nowCol)) {
-//	    		if(comEnd<=nowLine) { // FIXME: always takes comment that are above this 
 		    		if(!have(prev,c) && useComment(c)) {
-		    			scanComment(c,parent,clSource);
+		    			scanComment(c,parent,clSource,true);
 		    			it.remove(); // remove from list
 		    		}
+//	    		}else if(comEnd<nowEndLine || ( comEnd==nowEndLine && comEndCol<=nowEndCol)) {
+//		    		if(!have(prev,c) && useComment(c)) {
+//		    			scanComment(c,parent,clSource,false);
+//		    			it.remove(); // remove from list
+//		    		}
 	    		}
 	    	}	
 	    }
 	}
 
-	private void scanComment(Comment c,DocObject parent,DocObject clSource) throws Exception {
+	private void scanComment(Comment c,DocObject parent,DocObject clSource,boolean setInParent) throws Exception {
 		if(c instanceof LineComment) { return ; } // ignore line comments
 		String str=toString(c);
-		scanComment(str, parent, clSource);
+		scanComment(str, parent, clSource,setInParent);
 		c.setEndLine(0); // set comment scanned)
 	}
 	
@@ -498,16 +507,17 @@ public class JavaSourceScanner {
 		if(c==null) { return false; }
 		else if(c.getContent()==null || c.getContent().trim().length()==0) { return false; } // remove empty
 		else if(c instanceof BlockComment) { return false; } // ignore blocks
+		else if(c instanceof LineComment) { return false; } // ignore blocks
 //		if(c instanceof JavadocComment) { return true; }
 		return true;
 	}
 	
 	/** set comment to object **/
-	protected void setComment(DocObject clDoc,Comment cDoc,DocObject clSource) throws Exception {	
+	protected void setComment(DocObject clDoc,Comment cDoc,DocObject clSource,boolean setInParent) throws Exception {	
 		if(cDoc==null) { return ; }
 //		String comment=toString(cDoc);
 //		clDoc.setComment(comment);
-		scanComment(cDoc, clDoc, clSource);
+		scanComment(cDoc, clDoc, clSource,setInParent);
 		
 		// remove seted commet from list
 		Iterator<Comment> it=comments.iterator();
@@ -525,12 +535,12 @@ public class JavaSourceScanner {
 
 
 	
-	private void scanComment(String str,DocObject parent,DocObject clSource) throws Exception {
+	private void scanComment(String str,DocObject parent,DocObject clSource,boolean setInParent) throws Exception {
 		try {
 			LOG.trace("scanComment "+str);
 			AnnotationDocScanner aDocScanner=new AnnotationDocScanner(str,true);			
 //			parent.setComment(str);
-			parent.setComment(aDocScanner.getComment()); // get comment before first annotation
+			if(setInParent) { parent.setComment(aDocScanner.getComment()); }// get comment before first annotation
 			
 			AnnotationDoc anno=aDocScanner.nextAnnotation();
 			while(anno!=null) {
@@ -631,7 +641,9 @@ public class JavaSourceScanner {
 			return ((BooleanLiteralExpr)obj).getValue();
 		}else if(obj instanceof StringLiteralExpr) {
 			String str=((StringLiteralExpr)obj).getValue();
-			return str;
+			if(AttributeReference.isAttributeReference(str)) {
+				return new AttributeReference(clSource.getClassName(), str, unit);
+			}else { return str; }
 		}else if(obj instanceof LiteralExpr) {
 			LiteralExpr str=(LiteralExpr)obj;
 			return str.getData();
@@ -645,13 +657,7 @@ public class JavaSourceScanner {
 				Object o=toObject(prev,exp.get(i),clSource);
 				l.add(o);
 			}
-			return l;
-//		}else if(obj instanceof NormalAnnotationExpr) {
-//			NormalAnnotationExpr a=(NormalAnnotationExpr)obj;	
-//			AnnotationDoc as=toAnnotationDoc(prev,clSource, a, clSource, comments);
-//	    	clSource.addAllAnnotations(as);  // class add annotation
-//	    	unit.addAnnotation(as);  // unit add annotation
-//	    	return as;		
+			return l;	
 		}else if(obj instanceof AnnotationExpr) {
 			AnnotationExpr a=(AnnotationExpr)obj;	
 			AnnotationDoc as=toAnnotationDoc(prev,clSource, a, clSource, comments);
@@ -662,12 +668,12 @@ public class JavaSourceScanner {
 		}else if(obj instanceof FieldAccessExpr) {
 			FieldAccessExpr f=(FieldAccessExpr)obj;
 			String className=findClassName(f.getScope().toString(), clSource);
-			return new DocReference(className,f.getField(),this.unit);			
+			return new ClassReference(className,f.getField(),this.unit);			
 
 		}else if(obj instanceof NameExpr) {
 			NameExpr exp=(NameExpr)obj;
 			String className=clSource.getClassName();
-			return new DocReference(className,exp.getName(),this.unit);
+			return new ClassReference(className,exp.getName(),this.unit);
 			
 
 			

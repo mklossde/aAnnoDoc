@@ -15,7 +15,7 @@ public class TestScanner {
 	}
 	
 	public void test() throws Exception {
-		JavaSourceScanner scanner=new JavaSourceScanner(null);
+		JavaSourceScanner scanner=new JavaSourceScanner(null,null);
 		scanner.readDir("src/test/java/org/openon/annodoc/test/scanner");
 		
 		JarDoc unit=scanner.getUnit();

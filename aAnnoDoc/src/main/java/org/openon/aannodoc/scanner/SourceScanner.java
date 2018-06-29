@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
+import org.openon.aannodoc.Options;
 import org.openon.aannodoc.source.ClassDoc;
 import org.openon.aannodoc.source.JarDoc;
 import org.openon.aannodoc.source.JavaSourceScanner;
@@ -38,6 +39,7 @@ public class SourceScanner {
 	/** cntains structur of scan **/
 	private JarDoc unit;
 	protected DocFilter filter;
+	private Options options;
 	
 	//------------------------------------------
 	
@@ -45,13 +47,14 @@ public class SourceScanner {
 	public SourceScanner() {}
 	
 	/** instance source scanner and scan java-source directory **/
-	public SourceScanner(String javaSourceDirectory,DocFilter filter) throws IOException {
-		this(javaSourceDirectory,null,filter);
+	public SourceScanner(String javaSourceDirectory,DocFilter filter,Options options) throws IOException {
+		this(javaSourceDirectory,null,filter,options);
 	}
 	
 	/** instacne sourceScanner, scan java-source-directory and dump scan into file **/
-	public SourceScanner(String javaSourceDirectory,String dumpFile,DocFilter filter) throws IOException {
+	public SourceScanner(String javaSourceDirectory,String dumpFile,DocFilter filter,Options options) throws IOException {
 		this.filter=filter;
+		this.options=options;
 		scan(javaSourceDirectory);
 		organize();
 		if(dumpFile!=null) save(dumpFile);
@@ -68,7 +71,7 @@ public class SourceScanner {
 	/** scan source directory **/
 	public SourceScanner scan(String javaSourceDirectory) throws IOException  {	
 		LOG.debug("SourceDir scan {} ({})",javaSourceDirectory,System.getProperty("user.dir"));
-		JavaSourceScanner scanner=new JavaSourceScanner(filter); 
+		JavaSourceScanner scanner=new JavaSourceScanner(filter,options); 
 		if(javaSourceDirectory.endsWith(".java")) { scanner.readFile(javaSourceDirectory); }
 		else if(javaSourceDirectory.endsWith(".adoc")) { scanner.readFile(javaSourceDirectory); }
 		else scanner.readDir(javaSourceDirectory);
@@ -79,7 +82,7 @@ public class SourceScanner {
 	/** scan jar file **/
 	public void scanJar(String jarFile,String dumpFile) throws Exception  {	
 		LOG.debug("SourceDir jarFile {}",jarFile);
-		JavaSourceScanner scanner=new JavaSourceScanner(filter); 
+		JavaSourceScanner scanner=new JavaSourceScanner(filter,options); 
 		scanner.readJar(jarFile);
 		this.unit=scanner.getUnit();
 		if(dumpFile!=null) save(dumpFile);		

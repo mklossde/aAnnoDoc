@@ -66,18 +66,15 @@ GRAPHVIZ MAVEN
 @Mojo(name = "annodoc")
 public class AnnoDocMojo extends AbstractMojo {
 	
-
-//	@Parameter(property = "annodoc.docDirectory", defaultValue = "..\\generated-docs")
-//	private String docDirectory;
-	
+//	@Parameter(defaultValue = "${project}", readonly = true, required = true)
+//	private MavenProject project;
+	  
 	@Parameter(property = "annodoc.source", defaultValue = "src")
 	private String source;
 	
 	@Parameter(property = "annodoc.outputFile", defaultValue = "doc/AnnoDocOutput")
 	private String outputFile;
 	
-//	@Parameter(property = "annodoc.outputDir", defaultValue = "")
-//	private String outputDir;
 	
 	@Parameter(property = "annodoc.format", defaultValue = "pdf")
 	private String format;
@@ -95,6 +92,8 @@ public class AnnoDocMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		String user = System.getProperty("user.name");
+		
+//System.out.println("pluginContext:"+getPluginContext());
 		
 		try {
 			aAnnoDoc doc=new aAnnoDoc();

@@ -24,7 +24,7 @@ public class TestComments {
 	
 	
 	public void test() throws Exception {
-		JavaSourceScanner scanner=new JavaSourceScanner(null);
+		JavaSourceScanner scanner=new JavaSourceScanner(null,null);
 		scanner.readFile("src/test/java/org/openon/annodoc/test/scanner/TestCommentsObj.java");
 		
 		JarDoc unit=scanner.getUnit();

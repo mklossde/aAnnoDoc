@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.openon.aannodoc.Options;
 import org.openon.aannodoc.source.AnnotationDoc;
 import org.openon.aannodoc.source.ClassDoc;
 import org.openon.aannodoc.source.DocObject;
@@ -33,14 +34,15 @@ import java.util.Set;
  */
 public class SourceAnnotations {
 
-	private JarDoc unit;
+	private JarDoc unit;	
 	
-	public SourceAnnotations(String javaSourceFileOrDirectory,DocFilter filter) throws IOException {
-		SourceScanner scanner=new SourceScanner(javaSourceFileOrDirectory,filter);
+	public SourceAnnotations(String javaSourceFileOrDirectory,DocFilter filter,Options options) throws IOException {
+		SourceScanner scanner=new SourceScanner(javaSourceFileOrDirectory,filter,options);
 		this.unit=scanner.getUnit();
+
 	}
 	
-	public SourceAnnotations(JarDoc unit) {
+	public SourceAnnotations(JarDoc unit,Options options) {
 		this.unit=unit;
 	}
 	

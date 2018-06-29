@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.openon.aannodoc.Options;
 import org.openon.aannodoc.scanner.SourceAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +21,12 @@ public class JarDoc extends DocObject implements Serializable {
 	
 	public List<PackageDoc> subPackages=new ArrayList<PackageDoc>();
 	
-	public JarDoc(String name) { 
+	/** AnnoDoc Options **/
+	protected Options options;
+	
+	public JarDoc(String name, Options options) { 
 		super(name,null,null);		
+		this.options=options;
 	}
 	
 	public void addAnnotation(AnnotationDoc anno) { annoMap.add(anno); }
@@ -32,6 +37,8 @@ public class JarDoc extends DocObject implements Serializable {
 	}
 	
 	//------------------------------------------------------------------
+	
+	public Options getOptions() { return this.options; }
 	
 	public List<PackageDoc> getPackages() { return subPackages; }
 	

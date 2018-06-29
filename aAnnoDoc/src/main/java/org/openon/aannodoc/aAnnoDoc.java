@@ -153,7 +153,7 @@ public class aAnnoDoc {
 	@aDoc(title="scan")
 	/** first step - scan soruce **/
 	public aAnnoDoc scan(Options options) throws IOException {		
-		return scan((String)options.get(Options.OPTION_SOURCE),options.getFilter());
+		return scan((String)options.get(Options.OPTION_SOURCE),options.getFilter(),options);
 	}
 	
 //	public aAnnoDoc scan(String javaSourceFileOrDirectory,Map<String,Object> options) throws IOException {
@@ -161,8 +161,8 @@ public class aAnnoDoc {
 //	}
 	
 	/** first step - scan soruce **/
-	public aAnnoDoc scan(String javaSourceFileOrDirectory,DocFilter filter) throws IOException {		
-		this.anno=new SourceAnnotations(javaSourceFileOrDirectory,filter);
+	public aAnnoDoc scan(String javaSourceFileOrDirectory,DocFilter filter,Options options) throws IOException {		
+		this.anno=new SourceAnnotations(javaSourceFileOrDirectory,filter,options);
 		return this;
 	}
 	

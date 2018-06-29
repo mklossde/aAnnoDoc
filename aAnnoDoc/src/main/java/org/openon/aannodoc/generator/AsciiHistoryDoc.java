@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.openon.aannodoc.annotation.aApplication;
 import org.openon.aannodoc.annotation.aAttribute;
+import org.openon.aannodoc.annotation.aBug;
+import org.openon.aannodoc.annotation.aChange;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aFeature;
 import org.openon.aannodoc.annotation.aVersion;
@@ -135,72 +137,71 @@ public class AsciiHistoryDoc extends AsciiDocGeneratorImpl implements DocGenerat
 		w.literalBlock(AnnoUtils.getDoc(version));
 		
 //		AnnoUtils.writeTable(w, "Informations", version);						
-	
+			
+		
+		List<AnnotationDoc> changes=AnnoUtils.findFeatures(annotations, ver,fromDate,toDate);	 // Features
+		changes.addAll(AnnoUtils.findChanges(annotations, ver,fromDate,toDate)); // Cahnges
+		changes.addAll(AnnoUtils.findBugs(annotations, ver,fromDate,toDate)); // Bugs
+		AnnoUtils.sortDate(changes);
+
 		w.table("Changes");
-		List<AnnotationDoc> features=AnnoUtils.findFeatures(annotations, ver,fromDate,toDate);		
-		for(int i=0;features!=null && i<features.size();i++) { w.tableLine("Feature",AnnoUtils.getDate(features.get(i),1),AnnoUtils.getTitle(features.get(i))); }
-		List<AnnotationDoc> changes=AnnoUtils.findChanges(annotations, ver,fromDate,toDate);
-		for(int i=0;changes!=null && i<changes.size();i++) { w.tableLine("Change",AnnoUtils.getDate(changes.get(i),1),AnnoUtils.getTitle(changes.get(i))); }
-		List<AnnotationDoc> bugs=AnnoUtils.findBugs(annotations, ver,fromDate,toDate);
-		for(int i=0;bugs!=null && i<bugs.size();i++) { w.tableLine("Bug",AnnoUtils.getDate(bugs.get(i),1),AnnoUtils.getTitle(bugs.get(i))); }
+		for(int i=0;changes!=null && i<changes.size();i++) {
+			AnnotationDoc anno=changes.get(i);
+			String type=anno.getSimpleName();
+			w.tableLine(type,AnnoUtils.getDate(anno,1),AnnoUtils.getTitle(anno)); 			
+		}
 		w.tableEnd();
 		
-		if(features!=null && features.size()>0) {
-			w.subTitle("Features");
-			for(int i=0;features!=null && i<features.size();i++) { writeFeature(features.get(i)); }
-			w.subTitleEnd();
+		
+		if(changes!=null && changes.size()>0) {			
+			for(int i=0;changes!=null && i<changes.size();i++) {
+				AnnotationDoc anno=changes.get(i);
+				String type=anno.getSimpleName();
+				if(type.equals(aBug.class.getSimpleName())) { writeBugs(anno); } 
+				if(type.equals(aChange.class.getSimpleName())) { writeChange(anno); } 
+				if(type.equals(aFeature.class.getSimpleName())) { writeFeature(anno); } 
+			}			
 		}
-		
-		
-		if(changes!=null && changes.size()>0) {
-			w.subTitle("Changes");
-			for(int i=0;changes!=null && i<changes.size();i++) { writeChange(changes.get(i)); }
-			w.subTitleEnd();
-		}
-		
-		
-		if(bugs!=null && bugs.size()>0) {
-			w.subTitle("Bugs");		
-			for(int i=0;bugs!=null && i<bugs.size();i++) { writeBugs(bugs.get(i)); }
-			w.subTitleEnd();
-		}
-		
+				
 		w.subTitleEnd();
 	}
 	
 	public void writeFeature(AnnotationDoc feature) throws IOException {
-		String featureTitle=AnnoUtils.getTitle(feature);
-//		w.subTitle("Feature "+featureTitle);
+		String title=AnnoUtils.getTitle(feature);
 //		w.paragraph(AnnoUtils.getDoc(feature));
 //		AnnoUtils.writeTable(w, "Informations", feature);
-//		w.subTitleEnd();	
-		w.list("Feature "+featureTitle);
+
+		w.subTitle("Feature "+title);
+//		w.list("Feature "+featureTitle);
 //		w.list("Feature "+featureTitle+" ["+w.toString(AnnoUtils.getDate(feature,1),"")+" "+w.toString(AnnoUtils.getVersion(feature,1),"")+"]");
 //		w.list("["+w.toString(AnnoUtils.getDate(feature,1),"")+" "+w.toString(AnnoUtils.getVersion(feature,1),"")+"] Feature "+featureTitle);
 		w.literalBlock(AnnoUtils.getDoc(feature));
+		w.subTitleEnd();	
 	}
 	
 	public void writeChange(AnnotationDoc change) throws IOException {
-		String featureTitle=AnnoUtils.getTitle(change);
-//		w.subTitle("Feature "+featureTitle);
+		String title=AnnoUtils.getTitle(change);
 //		w.paragraph(AnnoUtils.getDoc(feature));
 //		AnnoUtils.writeTable(w, "Informations", feature);
-//		w.subTitleEnd();	
-		w.list("Change "+featureTitle);
+//			
+		w.subTitle("Change "+title);
+//		w.list("Change "+featureTitle);
 //		w.list("Feature "+featureTitle+" ["+w.toString(AnnoUtils.getDate(feature,1),"")+" "+w.toString(AnnoUtils.getVersion(feature,1),"")+"]");
 //		w.list("["+w.toString(AnnoUtils.getDate(feature,1),"")+" "+w.toString(AnnoUtils.getVersion(feature,1),"")+"] Feature "+featureTitle);
 		w.literalBlock(AnnoUtils.getDoc(change));
+		w.subTitleEnd();
 	}
 	
 	public void writeBugs(AnnotationDoc bug) throws IOException {
-		String bugTitle=AnnoUtils.getTitle(bug);
-//		w.subTitle("Feature "+featureTitle);
+		String title=AnnoUtils.getTitle(bug);
+		w.subTitle("Bug "+title);
+//		w.list("Bug "+title);
 //		w.paragraph(AnnoUtils.getDoc(feature));
 //		AnnoUtils.writeTable(w, "Informations", feature);
-//		w.subTitleEnd();	
-		w.list("Bug "+bugTitle);
+//		w.subTitleEnd();			
 		w.caution(AnnoUtils.get(bug, aDoc.fLEVEL)); 
 		w.literalBlock(AnnoUtils.getDoc(bug));
 		w.italic(AnnoUtils.get(bug, aDoc.fFIX));
+		w.subTitleEnd();
 	}
 }

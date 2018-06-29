@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -46,19 +48,22 @@ public class Options {
 	
 	public static final String OPTION_AD_GRAPHVIZ="dot"; // asciiDoc Attribute DOC/GRAPHVIZ
 	
-//	public static final String OPTION_OUT_ADOC="outadoc";
-//	/** output directory - change working directory **/ 
-//	public static final String OPTION_OUT_DIR="outdir"; 
 	/** write only docFile - contains file="xxx" in annotation-attribute **/
 	public static final String OPTION_DOCFILE="docfile";
+	
+	public DateFormat df=new SimpleDateFormat("dd.MM.YYYY");
 	
 	/** option map **/
 	protected Map<String,Object> options=new HashMap<String, Object>();
 	/** asciidoctor attribtues **/
 	protected Map asciidoctorAttribtues=new HashMap();
+	/** value attribtues **/
+	protected Map attributes=new HashMap();
 	
 	/** actual resolved fitler **/
 	protected DocFilter filter;
+	
+	//-----------------------------------------------------------------
 	
 	/** instance new option obejct **/
 	public Options() {}
@@ -99,7 +104,19 @@ public class Options {
 			else { put(key,args[++i]); }
 		}
 	}
-		
+	
+	//---------------------------------------------------------------------------------------------
+	public Object getAttribute(String key) {
+		Object val=attributes.get(key);
+		if(val!=null) { return val; }
+		if(key.equalsIgnoreCase("NOW")) { return toDate(System.currentTimeMillis()); }
+		else { return null; }
+	}
+	public void setAttribute(String key,Object value) { attributes.put(key, value); }		
+
+	
+	public String toDate(long time) {return df.format(time);}
+	
 	//---------------------------------------------------------------------------------------------
 	/** read options from propertie file **/
 	protected void readProperties(String propertieFile) throws IOException {
@@ -130,6 +147,7 @@ public class Options {
 	
 	//-------------------------------------------------------------------------------------------------
 	
+	public void setFilter(DocFilter filter) throws IOException { this.filter=filter; }
 	public DocFilter getFilter() throws IOException {
 		if(this.filter!=null) { return filter; }
 		this.filter=(DocFilter)ReflectUtil.getInstance(DocFilter.class,options.get("filter"));

@@ -50,7 +50,8 @@ public abstract class DocObject implements Serializable {
 			this.comment=comment; 
 		}else {
 			LOG.warn("double set comment old:'{}' and new:'{}' to {}",this.comment,comment,this);
-			this.comment=this.comment+"\n"+comment;
+//			this.comment=this.comment+"\n"+comment;
+			this.comment=comment; // use only last 
 		}
 	}
 	

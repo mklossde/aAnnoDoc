@@ -316,7 +316,7 @@ public class AnnoUtils {
 		if(obj==null) { return def; }
 		else if(obj instanceof DocReference) {
 			DocReference ref=(DocReference)obj;
-			return ref.resolve();		
+			return toString(ref.resolve(),def);		
 		}else {	return String.valueOf(obj); }
 	}
 	
