@@ -12,6 +12,7 @@ import org.openon.aannodoc.generator.DocGenerator;
 import org.openon.aannodoc.generator.GenJavaDoc;
 import org.openon.aannodoc.scanner.SourceAnnotations;
 import org.openon.aannodoc.utils.DocFilter;
+import org.openon.aannodoc.utils.SourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,6 +161,13 @@ public class aAnnoDoc {
 //		return scan(javaSourceFileOrDirectory,getFilter(options));
 //	}
 	
+	public aAnnoDoc scanTestSource(Class sourceClass) throws IOException {
+		this.anno=new SourceAnnotations(SourceUtils.class2SourceFile(sourceClass),null,null);
+		return this;
+	}
+	
+
+	
 	/** first step - scan soruce **/
 	public aAnnoDoc scan(String javaSourceFileOrDirectory,DocFilter filter,Options options) throws IOException {		
 		this.anno=new SourceAnnotations(javaSourceFileOrDirectory,filter,options);
@@ -226,8 +234,8 @@ public class aAnnoDoc {
 	 */
 	@aFeature(title="execute/manuel/DocFiles")
 	/** create documentation for all given files in source **/
-	public static void DocFiles(String source,String output,String format) throws IOException  {
-		Options options=new Options(source,output,GENERATOR_ADOC,format);
+	public static void DocFiles(String source,String output,String generator,String format) throws IOException  {
+		Options options=new Options(source,output,generator,format);
 		new aAnnoDoc(options);		
 	}
 	
@@ -236,9 +244,10 @@ public class aAnnoDoc {
 	 * @param format - output-format
 	 */
 	@aFeature(title="execute/manuel/DocFiles")
-	public aAnnoDoc createDocFiles(String useDocFile,String output,String format) throws IOException  {
-		Options options=new Options(null,output,GENERATOR_ADOC,format);	
-		if(useDocFile!=null) { options.put(Options.OPTION_DOCFILE, useDocFile); }
+	public aAnnoDoc createDocFiles(String output,String generator,String format) throws IOException  {
+		Options options=new Options(null,output,generator,format);
+//		Options options=new Options(null,output,GENERATOR_ADOC,format);	
+//		if(useDocFile!=null) { options.put(Options.OPTION_DOCFILE, useDocFile); }
 		return create(options);
 	}
 

@@ -40,7 +40,7 @@ public class SimpleaDocExample {
 	public static void main(String[] args) throws IOException {
 		new aAnnoDoc()
 			.scan("src/test/java"+"/examples"+"/SimpleaDocExample.java",null,null)
-			.createDocFiles("SimpleaDocExample", null,aAnnoDoc.FORMAT_HTML);
+			.createDocFiles("SimpleaDocExample",aAnnoDoc.GENERATOR_ADOC,aAnnoDoc.FORMAT_HTML);
 	}
 	
 //	/** The programm is called by java examples.aDocExample **/

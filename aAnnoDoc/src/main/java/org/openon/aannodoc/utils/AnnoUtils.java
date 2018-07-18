@@ -248,9 +248,14 @@ public class AnnoUtils {
 	
 	//---------------------------------------------------------------------------------
 	
+	/** get a shorted doc/comment of DocObject **/
+	public static String getDocShort(DocObject doc) { return getDocShort(doc,160); }
+	public static String getDocShort(DocObject doc,int len) { return getShort(getDoc(doc),len);}
+		
+	/** use getDoc **/
+	@Deprecated public static String getComment(DocObject doc) { return getComment(doc); }
 	/** get doc of DocObject **/
-	public static String getDoc(DocObject doc) { return getComment(doc); } 
-	public static String getComment(DocObject doc) {
+	public static String getDoc(DocObject doc) {
 		if(doc==null) { return null; }
 		String text=doc.getComment();
 		// add descibtoon of annotation **/
@@ -262,7 +267,13 @@ public class AnnoUtils {
 		return text;
 	}
 	
-
+	public static String getShort(String text,int len) {
+		if(text==null) { return text; }
+		int firstNl=text.indexOf("\n");
+		if(firstNl>0 && (len<1 || firstNl<len)) {return text.substring(0, firstNl); } // find first NL
+		else if(len>3 && text.length()>len) { return text.substring(0, len-3)+"..."; } 
+		return text;	
+	}
 	
 	//---------------------------------------------------------------------------------
 	

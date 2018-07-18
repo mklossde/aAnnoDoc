@@ -1,9 +1,13 @@
 package org.openon.aannodoc.asciidoc;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,6 +27,8 @@ public class AsciiDocWriter {
 	
 	public static char NL='\n';
 	protected int titleDeep=1,listDeep=1;
+	
+	public AsciiDocWriter(String file) throws IOException { this(new FileWriter(file)); }
 	
 	public AsciiDocWriter(OutputStream wr) {  this.wr=new PrintWriter(wr); }
 	public AsciiDocWriter(PrintWriter wr) { this.wr=wr; }
@@ -60,7 +66,9 @@ public class AsciiDocWriter {
 	public AsciiDocWriter small(Object text) {  return wIf(text!=null,"[.small]#",text,"#"); }
 	public AsciiDocWriter big(Object text) {  return wIf(text!=null,"[.big]##",text,"##"); }
 	public AsciiDocWriter underline(Object text) {  return wIf(text!=null,"[.underline]#",text,"#"); }
-	public AsciiDocWriter linethrough(Object text) {  return wIf(text!=null,"[.line-through]#",text,"#"); }
+	public AsciiDocWriter linethrough(Object text) {  return w(toLinethrough(text)); }	
+	
+	public String toLinethrough(Object text) {  String t=toString(text); if(text==null) { return null; } return "[.line-through]#"+t+"#"; }
 	
 	public AsciiDocWriter superScript(Object text) {  return wIf(text!=null,"^",text,"^"); }
 	public AsciiDocWriter subScript(Object text) {  return wIf(text!=null,"~",text,"~"); }
@@ -108,16 +116,35 @@ public class AsciiDocWriter {
 	public AsciiDocWriter label(Object text) { return nnl().w(text).w(":: ").nl(); }
 	public AsciiDocWriter label(Object label,Object text) { return nnl().w(label).w(":: ").w(text).nl(); }
 	
-	public AsciiDocWriter reference(Object text) { return w("<<").w(text).w(">>"); }
+	public AsciiDocWriter reference(Object ref) { return w(toReference(ref)); }	
+
+	/** role/css of a block **/
+	public AsciiDocWriter role(Object role) { nnl(); return w("[.", 1, role, "]"); }
 	
-	public AsciiDocWriter table(Object title,Object... heads) { nnl2().w(".table ").w(title).nl().w("|===").nl();for(int i=0;heads!=null && i<heads.length;i++) { w("|").w(heads[i]); } return nl(); }
-	public AsciiDocWriter tableLine(Object... cells) { nnl(); for(int i=0;cells!=null && i<cells.length;i++) { w("|").w(cells[i]); } return nl(); }
+	public AsciiDocWriter table(Object title) { tableTitle(title); return tableStart(); }
+	public AsciiDocWriter table(Object title,Object... heads) { tableTitle(title); tableOptions(TableWriter.OPTIONS_DEFAULT); tableStart(); return tableHead(heads); }
+	public AsciiDocWriter table(Object title,String cols[],String options,Object... heads) { tableTitle(title); tableOptions(options,cols);tableStart(); return tableHead(heads); }
+	
+	public AsciiDocWriter tableTitle(Object title) { if(title==null) {return this; } return nnl2().w(".").w(title); } 	
+	public AsciiDocWriter tableOptions(String options) { if(options==null) { return this; }return nl().w("[").w(options).w("]").nl(); }
+	public AsciiDocWriter tableOptions(String options,Object...cols) {		
+		if(cols==null && options==null) { return this; }  
+		nl().w("[");
+//		w("cols=\""); for(int i=0;i<cols.length;i++) { if(i>0) {w(",");} w(cols[i]); } w("\"");
+		wList("cols=\"",",","\"",cols);
+		w("options=\"",options,"\"");
+		return wnl("]");
+	}
+
+	public AsciiDocWriter tableStart() { return nnl().w("|===").nl(); }
+	public AsciiDocWriter tableHead(Object... heads) { for(int i=0;heads!=null && i<heads.length;i++) { w("|").w(heads[i]); } return nl(); }
+	public AsciiDocWriter tableLine(Object... cells) {nnl(); for(int i=0;cells!=null && i<cells.length;i++) { w("|").w(cells[i]); } return nl(); }
 	/** table line ONLY if ANY CELL NOT NULL **/
 	public AsciiDocWriter tableLineNN(Object... cells) { 
 		for(int t=0;cells!=null && t<cells.length;t++) { if(cells[t]==null) { return this; }}
 		nnl(); for(int i=0;cells!=null && i<cells.length;i++) { w("|").w(cells[i]); } return nl(); 
 	}
-	public AsciiDocWriter tableEnd() { return nnl().wnl("|==="); }
+	public AsciiDocWriter tableEnd() {return nnl().wnl("|==="); }	
 	
 	public AsciiDocWriter include(String file) { return include(file,null); }
 	public AsciiDocWriter includeOrg(String file) { return include(file,"[tag=b-base-h-co"); }
@@ -162,9 +189,18 @@ public class AsciiDocWriter {
 	/** write if rule **/
 	public AsciiDocWriter wIf(boolean rule,Object... texts) { if(rule) { w(texts); } return this;}
 	public AsciiDocWriter wIf(boolean rule,String before,Object body,String after) { if(!rule || e(body)) {return this;} w(before); wTrim(body); return w(after); }
-	public AsciiDocWriter w(String before,int count,String body,String after) { w(before) ;for(int i=0;i<count;i++) { w(body.trim()); } w(after); return this; }
+	public AsciiDocWriter w(String before,String body,String after) { if(body==null) { return this; } w(before) ;  w(body.trim()); return w(after); }
+	public AsciiDocWriter w(String before,int count,String body,String after) { if(body==null) { return this; } w(before) ;for(int i=0;i<count;i++) { w(body.trim()); } w(after); return this; }
 
 	public AsciiDocWriter w(Object... t) { for(int i=0;t!=null && i<t.length;i++) { w((String)valueOf(t[i]));} return this; }
+	
+	public AsciiDocWriter wList(String before,String del,String after,Object...o) { 
+		if(o==null) { return this; } 
+		w(before); 
+		boolean next=false; for(int i=0;i<o.length;i++) { if(!e(o[i])) { if(next) {w(del);} w(o[i]); next=true; }} 
+		return w(after);  
+	}
+	
 	//---------------------------------------------------------------------------------------------------------
 	
 	public AsciiDocWriter w(char c) { wr.print(c); lastcharNL=(c==NL); if(cacheOn) { cache.append(c); }  return this; }  
@@ -195,7 +231,8 @@ public class AsciiDocWriter {
 		else { return "AsciiWriter "+wr; }
 	}
 	
-	
+	/** get text as reference **/
+	public String toReference(Object text) { String t=toString(text); if(t==null || t.length()==0) {return null;} return "<<"+t+">>"; }
 
 	//----------------------------------------------------------------------------	
 	/** get string or empty **/

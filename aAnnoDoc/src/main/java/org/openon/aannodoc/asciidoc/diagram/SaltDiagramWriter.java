@@ -1,8 +1,9 @@
-package org.openon.aannodoc.asciidoc;
+package org.openon.aannodoc.asciidoc.diagram;
 
 import java.io.IOException;
 
 import org.openon.aannodoc.annotation.aDoc;
+import org.openon.aannodoc.asciidoc.AsciiDocWriter;
 
 /**
  * Design graphical interface

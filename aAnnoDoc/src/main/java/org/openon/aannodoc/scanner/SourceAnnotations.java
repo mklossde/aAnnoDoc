@@ -19,6 +19,7 @@ import org.openon.aannodoc.source.DocObject;
 import org.openon.aannodoc.source.JarDoc;
 import org.openon.aannodoc.utils.AnnoUtils;
 import org.openon.aannodoc.utils.DocFilter;
+import org.openon.aannodoc.utils.SourceUtils;
 
 import japa.parser.ast.visitor.EqualsVisitor;
 import net.sourceforge.plantuml.Log;
@@ -36,13 +37,16 @@ public class SourceAnnotations {
 
 	private JarDoc unit;	
 	
+	public SourceAnnotations(Class sourceClass,DocFilter filter,Options options) throws IOException {
+		SourceScanner scanner=new SourceScanner(SourceUtils.class2SourceFile(sourceClass),filter,options);
+		this.unit=scanner.getUnit();
+	}
 	public SourceAnnotations(String javaSourceFileOrDirectory,DocFilter filter,Options options) throws IOException {
 		SourceScanner scanner=new SourceScanner(javaSourceFileOrDirectory,filter,options);
 		this.unit=scanner.getUnit();
-
 	}
 	
-	public SourceAnnotations(JarDoc unit,Options options) {
+	public SourceAnnotations(JarDoc unit) {
 		this.unit=unit;
 	}
 	

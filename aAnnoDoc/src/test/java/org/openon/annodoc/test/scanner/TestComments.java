@@ -18,12 +18,51 @@ public class TestComments {
 
 	public static void main(String[] args) throws Exception {
 		TestComments test=new TestComments();
-		test.test();
+		
+//		test.testCommentsObj();
+		test.testCommentsAnno();
+		
 		System.out.println("end");
 	}
 	
+//	@Test
+	public void testCommentsAnno() throws Exception {
+		JavaSourceScanner scanner=new JavaSourceScanner(null,null);
+		scanner.readFile("src/test/java/org/openon/annodoc/test/scanner/TestCommentsAnno.java");
+		
+		JarDoc unit=scanner.getUnit();
+		ClassDoc clDoc=unit.findClass("TestCommentsAnno");
+//System.out.println("doc:"+doc);
+		Assert.assertNotNull(clDoc);
+		Assert.assertEquals("TestCommentsAnno", clDoc.getComment());
+		
+		FieldDoc fDoc; AnnotationDoc aDoc; List<AnnotationDoc> list;
+		
+		fDoc=clDoc.getField(unit, "aktion");
+		Assert.assertNotNull(fDoc);	
+		Assert.assertEquals("aktion", fDoc.getComment());
+		Assert.assertEquals("String",fDoc.getTypeName());
+		
+		fDoc=clDoc.getField(unit, "aktion2");
+		Assert.assertNotNull(fDoc);	
+		Assert.assertEquals("aktion2", fDoc.getComment());		
+		aDoc=fDoc.getAnnotation(aDoc.class);
+		Assert.assertNotNull(aDoc);
+		Assert.assertEquals("aDoc", aDoc.getComment());		
+		Assert.assertEquals("String",fDoc.getTypeName());
+		
+		fDoc=clDoc.getField(unit, "length");
+		Assert.assertNotNull(fDoc);	
+		Assert.assertEquals("length", fDoc.getComment());		
+		aDoc=fDoc.getAnnotation(Deprecated.class);
+		Assert.assertNotNull(aDoc);
+		Assert.assertEquals("Deprecated", aDoc.getComment());		
+		Assert.assertEquals("Int",fDoc.getTypeName());
+	}
 	
-	public void test() throws Exception {
+	
+//	@Test	
+	public void testCommentsObj() throws Exception {
 		JavaSourceScanner scanner=new JavaSourceScanner(null,null);
 		scanner.readFile("src/test/java/org/openon/annodoc/test/scanner/TestCommentsObj.java");
 		

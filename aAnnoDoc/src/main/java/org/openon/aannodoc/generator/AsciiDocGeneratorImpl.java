@@ -47,7 +47,7 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	}
 	
 	@Override public void generate() throws IOException {
-		String outputName=(String)options.get(Options.OPTION_DOCFILE);		
+		String outputName=(String)options.get(Options.OPTION_OUTPUTNAME);		
 //		if(outputName!=null) {  
 		generate(outputName); 
 //		}else {
@@ -163,17 +163,18 @@ public abstract class AsciiDocGeneratorImpl implements DocGenerator {
 	/** write created to output **/
 	@Override public void output(String outputName) throws IOException {		
 		String adoc=w.toString();	
-		LOG.trace("document {} adoc: {}",outputName,adoc);	
+		LOG.trace("document adoc: {}",adoc);	
 		
 		String outputFile=outputName;
 		if(outputName==null || outputName.length()==0) { outputFile=getOutput(); } 
 		AsciiDocCreator cr=new AsciiDocCreator(options.getAsciidoctorAttribtues());
-				
-//		if(options.get(Options.OPTION_OUT_ADOC)!=null) { 
-//			String file=toFile(outputFile,aAnnoDoc.FORMAT_ASCIIDOC,true);
-//			LOG.info("write {} format adoc to {}",outputName,file);
-//			cr.create(adoc, aAnnoDoc.FORMAT_ASCIIDOC, file);
-//		}
+			
+		String outSource=(String)options.get(Options.OPTION_OUTSOURCE);
+		if(outSource!=null) { 			
+			String file=toFile(outSource,aAnnoDoc.FORMAT_ASCIIDOC,true);
+			LOG.info("write {} source to {}",outputName,file);
+			cr.create(adoc, aAnnoDoc.FORMAT_ASCIIDOC, file);
+		}
 		
 		String format=getFormat();
 		String file=toFile(outputFile,format,false);

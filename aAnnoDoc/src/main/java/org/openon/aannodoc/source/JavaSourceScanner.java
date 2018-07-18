@@ -53,13 +53,17 @@ import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.LiteralExpr;
 import japa.parser.ast.expr.MarkerAnnotationExpr;
 import japa.parser.ast.expr.MemberValuePair;
+import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.NormalAnnotationExpr;
 import japa.parser.ast.expr.NullLiteralExpr;
 import japa.parser.ast.expr.SingleMemberAnnotationExpr;
 import japa.parser.ast.expr.StringLiteralExpr;
 import japa.parser.ast.expr.UnaryExpr;
+import japa.parser.ast.stmt.BlockStmt;
+import japa.parser.ast.stmt.Statement;
 import japa.parser.ast.type.ClassOrInterfaceType;
+import japa.parser.ast.type.PrimitiveType;
 import japa.parser.ast.type.ReferenceType;
 
 /**
@@ -78,8 +82,7 @@ public class JavaSourceScanner {
 	
 	public static boolean ANALYSEAT=true;
 	
-//	protected String charset="UTF-8";
-	protected String charset="windows-1252"; //
+	protected String charset=Options.CHARTSET_UTF8;
 	
 	public static String debug=null;
 	
@@ -121,6 +124,10 @@ public class JavaSourceScanner {
 	public JavaSourceScanner(DocFilter filter,Options options) {		
 		this.filter=filter;
 		this.options=options;
+		if(options!=null) {
+			String charset=options.getSourceCharset(); 
+			if(charset!=null && charset.length()>0) { this.charset=charset; }
+		}
 //TODO: create a list of all classes in java.lang.*				
 		defaultClass.put("String","java.lang,String");
 	}
@@ -318,7 +325,7 @@ public class JavaSourceScanner {
 			    List<BodyDeclaration> mem=clDeclarion.getMembers();
 			    for(int i=0;mem!=null && i<mem.size();i++) {
 			    	BodyDeclaration body=mem.get(i);		    	
-			    	
+			    			    	
 			    	if(body instanceof FieldDeclaration) { // Field
 			    		FieldDeclaration dec=(FieldDeclaration)body;
 			    		List<VariableDeclarator> vars=dec.getVariables();		    		
@@ -352,6 +359,7 @@ public class JavaSourceScanner {
 			    	}else if(body instanceof MethodDeclaration) {// Method	
 			    		MethodDeclaration method=(MethodDeclaration)body;
 			    		
+//			    		method.getAllContainedComments();			    		
 			    		MethodDoc mc=new MethodDoc(method.getName(), toString(method.getType()), clSource, clSource);
 			    		ParametersDoc params=getParams(prev,method,mc,clSource); 
 			    		mc.setParameter(params);
@@ -363,9 +371,25 @@ public class JavaSourceScanner {
 			    		clSource.addMethod(mc);
 			    		scanComments(prev,method, mc, clSource,comments); // scan inside comments
 			    		
-			    	}else if(body instanceof AnnotationMemberDeclaration) {// Annotation 
+			    		recursiveSan(method,mc,clSource);
+			    	}else if(body instanceof AnnotationMemberDeclaration) {// Annotation attribute/parameter definition (e.g. public Type type();)
 			    		AnnotationMemberDeclaration an=(AnnotationMemberDeclaration)body;
-			    		LOG.trace("AnnotationMemberDeclaration "+an.getName());			    		
+			    		LOG.trace("AnnotationMemberDeclaration "+an.getName());	
+			    		Node anType=an.getType();
+			    		String type=toString(anType);			    		
+			    		Object value=toObject(prev,an.getDefaultValue(), clSource);			    		
+			    		AnnotationParameterDoc annoParam=new AnnotationParameterDoc(an.getName(),type,clSource,clSource,value);
+			    		
+		    			setAnnotations(prev,annoParam, an.getAnnotations(), clSource,comments);
+		    			annoParam.modifiers=an.getModifiers();
+		    			annoParam.setComment(findComment(prev,cu, an,comments)); // toString(dec.getJavaDoc());
+		    			clSource.addField(annoParam);		 
+		    			
+		    			/** aBug(author="mk",date="18.07.2018",title="parser use wrong line",fix="use line of type") **/
+//		    			scanComments(prev,an, annoParam, clSource,comments); // scan inside comments
+		    			scanComments(prev,anType, annoParam, clSource,comments); // scan inside comments		    			
+			    		LOG.trace("AnnotationParam "+annoParam);	    		
+			    		
 			    	}else if(body instanceof AnnotationDeclaration) {// Annotation 
 			    		AnnotationDeclaration an=(AnnotationDeclaration)body;
 			    		LOG.trace("AnnotationDeclaration "+an.getName());
@@ -400,6 +424,37 @@ public class JavaSourceScanner {
 		}
 	}	
 	
+	/** recursive scan java programm **/
+	protected void recursiveSan(Node node,MethodDoc parent,DocObject group) {
+		List<Node> childs=node.getChildrenNodes();
+		for (Node childNode : childs) {
+			recursiveSan(childNode,parent,group);
+//System.out.println("n:"+node.getClass()+" "+node);	
+			/** Remember call structure **/
+			if(childNode instanceof MethodCallExpr) {
+				MethodCallExpr mce=(MethodCallExpr)childNode;
+				String methodName=mce.getName();
+				Expression scope=mce.getScope();
+				List<Expression> methodArgs=mce.getArgs();
+//System.out.println("MethodCallExpr:"+childNode+" a:"+mce.getArgs()+" n:"+mce.getName()+" t:"+mce.getTypeArgs()+" s:"+scope);
+				CallDoc call=new CallDoc(methodName, parent, group);
+				
+				if(methodArgs!=null) {
+					ParametersDoc params=new ParametersDoc(parent,group,methodArgs.size());
+					for(int i=0;i<methodArgs.size();i++) {
+						String paramClass=null;
+						String paramName=toString(methodArgs.get(i));					
+						params.set(i, paramClass, paramName);
+					}
+					call.setParameter(params);
+				}
+				
+//System.out.println("call:"+call);
+				parent.addCall(call);
+			}			
+		}
+	}
+		
 	protected ParametersDoc getParams(Node prev,MethodDeclaration method,MethodDoc methodDoc,ClassDoc clSource) throws Exception {
 		List<Parameter> parameter=method.getParameters();
 //		List<TypeParameter> parameter2=method.getTypeParameters();
@@ -576,7 +631,8 @@ public class JavaSourceScanner {
 	    	
 	    	AnnotationDoc as=toAnnotationDoc(prev,source, anno, clSource,comments);
 	    	
-	    	clSource.addAllAnnotations(as);  // class add annotation
+	    	/** @aBug(author="mk",date="18.07.2018",title="annotations are wrong added to class (e.g. deprecated) ",fix="do not add annotation to class as default") **/	    	
+//	    	clSource.addAllAnnotations(as);  // class add annotation
 	    	unit.addAnnotation(as);  // unit add annotation
 	    	list.add(as);
 	    	
@@ -716,7 +772,9 @@ public class JavaSourceScanner {
 	private String toString(Object obj) {
 		if(obj==null) return null;
 		else if(obj instanceof NameExpr) return ((NameExpr)obj).toString();
-		else if(obj instanceof Comment) {
+		else if(obj instanceof PrimitiveType) {
+			return ((PrimitiveType)obj).getType().toString();
+		}else if(obj instanceof Comment) {
     		String str=((Comment)obj).getContent();
     		if(str!=null && str.length()>0) { 	    			
 	    		return getCommentString(str);

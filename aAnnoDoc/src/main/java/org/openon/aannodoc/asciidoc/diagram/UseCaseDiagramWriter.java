@@ -1,8 +1,9 @@
-package org.openon.aannodoc.asciidoc;
+package org.openon.aannodoc.asciidoc.diagram;
 
 import java.io.IOException;
 
 import org.openon.aannodoc.annotation.aDoc;
+import org.openon.aannodoc.asciidoc.AsciiDocWriter;
 
 /**
  * Create a use-case diagram, within generator, with UseCaseDiagramWriter
@@ -16,7 +17,7 @@ public class UseCaseDiagramWriter {
 
 	public static final String LINK="----------------------------------------------------------------------------------------------------";
 	public static final String LINE="....................................................................................................";
-	public static final String plutgin="plantuml";
+	public static final String plugin="plantuml";
 	
 	public static final String LEFT="left";
 	public static final String RIGHT="right";
@@ -33,7 +34,7 @@ public class UseCaseDiagramWriter {
 	
 	/** start sequenz diagram with title of it **/
 	public UseCaseDiagramWriter start(String name) throws IOException {
-		wr.nnl2().w('[').w(plutgin).w(',').w(name).w(']').nl();
+		wr.nnl2().w('[').w(plugin).w(',').w(name).w(']').nl();
 		wr.w("----").nl();
 		return this;
 	}

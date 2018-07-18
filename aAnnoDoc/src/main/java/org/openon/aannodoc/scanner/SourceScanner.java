@@ -70,6 +70,7 @@ public class SourceScanner {
 	
 	/** scan source directory **/
 	public SourceScanner scan(String javaSourceDirectory) throws IOException  {	
+		if(javaSourceDirectory==null) { throw new IOException("missing javaSourceDirectory"); }
 		LOG.debug("SourceDir scan {} ({})",javaSourceDirectory,System.getProperty("user.dir"));
 		JavaSourceScanner scanner=new JavaSourceScanner(filter,options); 
 		if(javaSourceDirectory.endsWith(".java")) { scanner.readFile(javaSourceDirectory); }

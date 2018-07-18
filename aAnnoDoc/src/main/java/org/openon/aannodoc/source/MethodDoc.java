@@ -2,6 +2,10 @@ package org.openon.aannodoc.source;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+import japa.parser.ast.Node;
 
 /**
  * Annoation documenation of a Java-Method
@@ -12,6 +16,9 @@ public class MethodDoc extends TypeDoc implements Serializable{
 
 	protected ParametersDoc parameter;
 	protected transient Method method;
+	
+	/** list of programm calls **/
+	protected List<CallDoc> calls;
 	
 	public MethodDoc(String name,String typeName,DocObject parent,ClassDoc clSource)  { 
 		super(name,typeName,parent,clSource); 
@@ -33,6 +40,14 @@ public class MethodDoc extends TypeDoc implements Serializable{
 	
 	/** get method parameter **/
 	public ParametersDoc getParameter() { return parameter; }
+	
+	/** add programm calls to method **/
+	public void addCall(CallDoc call) { 
+		if(calls==null) { calls=new ArrayList<CallDoc>(); } 
+		calls.add(call);
+	}
+	/* get list of programm calls inside method **/
+	public List<CallDoc> getCalls() { return calls; }
 	
 	public String toJava() { return toJava(modifiers)+" "+name+"("+(parameter.toJava())+")"; }
 	public String toString() { return "Method "+name; }

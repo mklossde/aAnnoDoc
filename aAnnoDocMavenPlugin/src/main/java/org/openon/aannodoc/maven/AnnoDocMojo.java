@@ -70,19 +70,22 @@ public class AnnoDocMojo extends AbstractMojo {
 //	private MavenProject project;
 	  
 	@Parameter(property = "annodoc.source", defaultValue = "src")
-	private String source;
+	protected String source;
 	
 	@Parameter(property = "annodoc.outputFile", defaultValue = "doc/AnnoDocOutput")
-	private String outputFile;
+	protected String outputFile;
 	
+	@Parameter(property = "annodoc.outputSource", defaultValue = "doc/AnnoSourceOutput")
+	protected String outputSource;
 	
 	@Parameter(property = "annodoc.format", defaultValue = "pdf")
-	private String format;
+	protected String format;
 	
 	@Parameter(property = "annodoc.generator", defaultValue = aAnnoDoc.GENERATOR_ANNOTATIONS)
-	private String generator;
+	protected String generator;
 	
-
+	@Parameter(property = "annodoc.sourceCharset", defaultValue = Options.CHARTSET_UTF8)
+	protected String sourceCharset;
 	
 	/**
 	 * plugin for maven - run via mvn in cmd 
@@ -99,11 +102,13 @@ public class AnnoDocMojo extends AbstractMojo {
 			aAnnoDoc doc=new aAnnoDoc();
 			String javaSourceFileOrDirectory=source;		
 			Options options=new Options(javaSourceFileOrDirectory,outputFile,generator, format);
-//			if(outputDir!=null && outputDir.length()>0) { options.put(Options.OPTION_OUT_DIR, outputDir);}
+			if(outputSource!=null && outputSource.length()>0) { options.put(Options.OPTION_OUTSOURCE, outputSource);}
+			if(sourceCharset!=null && sourceCharset.length()>0) { options.put(Options.OPTION_SOURCE_CHARTSET, sourceCharset);}
 			
 			getLog().info("source: " + source);
+			getLog().info("sourceChartset: " + sourceCharset);
 			getLog().info("outputFile: " + outputFile);
-//			getLog().info("outputDir: " + outputDir);
+			getLog().info("outputSource: " + outputSource);
 			getLog().info("format: " + format);
 			getLog().info("generator: " +generator);
 					

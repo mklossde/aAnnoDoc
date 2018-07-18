@@ -8,10 +8,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.openon.aannodoc.annotation.aAttribute;
 import org.openon.aannodoc.annotation.aDoc;
+import org.openon.aannodoc.annotation.aFeature;
 import org.openon.aannodoc.utils.DocFilter;
 import org.openon.aannodoc.utils.ReflectUtil;
 
@@ -42,14 +44,28 @@ public class Options {
 	
 	@aAttribute()
 	public static final String OPTION_SOURCE="soruce";
+	
+	/** add option to set charset of source (to scann source/comments with this charset) **/
+	@aFeature(date="16.07.2018",title="soruceChartset")
+	/** define source code charset (e.g. UTF-8/windows-1252 )**/	
+	public static final String OPTION_SOURCE_CHARTSET="soruceChartset";
+//TODO: inspect maven (pom.xml) for charset	
+	public static final String CHARTSET_UTF8="UTF-8";
+	public static final String CHARTSET_WINDOWS="windows-1252"; 
+	
 	public static final String OPTION_GENERATOR="generator";
 	public static final String OPTION_FORMAT="format";
 	public static final String OPTION_OUTPUT="output";
 	
+	/** output source for output-format to "outsource" file (e.g. asciidoc) **/
+	public static final String OPTION_OUTSOURCE="outsource";
+	
 	public static final String OPTION_AD_GRAPHVIZ="dot"; // asciiDoc Attribute DOC/GRAPHVIZ
 	
-	/** write only docFile - contains file="xxx" in annotation-attribute **/
-	public static final String OPTION_DOCFILE="docfile";
+//	/** write only docFile - contains file="xxx" in annotation-attribute **/
+//	public static final String OPTION_DOCFILE="docfile";
+	/** define generator output-name (e.g. group) **/
+	public static final String OPTION_OUTPUTNAME="outputname";
 	
 	public DateFormat df=new SimpleDateFormat("dd.MM.YYYY");
 	
@@ -138,6 +154,8 @@ public class Options {
 	public void put(String key,Object value) { options.put(key, value); }
 	/** get option **/
 	public Object get(String key) { return options.get(key); }
+	/** get option as string **/
+	public String getString(String key) { return Objects.toString(options.get(key),null); }
 	/** remove key **/
 	public Object remove(String key) { return options.remove(key); }	
 	/** do optiin contaisn key **/
@@ -155,5 +173,9 @@ public class Options {
 		return filter;
 	}
 	
-
+	/** get source-code charset option **/
+	public String getSourceCharset() { return getString(OPTION_SOURCE_CHARTSET); }
+	/** set source-code charset option **/
+	public Options setSourceCharset(String charset) { put(OPTION_SOURCE_CHARTSET, charset); return this; }
+	
 }

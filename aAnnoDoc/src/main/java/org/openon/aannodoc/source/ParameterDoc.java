@@ -1,10 +1,11 @@
 package org.openon.aannodoc.source;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * Annotation bases documenation about a parameter-set
+ * Annotation bases documenation about a method parameter
+ * 		
+ * 		method(Parameter)
  * 
  */
 public class ParameterDoc extends DocObject {

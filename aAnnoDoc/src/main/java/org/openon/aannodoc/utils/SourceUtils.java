@@ -1,8 +1,17 @@
 package org.openon.aannodoc.utils;
 
+import java.io.File;
+
 public class SourceUtils {
 
 
+	public static String class2SourceFile(Class sourceClass) {
+		File f=new File("");
+		String path = sourceClass.getName().replaceAll("\\.","/");
+		String sourcePath=f.getAbsolutePath()+"/src/test/java/"+path;
+		String javaSourceFileOrDirectory = sourcePath+ ".java";
+		return javaSourceFileOrDirectory;
+	}
 	
 	/** 
 	 * split java.util.List org.openon.annodoc.test.scanner.TestObject2 into {java.util,List,<org.openon.annodoc.test.scanner.TestObject2} 

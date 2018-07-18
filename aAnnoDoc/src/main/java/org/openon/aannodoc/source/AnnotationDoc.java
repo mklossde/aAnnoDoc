@@ -82,12 +82,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	public String getRef() {  return parentName; }
 //		if(parent==null) { return null; } else { return parent.getName(); }}
 	
-//	/** get inline annotation author (\@author MYNAME) **/
-//	public String getAuthor() { String value=super.getAuthor(); if(value==null && parent!=null) { value=parent.getAuthor(); } return value; }
-//	/** get inline annotation version (\@version VERSION) **/
-//	public String getVersion() {  String value=super.getVersion(); if(value==null && parent!=null) { value=parent.getVersion(); } return value; }
-	
-	
+
 	
 	//-----------------------------------------------------------------
 	
@@ -150,18 +145,36 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 		if(values==null) { return null; }
 		return values.get(key); 
 	}
-	/** getValues():	get all values as Map String,Object  **/
-//	public Map<String,Object> getValues() { return values; }
-	public Iterator<String> getValueKeys() { return values.keySet().iterator(); }
+	
+	
 	/** get resolved value as string **/
 	public String getValueString(String key) { 
 		if(values==null) { return null; }
 		Object obj=values.get(key);
-		return AnnoUtils.toString(obj, null); 
-		
+		return AnnoUtils.toString(obj, null); 		
 	}
+	
 	/** get value as integer **/
 	public int getValueIntger(String key,int def) { return AnnoUtils.toInteger(values.get(key), def); }		
+	
+	/** getValues():	get all values as Map String,Object  **/
+//	public Map<String,Object> getValues() { return values; }
+	public Iterator<String> getValueKeys() { return values.keySet().iterator(); }
+
+//	//-----------------------------------------------------------------
+//	// compatible with older versions
+//	
+//	/** @deprecated for compatible - use getValueString()  - resolved value as string **/
+//	public Object getValue(String key) { return getValueObject(key); } 
+//	
+//	/**  @deprecated for compatible - use AnnoUtils.getAuthor -  resolve author **/
+//	public String getAuthor() { return AnnoUtils.getAuthor(this); }
+//
+//	/**  @deprecated for compatible - use AnnoUtils.getVersion -  resolve verion **/
+//	public String getVersion() {   return AnnoUtils.getVersion(this);  }
+//	
+//	/**  @deprecated - use getValueKeys and iterate - THIS VALUES ARE NOT RESOLVED **/
+//	public Map<String,Object> getValues() { return values; }
 	
 	//-----------------------------------------------------------------
 	

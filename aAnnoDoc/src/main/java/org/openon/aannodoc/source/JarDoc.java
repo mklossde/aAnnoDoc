@@ -153,6 +153,7 @@ public class JarDoc extends DocObject implements Serializable {
 		if(parent!=null) { getParentList(parents,parent,true); }
 		// add impls
 		List<String> impl=tag.getImplements();
+		if(impl==null) { return ; }
 		for (String imp : impl) {
 			parent=findClass(imp);
 			if(parent!=null) { getParentList(parents,parent,true); } 

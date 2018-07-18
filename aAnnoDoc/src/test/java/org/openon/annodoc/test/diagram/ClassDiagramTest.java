@@ -7,13 +7,14 @@ import java.util.Map;
 
 import org.openon.aannodoc.asciidoc.AsciiDocCreator;
 import org.openon.aannodoc.asciidoc.AsciiDocWriter;
+import org.openon.aannodoc.asciidoc.diagram.ClassDiagramWriter;
 import org.openon.aannodoc.asciidoc.diagram.SaltDiagramWriter;
 import org.openon.aannodoc.asciidoc.diagram.SaltDiagramWriter.Align;
 
-public class SaltDiagramTest {
+public class ClassDiagramTest {
 
 	public static void main(String[] args) throws Exception {
-		SaltDiagramTest dia=new SaltDiagramTest();
+		ClassDiagramTest dia=new ClassDiagramTest();
 		
 //		dia.testSystemOut();
 		dia.test();
@@ -41,29 +42,13 @@ System.out.println(adoc);
 //adoc="User -> (Start)\nUser --> (Use the application) : A small label\n\n:Main Admin: ---> (Use the application) : This is\nyet another\nlabel";
 		Map asciidoctorAttribtues=new HashMap();
 		asciidoctorAttribtues.put(AsciiDocCreator.ASCIIDOC_ATTR_DOT, "C:/Data/Programme/graphviz/bin/dot.exe");
-		AsciiDocCreator.Adoc2Html(adoc, "doc/SaltDiagrammTest.html",asciidoctorAttribtues);
+		AsciiDocCreator.Adoc2Html(adoc, "doc/ClassDiagrammTest.html",asciidoctorAttribtues);
 	}		
 	
 	public void createDiagram(AsciiDocWriter wr) throws IOException {
-		SaltDiagramWriter dia=new SaltDiagramWriter(wr, "mySaltDiagram");
+		ClassDiagramWriter dia=new ClassDiagramWriter(wr, "myClassDiagram");
 
-		dia.menu(null,"one","two","three");
-		dia.tab("bbb", "aaa","bbb","ccc","ddd");
-		
-		dia.form(2, true); 
-		dia.input("input", "value", 20,Align.right);
-		dia.checkbox("checkboxes", "2","1","2","3");
-		dia.radio("radios", null,"1","2","3");
-		dia.select("select", "selected value");
-		dia.formLine();
-		dia.empty(); 		
-		dia.group(); dia.button("cancel","save","delete"); dia.groupEnd();		
-		dia.formEnd();
-		
-		dia.tree();dia.treeLine("one");dia.treeSub("two");dia.treeSub("three");dia.treeSubEnd(); dia.treeLine("four"); dia.treeEnd();
-		
-		dia.table();dia.tableLine("111","222","333"); dia.tableLine("xxx","yyy","zzz");dia.tableEnd();
-
+		dia.test();
 		
 		dia.end();
 	}
