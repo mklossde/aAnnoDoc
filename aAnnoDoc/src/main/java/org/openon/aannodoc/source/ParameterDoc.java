@@ -12,6 +12,8 @@ public class ParameterDoc extends DocObject {
 
 	protected String name;
 	protected String className;
+	protected String simpleClassName;
+	
 	protected Class type;
 	protected List<AnnotationDoc> paramAnnotations;
 	
@@ -39,6 +41,17 @@ public class ParameterDoc extends DocObject {
 	}
 	
 	//----------------------------------------------------------------------
+	
+	public boolean equals(Object obj) {
+		if(obj==null) return false;
+		else if(obj==this) return true;
+		else if(obj instanceof String) {
+			String s=(String)obj; 
+//System.out.println("s:"+s+" n:"+name+" cn:"+className+" simpleClassName:"+simpleClassName);			
+			if(s.equals(name) || s.equals(className) || s.equals(simpleClassName) ) return true;
+			else return false;
+		}else return super.equals(obj);
+	}
 	
 	public String toString() {
 		return className+" "+name;

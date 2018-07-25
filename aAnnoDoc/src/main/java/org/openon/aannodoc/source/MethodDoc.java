@@ -48,6 +48,27 @@ public class MethodDoc extends TypeDoc implements Serializable{
 	}
 	/* get list of programm calls inside method **/
 	public List<CallDoc> getCalls() { return calls; }
+	/** find first call by name **/
+	public CallDoc getCall(String name) { 
+//System.out.println("c:"+calls);		
+		for(int i=0;calls!=null && i<calls.size();i++) {
+			CallDoc call=calls.get(i);
+			if(call.equals(name)) { return call; }
+		}
+		return null;
+	}
+	
+	public boolean is(CallDoc call) {
+		return is(call.getName(), call.toParams());
+	}
+	
+	/** do methodhave this name and params **/
+	public boolean is(String name,String params[]) {
+		if(name==null || !name.equals(this.name)) { return false; }  
+		else if(params==null) { return true; }
+		else if(this.parameter==null) { return false; }
+		return this.parameter.equals(params);
+	}
 	
 	public String toJava() { return toJava(modifiers)+" "+name+"("+(parameter.toJava())+")"; }
 	public String toString() { return "Method "+name; }

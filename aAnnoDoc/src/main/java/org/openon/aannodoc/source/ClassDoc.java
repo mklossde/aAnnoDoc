@@ -102,6 +102,46 @@ public class ClassDoc extends TypeDoc implements Serializable {
 		return all;
 	}
 	
+	/** get all possible methods for this call **/
+	public List<MethodDoc> getMethods(JarDoc doc,CallDoc call) {
+		List<MethodDoc> list=new ArrayList<MethodDoc>();
+		List<ClassDoc> allCl=relevantClasses(doc);
+		for (ClassDoc classDoc : allCl) {	
+			List<MethodDoc> fs=classDoc.getAllMethods(doc);
+			for(int t=0;fs!=null && t<fs.size();t++) {
+				MethodDoc fd=fs.get(t);		
+				if(fd.is(call)) { list.add(fd); }				
+			}
+		}
+		return list;
+	}
+	
+	public MethodDoc getMethod(JarDoc doc,CallDoc call) { 
+		List<ClassDoc> allCl=relevantClasses(doc);
+		for (ClassDoc classDoc : allCl) {	
+			List<MethodDoc> fs=classDoc.getAllMethods(doc);
+			for(int t=0;fs!=null && t<fs.size();t++) {
+				MethodDoc fd=fs.get(t);		
+				if(fd.is(call)) { return fd; }				
+			}
+		}
+		return null;
+	}
+	
+	/** find first method by name and aprams (all relevant classes (extends,imports,..)) **/
+	public MethodDoc getMethod(JarDoc doc,String methodName) { return  getMethod(doc,methodName,null); }
+	public MethodDoc getMethod(JarDoc doc,String methodName,String params[]) { 
+		List<ClassDoc> allCl=relevantClasses(doc);
+		for (ClassDoc classDoc : allCl) {	
+			List<MethodDoc> fs=classDoc.getAllMethods(doc);
+			for(int t=0;fs!=null && t<fs.size();t++) {
+				MethodDoc fd=fs.get(t);		
+				if(fd.is(methodName,params)) { return fd; }				
+			}
+		}
+		return null;
+	}
+	
 	public List<ConstructorDoc> getConstructor() { return constructors; }
 	public List<AnnotationDoc> getAnnotationsInClass() { return annotations; }
 	

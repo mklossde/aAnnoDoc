@@ -1,10 +1,10 @@
-package org.openon.annodoc.test.scanner;
+package junit.test.scanner;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Test;
 import org.openon.aannodoc.Options;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.source.AnnotationDoc;
@@ -25,11 +25,12 @@ public class TestAttributes {
 	}
 	
 	
+	@Test
 	public void test() throws Exception {
 		Options options=new Options();
 		
 		JavaSourceScanner scanner=new JavaSourceScanner(null,options);
-		scanner.readFile("src/test/java/org/openon/annodoc/test/scanner/TestAttributeObj.java");
+		scanner.readFile("src/test/java/junit/test/scanner/TestAttributeObj.java");
 		
 		JarDoc unit=scanner.getUnit();
 		ClassDoc clDoc=unit.findClass("TestAttributeObj");

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.openon.aannodoc.annotation.aApplication;
 import org.openon.aannodoc.annotation.aDoc;
+import org.openon.aannodoc.generator.writer.ApplicationWriter;
 import org.openon.aannodoc.generator.writer.VersionWriter;
 import org.openon.aannodoc.source.AnnotationDoc;
 import org.openon.aannodoc.utils.AnnoUtils;
@@ -36,20 +37,18 @@ public class AsciiHistoryDoc extends AsciiDocGeneratorImpl implements DocGenerat
 	/** document head **/
 	public void head(String outputName) throws IOException {	
 		init();		
+		
 		// Doc Title
-		w.title(title+" "+TITLE,author,null,version);		
-		String genLabel=(String)options.get("genlabel"); if(genLabel==null) { genLabel="aAnnoDoc created on"; }
-		w.nl().w(":last-update-label: "+genLabel).nl();	
-		if(depcrecated!=null) { w.warning(depcrecated); }		
+		ApplicationWriter appWr=new ApplicationWriter(w, annotations, options);
+		appWr.writeHead();
+
 		// App Doc		
 		w.literalBlock(AnnoUtils.getDoc(application)); 
-		// Copyright
-		w.paragraph(copyright);
 	}
 	
 	/** document body **/
 	public void body(String outputName) throws IOException {
-		VersionWriter verWr=new VersionWriter(w, annotations);
+		VersionWriter verWr=new VersionWriter(w, annotations,options);
 		verWr.wrtieVersionTable(options);
 		verWr.wrtieVersions(options);
 	}

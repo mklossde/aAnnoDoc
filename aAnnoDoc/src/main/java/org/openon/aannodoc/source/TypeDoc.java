@@ -73,7 +73,7 @@ public abstract class TypeDoc extends DocObject implements Serializable {
 	public TypeDoc getTypeClass() { return (TypeDoc)findClass(typeClassName); }
 	
 	public int getModifiers() { return modifiers; }
-	 
+	 	
 	public boolean equals(Object obj) {
 		if(obj==null) return false;
 		else if(obj==this) return true;

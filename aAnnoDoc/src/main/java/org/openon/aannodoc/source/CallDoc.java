@@ -1,6 +1,7 @@
 package org.openon.aannodoc.source;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,18 @@ public class CallDoc extends DocObject {
 	
 	public void setParameter(ParametersDoc parameter) { this.parameter=parameter; }
 	public ParametersDoc getParameter() { return parameter; }
+	
+	/** find first destination method for this call **/
+	public MethodDoc getMethod(JarDoc unit) {return unit.findMethod(this);}
+	/** find all destination method for this call **/
+	public List<MethodDoc> getMethods(JarDoc unit) {return unit.findMethods(this);}
+	
+	public String[] toParams() {
+		if(parameter==null) { return null; } 
+		return parameter.toParamsSize();
+//		return parameter.toParamsName();
+//		return parameter.toParamsType();
+	}
 	
 	public String toString() { return "CallDoc "+name+"("+parameter+")"; }
 }

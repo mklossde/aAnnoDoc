@@ -1,7 +1,8 @@
-package org.openon.annodoc.test.scanner;
+package junit.test.scanner;
 
 import java.util.List;
 
+import org.junit.Test;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aDoc.aDocs;
 import org.openon.aannodoc.source.AnnotationDoc;
@@ -19,24 +20,30 @@ public class TestComments {
 	public static void main(String[] args) throws Exception {
 		TestComments test=new TestComments();
 		
-//		test.testCommentsObj();
+		test.testCommentsObj();
 		test.testCommentsAnno();
 		
 		System.out.println("end");
 	}
 	
-//	@Test
+	@Test
 	public void testCommentsAnno() throws Exception {
 		JavaSourceScanner scanner=new JavaSourceScanner(null,null);
-		scanner.readFile("src/test/java/org/openon/annodoc/test/scanner/TestCommentsAnno.java");
+		scanner.readFile("src/test/java/junit/test/scanner/TestCommentsAnno.java");
+		
+		FieldDoc fDoc; AnnotationDoc aDoc; List<AnnotationDoc> list;
 		
 		JarDoc unit=scanner.getUnit();
 		ClassDoc clDoc=unit.findClass("TestCommentsAnno");
 //System.out.println("doc:"+doc);
 		Assert.assertNotNull(clDoc);
-		Assert.assertEquals("TestCommentsAnno", clDoc.getComment());
 		
-		FieldDoc fDoc; AnnotationDoc aDoc; List<AnnotationDoc> list;
+		// test comment of class
+		Assert.assertEquals("TestCommentsAnno", clDoc.getComment());
+		aDoc=clDoc.getAnnotation(aDoc.class);
+		Assert.assertNotNull(aDoc);
+		Assert.assertEquals("aDocTestCommentsAnno", aDoc.getComment());
+				
 		
 		fDoc=clDoc.getField(unit, "aktion");
 		Assert.assertNotNull(fDoc);	
@@ -61,18 +68,31 @@ public class TestComments {
 	}
 	
 	
-//	@Test	
+	@Test
 	public void testCommentsObj() throws Exception {
 		JavaSourceScanner scanner=new JavaSourceScanner(null,null);
-		scanner.readFile("src/test/java/org/openon/annodoc/test/scanner/TestCommentsObj.java");
+		scanner.readFile("src/test/java/junit/test/scanner/TestCommentsObj.java");
+//scanner.readFile("src/test/java/junit/test/scanner/TestCommentsObj2.java");
+		
+		FieldDoc fDoc; AnnotationDoc aDoc; List<AnnotationDoc> list;
 		
 		JarDoc unit=scanner.getUnit();
 		ClassDoc clDoc=unit.findClass("TestCommentsObj");
+//ClassDoc clDoc=unit.findClass("TestCommentsObj2");		
 //System.out.println("doc:"+doc);
-		Assert.assertNotNull(clDoc);
+		Assert.assertNotNull(clDoc);		
+		
+		// Test class commment
 		Assert.assertEquals("TestCommentsObj", clDoc.getComment());
 		
-		FieldDoc fDoc; AnnotationDoc aDoc; List<AnnotationDoc> list;
+		// test annoation
+		aDoc=clDoc.getAnnotation(aDoc.class);
+		Assert.assertNotNull(aDoc);
+		Assert.assertEquals("aDocTestCommentsObj", aDoc.getComment());
+		// check only one annotation
+		List<AnnotationDoc> aList=clDoc.findAnnotation(aDoc.class);
+		Assert.assertNotNull(aList);
+		Assert.assertEquals(1, aList.size());		
 		
 		fDoc=clDoc.getField(unit, "aktion");
 		Assert.assertNotNull(fDoc);	

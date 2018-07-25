@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.openon.aannodoc.asciidoc.AsciiDocCreator;
 import org.openon.aannodoc.asciidoc.AsciiDocWriter;
 
@@ -21,6 +23,7 @@ public class AsciiDocExample {
 		System.out.println("end");
 	}
 	
+//	@Before
 	public void open() throws IOException {
 		file="doc/AsciiDocExample.adoc";
 		FileWriter w=new FileWriter("doc/AsciiDocExample.adoc");		
@@ -28,6 +31,7 @@ public class AsciiDocExample {
 //wr=new AsciiDocWriter(System.out);
 	}
 	
+//	@Test
 	public void write()  throws IOException {
 		
 		wr.title("AsciiDocExample", "AnnoDoc", "mail@openon.org", "1.0"); e();

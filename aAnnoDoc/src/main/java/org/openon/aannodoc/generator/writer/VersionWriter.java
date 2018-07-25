@@ -22,25 +22,17 @@ import org.openon.aannodoc.utils.DocUtils;
  * 
  *
  */
-public class VersionWriter {
+public class VersionWriter extends ApplicationWriter {
 
-	protected SourceAnnotations annotations;	
-	protected AsciiDocWriter w;	
+
 	
 //	protected List<AnnotationDoc> versions,versionList;
 	
-	public VersionWriter(AsciiDocWriter w,SourceAnnotations adoc) throws IOException {
-		this.w=w;
-		this.annotations=adoc; 				
+	public VersionWriter(AsciiDocWriter w,SourceAnnotations adoc,Options options) throws IOException {
+		super(w, adoc,options);
 	}
 	
-	//----------------------------------------------------------------------------------------
-	
-	/** get application **/
-	public AnnotationDoc application() throws IOException  {
-		AnnotationDoc application=this.annotations.getAnnotation(aApplication.class);
-		return application;
-	}
+
 	
 	/** get versions of application **/
 	public List<AnnotationDoc> versions()   throws IOException {

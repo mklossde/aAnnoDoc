@@ -57,6 +57,13 @@ public class Options {
 	public static final String OPTION_FORMAT="format";
 	public static final String OPTION_OUTPUT="output";
 	
+	public static final String OPTION_APP_TITLE="title";
+	public static final String OPTION_APP_VERSION="version";
+	public static final String OPTION_APP_DATE="date";
+	public static final String OPTION_APP_AUTHOR="author";
+	public static final String OPTION_APP_DEPRECATED="deprecated";
+	public static final String OPTION_APP_COPYRIGHT="copyright";
+	
 	/** output source for output-format to "outsource" file (e.g. asciidoc) **/
 	public static final String OPTION_OUTSOURCE="outsource";
 	

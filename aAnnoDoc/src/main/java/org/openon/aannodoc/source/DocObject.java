@@ -57,8 +57,8 @@ public abstract class DocObject implements Serializable {
 	
 	public String getComment() { return comment; }
 	
-	public void addAllAnnotations(AnnotationDoc anno) { annotations.add(anno);}
-	public void addAnnotations(List<AnnotationDoc> annos) { annotations.addAll(annos); }
+	public void addAnnotation(AnnotationDoc anno) { annotations.add(anno);}
+//	public void addAnnotations(List<AnnotationDoc> annos) { annotations.addAll(annos); }
 
 //	//--------------------------------------------------------------------------
 //	/** get inline annotation author (\@author MYNAME) **/
@@ -201,6 +201,16 @@ public abstract class DocObject implements Serializable {
 	}
 	public DocObject getGroup() { return this.group; }
 	
+	
+	public boolean equals(Object obj) {
+		if(obj==null) return false;
+		else if(obj==this) return true;
+		else if(obj instanceof String) {
+			String s=(String)obj; 
+			if(s.equals(name)) return true;
+			else return false;
+		}else return super.equals(obj);
+	}
 	
 	public String toJava() { return toString(); }
 	public abstract String toString();

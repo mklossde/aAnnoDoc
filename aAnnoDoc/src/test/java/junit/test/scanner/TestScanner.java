@@ -1,5 +1,6 @@
-package org.openon.annodoc.test.scanner;
+package junit.test.scanner;
 
+import org.junit.Test;
 import org.openon.aannodoc.source.ClassDoc;
 import org.openon.aannodoc.source.DocObject;
 import org.openon.aannodoc.source.JarDoc;
@@ -14,9 +15,10 @@ public class TestScanner {
 		System.out.println("end");
 	}
 	
+	@Test
 	public void test() throws Exception {
 		JavaSourceScanner scanner=new JavaSourceScanner(null,null);
-		scanner.readDir("src/test/java/org/openon/annodoc/test/scanner");
+		scanner.readDir("src/test/java/junit/test/scanner");
 		
 		JarDoc unit=scanner.getUnit();
 		DocObject doc=unit.findClass("TestObject");

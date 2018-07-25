@@ -112,6 +112,7 @@ public class AnnoUtils {
 	
 	/** get attribute-value of annotation or name of parent (class/method/field) **/
 	public static String getValueOrName(AnnotationDoc doc,String key) {
+		if(doc==null) { return null; }
 		String value=doc.getValueString(key);
 		if(value==null) { value=ReflectUtil.toName(doc.getParent().getName()); }
 		return value;
@@ -119,18 +120,21 @@ public class AnnoUtils {
 	
 	/** get attribute-value of annotation **/
 	public static String getValue(AnnotationDoc doc,String key) {
+		if(doc==null) { return null; }
 		String value=doc.getValueString(key);
 		return value;
 	}
 	
 	/** get group of annotation **/
 	public static String getGroup(AnnotationDoc doc) {
+		if(doc==null) { return null; }
 		return doc.getValueString(aDoc.fGROUP);
 	}
 	
 	/** get title of annotation **/
 	public static String getTitle(AnnotationDoc doc) { return getTitle(doc, false); }
 	public static String getTitle(AnnotationDoc doc,boolean removePath) {
+		if(doc==null) { return null; }
 		String title=doc.getValueString(aDoc.fTITLE);
 		if(title==null && doc.isInline()) { // title of inline doc from comment
 			title=doc.getComment();
@@ -148,26 +152,31 @@ public class AnnoUtils {
 	}
 	
 	public static final String getVersion(AnnotationDoc doc,int deep) {
+		if(doc==null) { return null; }
 		String version=doc.getValueString(aDoc.fVERSION);
 		if(version==null) { return getVersion((DocObject)doc,deep-1); } else { return version; }
 	}
 	
 	public static final String getAuthor(AnnotationDoc doc,int deep) {
+		if(doc==null) { return null; }
 		String author=doc.getValueString(aDoc.fAUTHOR);
 		if(author==null) { return getAuthor((DocObject)doc,deep-1); } else { return author; }
 	}
 	
 	public static final String getAuthor(AnnotationDoc doc) {
+		if(doc==null) { return null; }
 		String author=doc.getValueString(aDoc.fAUTHOR);
 		return author;
 	}
 	
 	public static final String getDeprecated(AnnotationDoc doc,int deep) {
+		if(doc==null) { return null; }
 		String dep=doc.getValueString(aDoc.fDEPRECATED);
 		if(dep==null) { return getDeprecated((DocObject)doc,deep-1); } else { return dep; }
 	}
 	
 	public static final String getDate(AnnotationDoc doc,int deep) {
+		if(doc==null) { return null; }
 		String date=doc.getValueString(aDoc.fDATE);
 //		if(date==null) { return getDate((DocObject)doc,deep-1); } else { return date; }
 		return date;
@@ -175,6 +184,7 @@ public class AnnoUtils {
 	
 	/** get default-attribute or field-value **/
 	public static final String getDefaultOrValue(AnnotationDoc doc) {
+		if(doc==null) { return null; }
 		String value=doc.getValueString("value");
 		if(value!=null && value.length()>0) { return value; }
 		Object parent=doc.getParent();
@@ -186,7 +196,10 @@ public class AnnoUtils {
 	}
 	
 	/** get parameter (key) of annoation as string, or null for empty **/ 
-	public static final String get(AnnotationDoc doc,String key) { return doc.getValueString(key); }
+	public static final String get(AnnotationDoc doc,String key) { 
+		if(doc==null) { return null; }
+		return doc.getValueString(key); 
+	}
 		
 	//---------------------------------------------------------------------------------
 	

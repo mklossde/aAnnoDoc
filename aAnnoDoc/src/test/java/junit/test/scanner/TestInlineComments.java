@@ -1,7 +1,8 @@
-package org.openon.annodoc.test.scanner;
+package junit.test.scanner;
 
 import java.util.List;
 
+import org.junit.Test;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aDoc.aDocs;
 import org.openon.aannodoc.source.AnnotationDoc;
@@ -23,9 +24,10 @@ public class TestInlineComments {
 	}
 	
 	
+	@Test
 	public void test() throws Exception {
 		JavaSourceScanner scanner=new JavaSourceScanner(null,null);
-		scanner.readFile("src/test/java/org/openon/annodoc/test/scanner/TestInlineCommentsObj.java");
+		scanner.readFile("src/test/java/junit/test/scanner/TestInlineCommentsObj.java");
 		
 		JarDoc unit=scanner.getUnit();
 		ClassDoc clDoc=unit.findClass("TestInlineCommentsObj");

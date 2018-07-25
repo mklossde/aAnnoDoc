@@ -14,6 +14,7 @@ import org.openon.aannodoc.annotation.aAttribute;
 import org.openon.aannodoc.annotation.aBug;
 import org.openon.aannodoc.annotation.aVersion;
 import org.openon.aannodoc.asciidoc.diagram.SequenceDiagramWriter;
+import org.openon.aannodoc.generator.writer.ApplicationWriter;
 import org.openon.aannodoc.annotation.aInterface;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aError;
@@ -129,20 +130,10 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	public void head(String outputName) throws IOException {
 		createStructure(outputName);		
 		
-		String title="AppDoc",author=null,version=null,date=null,depcrecated=null,copyright=null;
-		application=getMainDoc();
-//System.out.println("d:"+docs);
-		if(application!=null) {			
-			title=AnnoUtils.getTitle(application,true);
-			author=AnnoUtils.getAuthor(application, 1);version=AnnoUtils.getVersion(application, 1);
-			date=AnnoUtils.getDate(application, 1); depcrecated=AnnoUtils.getDeprecated(application, 1);
-			copyright=application.getValueString("copyright");
-		}
-		w.title(title,author,null,version); // ,doc.getAnnotation("author"),doc.getAnnotation("date"));
+		ApplicationWriter appWr=new ApplicationWriter(w, annotations, options);
+		application=appWr.application();
 		
-		String genLabel=(String)options.get("genlabel"); if(genLabel==null) { genLabel="aAnnoDoc created on"; }
-		w.nl().w(":last-update-label: "+genLabel).nl();	
-		if(depcrecated!=null) { w.warning(depcrecated); }
+		appWr.writeHead();
 		
 		if(application!=null) {
 			w.paragraph(AnnoUtils.getDoc(application));
@@ -150,7 +141,6 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 			attribtue("Attributes", attr);
 		}
 		
-		w.paragraph(copyright);
 	}
 	
 	/** document body **/
@@ -435,12 +425,12 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		
 	//------------------------------------------------------------------
 	
-	/** get root Object **/
-	public AnnotationDoc getMainDoc() {
-		List<AnnotationDoc> docs=annotations.findAnnotation(aApplication.class);
-		if(docs!=null && docs.size()>0) { return docs.get(0); }
-		return null;
-	}
+//	/** get root Object **/
+//	public AnnotationDoc getMainDoc() {
+//		List<AnnotationDoc> docs=annotations.findAnnotation(aApplication.class);
+//		if(docs!=null && docs.size()>0) { return docs.get(0); }
+//		return null;
+//	}
 	
 	/** get title of tree **/
 	public String getTitle(Tree<AnnotationDoc> tree) {

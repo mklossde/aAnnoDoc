@@ -1,14 +1,13 @@
 package org.openon.aannodoc;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
+import org.openon.aannodoc.annotation.aApplication;
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aFeature;
-import org.openon.aannodoc.generator.GenAppDoc;
-import org.openon.aannodoc.generator.GenAllAnno;
 import org.openon.aannodoc.generator.DocGenerator;
+import org.openon.aannodoc.generator.GenAllAnno;
+import org.openon.aannodoc.generator.GenAppDoc;
 import org.openon.aannodoc.generator.GenJavaDoc;
 import org.openon.aannodoc.scanner.SourceAnnotations;
 import org.openon.aannodoc.utils.DocFilter;
@@ -16,12 +15,11 @@ import org.openon.aannodoc.utils.SourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@aApplication(date="01.07.2018",version="1.0",author="Michael Kloss",title="aAnnoDoc")
 /**
  * aAnnoDoc - (Java) annotation based documentation
  * (Apache License 2.0)
  * 
- * DONATE :-) to https://www.paypal.me/openonorg/5
- * (If you like aAnnoDoc, donates are welcome via paypal to openonorg. Every $1 is fine ;-)
  * 
  * Background Story, why aAnnoDoc
  * Normal, documentation and development are two separated parts

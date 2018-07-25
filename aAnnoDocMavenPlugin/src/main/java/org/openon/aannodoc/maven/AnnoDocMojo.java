@@ -87,6 +87,19 @@ public class AnnoDocMojo extends AbstractMojo {
 	@Parameter(property = "annodoc.sourceCharset", defaultValue = Options.CHARTSET_UTF8)
 	protected String sourceCharset;
 	
+	@Parameter(property = "annodoc.title", defaultValue = "")
+	protected String appTitle;
+	@Parameter(property = "annodoc.version", defaultValue = "")
+	protected String appVersion;
+	@Parameter(property = "annodoc.date", defaultValue = "")
+	protected String appDate;
+	@Parameter(property = "annodoc.author", defaultValue = "")
+	protected String appAuthor;
+	@Parameter(property = "annodoc.deprecated", defaultValue = "")
+	protected String appDeprecated;
+	@Parameter(property = "annodoc.copyright", defaultValue = "")
+	protected String appCopyright;
+	
 	/**
 	 * plugin for maven - run via mvn in cmd 
 	 * 	
@@ -105,12 +118,21 @@ public class AnnoDocMojo extends AbstractMojo {
 			if(outputSource!=null && outputSource.length()>0) { options.put(Options.OPTION_OUTSOURCE, outputSource);}
 			if(sourceCharset!=null && sourceCharset.length()>0) { options.put(Options.OPTION_SOURCE_CHARTSET, sourceCharset);}
 			
+			if(appTitle!=null && appTitle.length()>0) { options.put(Options.OPTION_APP_TITLE, appTitle);}
+			if(appVersion!=null && appVersion.length()>0) { options.put(Options.OPTION_APP_VERSION, appVersion);}
+			if(appDate!=null && appDate.length()>0) { options.put(Options.OPTION_APP_DATE, appDate);}
+			if(appAuthor!=null && appAuthor.length()>0) { options.put(Options.OPTION_APP_AUTHOR, appAuthor);}
+			if(appDeprecated!=null && appDeprecated.length()>0) { options.put(Options.OPTION_APP_DEPRECATED, appDeprecated);}
+			if(appCopyright!=null && appCopyright.length()>0) { options.put(Options.OPTION_APP_COPYRIGHT, appCopyright);}
+			
 			getLog().info("source: " + source);
 			getLog().info("sourceChartset: " + sourceCharset);
 			getLog().info("outputFile: " + outputFile);
 			getLog().info("outputSource: " + outputSource);
 			getLog().info("format: " + format);
 			getLog().info("generator: " +generator);
+			
+			getLog().info("appTitle:"+appTitle+" appVersion:"+appVersion+" appDate"+appDate+" appAuthor:"+appAuthor+" appDeprecated:"+appDeprecated+" appCopyright:"+appCopyright);
 					
 			doc.scan(options).create(options);
 			

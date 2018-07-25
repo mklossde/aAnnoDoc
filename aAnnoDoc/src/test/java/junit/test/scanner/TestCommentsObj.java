@@ -1,14 +1,17 @@
-package org.openon.annodoc.test.scanner;
+package junit.test.scanner;
 
 import org.openon.aannodoc.annotation.aDoc;
 import org.openon.aannodoc.annotation.aDoc.aDocs;
 
 //ignore this inline comment
-
+/**aDocTestCommentsObj**/
+//ignore this inline comment
+@aDoc
+//ignore this inline comment
 /**TestCommentsObj**/
 //ignore this inline comment
 public class TestCommentsObj {
-	
+
 	/** this is not used **/
 	private String getValue() {
 		/** ignore this internal without ref**/

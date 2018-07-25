@@ -1,5 +1,6 @@
 package org.openon.annodoc.test;
 
+import org.junit.Test;
 import org.openon.aannodoc.doc.AnnotationDocScanner;
 import org.openon.aannodoc.source.AnnotationDoc;
 

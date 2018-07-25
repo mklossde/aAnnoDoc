@@ -1,4 +1,4 @@
-package org.openon.annodoc.test.scanner;
+package junit.test.scanner;
 
 import org.openon.aannodoc.annotation.aDoc;
 

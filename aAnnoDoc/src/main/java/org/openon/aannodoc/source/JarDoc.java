@@ -121,6 +121,68 @@ public class JarDoc extends DocObject implements Serializable {
 	}
 	
 	//------------------------------------------------------------------
+	// references Method calls
+	
+	/** find all method by call **/
+	public List<MethodDoc> findMethods(CallDoc call) { 
+		List<MethodDoc> list=new ArrayList<MethodDoc>();
+		for(int i=0;i<subPackages.size();i++) {
+			PackageDoc sub=subPackages.get(i);			
+			 List<ClassDoc> classes=sub.getClasses();
+			 for(int t=0;classes!=null && t<classes.size();t++) {
+				 ClassDoc cl=classes.get(t);
+				 List<MethodDoc> mDoc=cl.getMethods(this, call);			 
+				 if(mDoc!=null) { list.addAll(mDoc); }
+			 }
+		}
+		return list;
+	}
+	
+	/** find all method by name **/
+	public List<MethodDoc> findMethods(String methodName) { return findMethods(methodName, null); }
+	public List<MethodDoc> findMethods(String methodName,String params[]) {
+		List<MethodDoc> list=new ArrayList<MethodDoc>();
+		for(int i=0;i<subPackages.size();i++) {
+			PackageDoc sub=subPackages.get(i);			
+			 List<ClassDoc> classes=sub.getClasses();
+			 for(int t=0;classes!=null && t<classes.size();t++) {
+				 ClassDoc cl=classes.get(t);
+				 MethodDoc mDoc=cl.getMethod(this, methodName);
+				 if(mDoc!=null) { list.add(mDoc); }
+			 }
+		}
+		return list;
+	}
+	
+	public MethodDoc findMethod(CallDoc call) { 
+		for(int i=0;i<subPackages.size();i++) {
+			PackageDoc sub=subPackages.get(i);			
+			 List<ClassDoc> classes=sub.getClasses();
+			 for(int t=0;classes!=null && t<classes.size();t++) {
+				 ClassDoc cl=classes.get(t);
+				 MethodDoc mDoc=cl.getMethod(this, call);
+				 if(mDoc!=null) { return mDoc; }
+			 }
+		}
+		return null;
+	}
+	
+	/** find first method by name and params **/
+	public MethodDoc findMethod(String methodName) { return  findMethod(methodName,null); }
+	public MethodDoc findMethod(String methodName,String params[]) {
+		for(int i=0;i<subPackages.size();i++) {
+			PackageDoc sub=subPackages.get(i);			
+			 List<ClassDoc> classes=sub.getClasses();
+			 for(int t=0;classes!=null && t<classes.size();t++) {
+				 ClassDoc cl=classes.get(t);
+				 MethodDoc mDoc=cl.getMethod(this, methodName,params);
+				 if(mDoc!=null) { return mDoc; }
+			 }
+		}
+		return null;
+	}
+	
+	//------------------------------------------------------------------
 	
 	public void error(String err) {
 		errors.add(err);

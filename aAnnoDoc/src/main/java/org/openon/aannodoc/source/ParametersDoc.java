@@ -26,9 +26,9 @@ public class ParametersDoc extends DocObject {
 	protected void set(int index,List<AnnotationDoc> annos) { params[index].annotations=annos; }
 	public List<AnnotationDoc> getAnnotations(int index) { return params[index].annotations; }
 	
-	protected void set(int index,String className,String name) { 
+	protected void set(int index,String className,String simpleClassName,String name) { 
 //		params[index]=new ParameterDoc(this, group, name, className, null, null);
-		params[index].name=name;params[index].className=className;  
+		params[index].name=name;params[index].className=className; params[index].simpleClassName=simpleClassName;
 	} 
 	
 	/** number of parameter **/
@@ -55,6 +55,8 @@ public class ParametersDoc extends DocObject {
 	
 //	public String[] getClassNames() { return classNames;}
 	
+
+	
 	//----------------------------------------------------------------------
 	// find class for types
 	
@@ -76,6 +78,52 @@ public class ParametersDoc extends DocObject {
 //		}
 //		return types;
 //	}
+	
+	/** get first param by name **/
+	public ParameterDoc getParam(String nameOrClass) {
+		for(int i=0;params!=null && i<params.length;i++) {
+			ParameterDoc p=params[i];
+			if(p.equals(nameOrClass)) { return p; }
+		}
+		return null;	
+	}
+	
+	//-----------------------------------------------------------
+	
+	/** get array with empty numer of parmetzer only **/
+	public String[] toParamsSize() {
+		if(params==null) { return null; }	
+		return new String[params.length]; 
+	}
+	
+	/** get array with names **/
+	public String[] toParamsName() {
+		if(params==null) { return null; }	
+		String a[]=new String[params.length]; 
+		for(int i=0;i<params.length;i++) { a[i]=params[i].name; }
+		return a;
+	}
+	
+	/** get array with types **/
+	public String[] toParamsType() {
+		if(params==null) { return null; }	
+		String a[]=new String[params.length]; 
+		for(int i=0;i<params.length;i++) { a[i]=params[i].simpleClassName; }
+		return a;
+	}
+	
+	public boolean equals(Object obj) {
+		if(obj instanceof String[]) {
+			String a[]=(String[])obj;
+			if(a.length!=params.length) { return false; }
+			for(int i=0;i<a.length;i++) {
+//System.out.println("a:"+a[i]+"=="+params[i]);				
+				if(a[i]!=null && !params[i].equals(a[i])) { return false; } 
+			}
+			return true;
+			
+		}else { return super.equals(obj); }
+	}
 	
 	//----------------------------------------------------------------------
 	

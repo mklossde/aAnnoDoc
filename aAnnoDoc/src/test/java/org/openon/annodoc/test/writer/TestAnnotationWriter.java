@@ -30,6 +30,7 @@ public class TestAnnotationWriter {
 		System.out.println("end");
 	}
 	
+	
 	public void open() throws Exception {		
 		// create writer
 		bout=new ByteArrayOutputStream();		
