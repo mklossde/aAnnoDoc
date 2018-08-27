@@ -148,7 +148,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	
 	
 	/** get resolved value as string **/
-	public String getValueString(String key) { 
+	public String getResolveString(String key) { 
 		if(values==null) { return null; }
 		Object obj=values.get(key);
 		return AnnoUtils.toString(obj, null); 		
@@ -192,7 +192,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	
 	/** do annotation havae attribute-value name=value **/
 	public boolean is(String valueName,String value) {
-		return Objects.equals(value, getValueString(valueName));
+		return Objects.equals(value, getResolveString(valueName));
 	}
 	
 //	public boolean equals(Object obj) {

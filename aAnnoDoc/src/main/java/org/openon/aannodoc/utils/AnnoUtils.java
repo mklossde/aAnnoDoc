@@ -43,12 +43,12 @@ public class AnnoUtils {
 		final long f=toTime(from),t=toTime(to);
 		return new Comparator<AnnotationDoc>() { 
 			@Override public int compare(AnnotationDoc a,AnnotationDoc b) { // for sort
-				String da=((AnnotationDoc)a).getValueString(key); long la=toTime(da);
-				String db=((AnnotationDoc)b).getValueString(key); long lb=toTime(db);
+				String da=((AnnotationDoc)a).getResolveString(key); long la=toTime(da);
+				String db=((AnnotationDoc)b).getResolveString(key); long lb=toTime(db);
 				return Long.compare(lb,la);
 			}
 			@Override public boolean equals(Object an) { // for find 
-				String d=((AnnotationDoc)an).getValueString(key); long l=toTime(d);	
+				String d=((AnnotationDoc)an).getResolveString(key); long l=toTime(d);	
 //System.out.println("compare "+from+" >= "+d+" <= "+to+" "+an);	
 				if(l==-1) { return false; }
 				else if((f==-1 || l>f) && (t==-1 || l<=t)) {return true;
@@ -113,7 +113,7 @@ public class AnnoUtils {
 	/** get attribute-value of annotation or name of parent (class/method/field) **/
 	public static String getValueOrName(AnnotationDoc doc,String key) {
 		if(doc==null) { return null; }
-		String value=doc.getValueString(key);
+		String value=doc.getResolveString(key);
 		if(value==null) { value=ReflectUtil.toName(doc.getParent().getName()); }
 		return value;
 	}
@@ -121,21 +121,21 @@ public class AnnoUtils {
 	/** get attribute-value of annotation **/
 	public static String getValue(AnnotationDoc doc,String key) {
 		if(doc==null) { return null; }
-		String value=doc.getValueString(key);
+		String value=doc.getResolveString(key);
 		return value;
 	}
 	
 	/** get group of annotation **/
 	public static String getGroup(AnnotationDoc doc) {
 		if(doc==null) { return null; }
-		return doc.getValueString(aDoc.fGROUP);
+		return doc.getResolveString(aDoc.fGROUP);
 	}
 	
 	/** get title of annotation **/
 	public static String getTitle(AnnotationDoc doc) { return getTitle(doc, false); }
 	public static String getTitle(AnnotationDoc doc,boolean removePath) {
 		if(doc==null) { return null; }
-		String title=doc.getValueString(aDoc.fTITLE);
+		String title=doc.getResolveString(aDoc.fTITLE);
 		if(title==null && doc.isInline()) { // title of inline doc from comment
 			title=doc.getComment();
 		}else {
@@ -153,31 +153,31 @@ public class AnnoUtils {
 	
 	public static final String getVersion(AnnotationDoc doc,int deep) {
 		if(doc==null) { return null; }
-		String version=doc.getValueString(aDoc.fVERSION);
+		String version=doc.getResolveString(aDoc.fVERSION);
 		if(version==null) { return getVersion((DocObject)doc,deep-1); } else { return version; }
 	}
 	
 	public static final String getAuthor(AnnotationDoc doc,int deep) {
 		if(doc==null) { return null; }
-		String author=doc.getValueString(aDoc.fAUTHOR);
+		String author=doc.getResolveString(aDoc.fAUTHOR);
 		if(author==null) { return getAuthor((DocObject)doc,deep-1); } else { return author; }
 	}
 	
 	public static final String getAuthor(AnnotationDoc doc) {
 		if(doc==null) { return null; }
-		String author=doc.getValueString(aDoc.fAUTHOR);
+		String author=doc.getResolveString(aDoc.fAUTHOR);
 		return author;
 	}
 	
 	public static final String getDeprecated(AnnotationDoc doc,int deep) {
 		if(doc==null) { return null; }
-		String dep=doc.getValueString(aDoc.fDEPRECATED);
+		String dep=doc.getResolveString(aDoc.fDEPRECATED);
 		if(dep==null) { return getDeprecated((DocObject)doc,deep-1); } else { return dep; }
 	}
 	
 	public static final String getDate(AnnotationDoc doc,int deep) {
 		if(doc==null) { return null; }
-		String date=doc.getValueString(aDoc.fDATE);
+		String date=doc.getResolveString(aDoc.fDATE);
 //		if(date==null) { return getDate((DocObject)doc,deep-1); } else { return date; }
 		return date;
 	}
@@ -185,7 +185,7 @@ public class AnnoUtils {
 	/** get default-attribute or field-value **/
 	public static final String getDefaultOrValue(AnnotationDoc doc) {
 		if(doc==null) { return null; }
-		String value=doc.getValueString("value");
+		String value=doc.getResolveString("value");
 		if(value!=null && value.length()>0) { return value; }
 		Object parent=doc.getParent();
 		if(parent instanceof FieldDoc) {
@@ -198,7 +198,7 @@ public class AnnoUtils {
 	/** get parameter (key) of annoation as string, or null for empty **/ 
 	public static final String get(AnnotationDoc doc,String key) { 
 		if(doc==null) { return null; }
-		return doc.getValueString(key); 
+		return doc.getResolveString(key); 
 	}
 		
 	//---------------------------------------------------------------------------------
@@ -221,7 +221,7 @@ public class AnnoUtils {
 		for(int i=0;i<list.size();i++) {
 			AnnotationDoc doc=list.get(i);
 			Object cells[]=new Object[heads.size()];
-			for(int t=0;t<heads.size();t++) { cells[t]=doc.getValueString(heads.get(t)); }
+			for(int t=0;t<heads.size();t++) { cells[t]=doc.getResolveString(heads.get(t)); }
 			w.tableLine(cells);
 		}
 		w.tableEnd();		
@@ -241,7 +241,7 @@ public class AnnoUtils {
 		w.table(title);
 		Object cells[]=new Object[heads.size()];
 		for(int t=0;t<heads.size();t++) {
-			w.tableLine(heads.get(t),doc.getValueString(heads.get(t)));
+			w.tableLine(heads.get(t),doc.getResolveString(heads.get(t)));
 		}
 		w.tableEnd();		
 	}
@@ -272,7 +272,7 @@ public class AnnoUtils {
 		if(doc==null) { return null; }
 		String text=doc.getComment();
 		// add descibtoon of annotation **/
-		if(doc instanceof AnnotationDoc) { text=addString(text, ((AnnotationDoc)doc).getValueString(aDoc.fDESCIPTION));}
+		if(doc instanceof AnnotationDoc) { text=addString(text, ((AnnotationDoc)doc).getResolveString(aDoc.fDESCIPTION));}
 		if(text==null) { return null; }
 		text=removeLeadingSpace(text);
 		text=removeBackslash(text);

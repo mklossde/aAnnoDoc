@@ -66,7 +66,7 @@ public class AsciiHistoryDoc extends AsciiDocGeneratorImpl implements DocGenerat
 			title=AnnoUtils.getTitle(application,true);
 			author=AnnoUtils.getAuthor(application, 1);version=AnnoUtils.getVersion(application, 1);
 			date=AnnoUtils.getDate(application, 1); depcrecated=AnnoUtils.getDeprecated(application, 1);
-			copyright=application.getValueString("copyright");
+			copyright=application.getResolveString("copyright");
 		}
 	}
 

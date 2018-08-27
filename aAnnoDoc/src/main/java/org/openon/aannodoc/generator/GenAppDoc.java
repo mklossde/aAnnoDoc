@@ -240,7 +240,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		w.table("Fields", "Name","Compute");
 		for(int i=0;i<list.size();i++) {
 			AnnotationDoc doc=list.get(i);
-			w.tableLine(AnnoUtils.getTitle(doc, true),doc.getValueString("compute"));
+			w.tableLine(AnnoUtils.getTitle(doc, true),doc.getResolveString("compute"));
 		}
 		w.tableEnd();	
 	}
@@ -360,8 +360,8 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		infos(doc); // author,date,version,deprecated
 
 		// request && response
-		String req=doc.getValueString("request");
-		String res=doc.getValueString("response");
+		String req=doc.getResolveString("request");
+		String res=doc.getResolveString("response");
 		if(req!=null || res!=null) {
 			SequenceDiagramWriter seq=new SequenceDiagramWriter(w);
 			seq.start("Service Request-Response");
@@ -388,13 +388,13 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 	
 	/** write unkown Annoation **/
 	public void annotationUnkown(AnnotationDoc doc) {
-		String title=AnnoUtils.addString(doc.getValueString(aDoc.fTITLE)); //, " ",doc.getValuePath());
+		String title=AnnoUtils.addString(doc.getResolveString(aDoc.fTITLE)); //, " ",doc.getValuePath());
 		w.subTitle(title);
 //		attribtue(title,adoc.findAnnotation(aAttribute.class, aDoc.fGROUP, title));
 //		Map<String,Object> values=doc.getValues();		
 //		for (Entry<String,Object> it : values.entrySet()) {w.tableLine(it.getKey(), it.getValue());}
 		Iterator<String> it=doc.getValueKeys();
-		while(it.hasNext()) { String key=it.next(),value=doc.getValueString(key);w.tableLine(key,value);}
+		while(it.hasNext()) { String key=it.next(),value=doc.getResolveString(key);w.tableLine(key,value);}
 		w.table("Annoation Attrbutes", "name","value");
 		
 		w.tableEnd();
