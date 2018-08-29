@@ -41,8 +41,9 @@ public class VersionWriter extends ApplicationWriter {
 		// get versions from @aAppliction
 		 List<AnnotationDoc> versions=(List<AnnotationDoc>)application.getValueObject(aDoc.fVERSIONS); 
 		//  find all @aVersion in all classes	
-		List<AnnotationDoc> versionList=versions=annotations.findAnnotation(aVersion.class); 
+		List<AnnotationDoc> versionList=annotations.findAnnotation(aVersion.class); 
 		if(versions==null) { versions=versionList; versionList=null; }  // without versions in @aAppliction =>	user versionList			
+		else { versions.addAll(versionList); }
 		
 		AnnoUtils.sortDate(versions);
 		return versions;
@@ -145,6 +146,7 @@ public class VersionWriter extends ApplicationWriter {
 	}
 		
 	public void writeVersionTable(List<AnnotationDoc> changes) throws IOException {
+		if(changes==null || changes.size()==0) { return ; }
 		
 		w.table("Changes");
 		for(int i=0;changes!=null && i<changes.size();i++) {

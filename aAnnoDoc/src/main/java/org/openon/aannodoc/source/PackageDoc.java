@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openon.aannodoc.annotation.aBug;
+
 public class PackageDoc extends DocObject implements Serializable {
 	private static final long serialVersionUID = 1369472051565228810L;
 	
@@ -24,13 +26,14 @@ public class PackageDoc extends DocObject implements Serializable {
 		}
 		return list;
 	}
-	
+
+	@aBug(author="mk",date="02.08.2017",title="double add not allowd. but inner classes add with same name",fix="allow double name adds")
 	public ClassDoc addClass(String name) {
-		ClassDoc cl=getClass(name);
-		if(cl==null) {
-			cl=new ClassDoc(name,this,null);
+//		ClassDoc cl=getClass(name);
+//		if(cl==null) {
+			ClassDoc cl=new ClassDoc(name,this,null);
 			classes.add(cl);
-		}
+//		}
 		return cl;
 	}
 	

@@ -85,16 +85,21 @@ public class TableWriter {
 	//--------------------------------------------------------------------------------------------------
 	
 	public TableWriter write() {
+//System.out.println("title:"+title);
+//		if((headLine==null || headLine.size()==0) && (tableLine==null || tableLine.size()==0) ) { return this; } // no table content
+		if(tableLine==null || tableLine.size()==0) { return this; } // no table content
 		wr.tableTitle(title);
 		// options
 		wr.nl().w("[");
-		if(cols!=null) { 
+		boolean kom=false;
+		if(cols!=null && cols.size()>0) { 
+			kom=true;
 			wr.w("cols=\""); 
 			boolean c=false;
 			for(int i=0;cols!=null && i<cols.size();i++) { if(use.get(i)) { if(c) {wr.w(",");} wr.w(cols.get(i));c=true; }}  
 			wr.w("\"");
 		}
-		if(options!=null) { if(cols!=null) { wr.w(",");} wr.w(options); }
+		if(options!=null && options.length()>0) { if(kom) { wr.w(",");} wr.w(options); }
 		wr.wnl("]");
 		
 		// start table
@@ -132,7 +137,11 @@ public class TableWriter {
 		Boolean ok;
 		if(autoReduceCells) { ok=(str!=null && str.length()>0); }  else { ok=true; }
 //System.out.println("x:"+col+" s:"+use.size());		
-		if(col>=use.size()) { use.add(ok); } else { use.set(col, ok); }
+		if(col>=use.size()) { 
+			use.add(ok);  
+		}else {
+			if(!use.get(col) && ok) { use.set(col, ok);} 
+		}
 		return str;
 	}
 	

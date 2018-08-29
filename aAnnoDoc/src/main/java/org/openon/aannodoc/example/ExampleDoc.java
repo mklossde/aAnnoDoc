@@ -32,7 +32,7 @@ public class ExampleDoc {
 		
 		this.design=doc.getValueString("design");
 		if(this.design==null) {
-			AnnotationDoc aDoc=cl.getAnnotationType(AnnotationDocDefinition.DOC_EXAMPLE);
+			AnnotationDoc aDoc=cl.getAnnotation(AnnotationDocDefinition.DOC_EXAMPLE);
 			if(aDoc!=null) { this.design=(String) aDoc.getValueString("design"); }
 		}	
 	}

@@ -25,7 +25,7 @@ public class MethodDoc extends TypeDoc implements Serializable{
 		
 	}
 	
-	public void setParameter(ParametersDoc parameter) { this.parameter=parameter; }
+	public void setParameter(ParametersDoc parameter) { this.parameter=parameter; addChild(parameter);}
 	
 	public Method getMethod() throws Exception  {
 		if(this.method!=null) { return this.method; }
@@ -45,6 +45,7 @@ public class MethodDoc extends TypeDoc implements Serializable{
 	public void addCall(CallDoc call) { 
 		if(calls==null) { calls=new ArrayList<CallDoc>(); } 
 		calls.add(call);
+		addChild(call);
 	}
 	/* get list of programm calls inside method **/
 	public List<CallDoc> getCalls() { return calls; }

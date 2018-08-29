@@ -107,11 +107,25 @@ public class JarDoc extends DocObject implements Serializable {
 		return null;
 	}
 	
+	/** is this a class from java.lang.* **/
+	public boolean isJavaLangClass(String name) {
+		if(name==null || name.length()==0) { return false; }
+		if(name.equals("Boolean") || name.equals("Byte") || name.equals("Character") || name.equals("Class") || name.equals("Double")
+			|| name.equals("Enum") || name.equals("Float") || name.equals("Integer") || name.equals("Long") || name.equals("Math")	
+			|| name.equals("Number") || name.equals("Object") || name.equals("Short") || name.equals("String") || name.equals("StringBuffer")
+			|| name.equals("StringBuilder") || name.equals("Thread") || name.equals("Void")
+	//TODO: add all ?
+				) {return true; }
+		return false;
+	}
+	
+	
+//	public ClassDoc getClass(String name) {
 	public ClassDoc findClass(String name) {
 		if(name==null) return null;
 		else if(name.endsWith(".class")) { name=name.substring(0,name.length()-6);}		
 		else if(name.endsWith(".java")) { name=name.substring(0,name.length()-5); }
-//		String pkgName=name.substring(0,name.lastIndexOf('.'));
+
 		for(int i=0;i<subPackages.size();i++) {	
 			PackageDoc pgk=subPackages.get(i);
 			ClassDoc cl=pgk.getClass(name);

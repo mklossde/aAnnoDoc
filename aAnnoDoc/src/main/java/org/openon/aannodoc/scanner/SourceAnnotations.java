@@ -120,17 +120,19 @@ public class SourceAnnotations {
 	public List<AnnotationDoc> listAnnotation(ClassDoc cs,String annotationClass,boolean icludeInheritance){return listAnnotation(cs, annotationClass, null, null, icludeInheritance); }
 	public List<AnnotationDoc> listAnnotation(ClassDoc cs,String annotationClass,String key,String value,boolean icludeInheritance) {
 		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>();
-		if(cs==null) return list;
-		List<AnnotationDoc> all=cs.getAnnotationsInClass();
-		for(int i=0;all!=null && i<all.size();i++) {
-			AnnotationDoc s=all.get(i);
-			if(annotationClass==null || s.equals(annotationClass)) {
-				if(key==null) addAnnotation(list,s);
-				else if(s.has(key,value)) addAnnotation(list,s);
-			}
-		}
+		if(cs==null) return list;		
+//		List<AnnotationDoc> all=cs.getAnnotationsInClass();
+//		for(int i=0;all!=null && i<all.size();i++) {
+//			AnnotationDoc s=all.get(i);
+//			if(annotationClass==null || s.equals(annotationClass)) {
+//				if(key==null) addAnnotation(list,s);
+//				else if(s.has(key,value)) addAnnotation(list,s);
+//			}
+//		}
+		List<AnnotationDoc> all=(List<AnnotationDoc>)cs.listAnnotation(AnnotationDoc.class, key, value); 
 		
-		if(icludeInheritance) {		
+		//--------------------------------------------------------------------	
+		if(icludeInheritance) { 	 
 			// include extends 
 			String extendName=cs.getExtends();
 			if(extendName!=null) {
@@ -140,7 +142,8 @@ public class SourceAnnotations {
 					addAnnotation(list,sc);
 				}
 			}
-				
+			
+			// include implements
 			List<String> prevList=cs.getImplements();
 			for(int i=0;prevList!=null && i<prevList.size();i++) {
 				List<AnnotationDoc> extendList=listAnnotation(prevList.get(i), annotationClass, key, value, icludeInheritance);
@@ -193,13 +196,23 @@ public class SourceAnnotations {
 		return null;
 	}
 	
+	public List<AnnotationDoc> listAnnotation(DocObject doc,Object annotationClassObject,String key,String value) {
+		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>(); 
+		String annotationClass=AnnoUtils.toAnnotationClassName(annotationClassObject);
+//		List sub=doc.listAnnotationType(annotationClass, key, value);
+		List sub=doc.listAnnotation(annotationClass, key, value);
+		if(sub!=null) { list.addAll(sub); }
+		return list;
+	}
+	
 	/** find all annotations by annotationClass (e.g. all aTag-Annotations) **/ 
 	public List<AnnotationDoc> findAnnotation(Object annotationClassObject) { return findAnnotation(annotationClassObject, null, null); }
 	
-	public List<AnnotationDoc> findAnnotationIn(DocObject doc,Object annotationClassObject,String key,String value) {
+	public List<AnnotationDoc> findAnnotation(DocObject doc,Object annotationClassObject,String key,String value) {
 		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>(); 
 		String annotationClass=AnnoUtils.toAnnotationClassName(annotationClassObject);
-		List sub=doc.listAnnotationType(annotationClass, key, value);
+//		List sub=doc.listAnnotationType(annotationClass, key, value);
+		List sub=doc.findAnnotation(annotationClass, key, value);
 		if(sub!=null) { list.addAll(sub); }
 		return list;
 	}
@@ -227,50 +240,15 @@ public class SourceAnnotations {
 	
 	/** list of annotations, in all classes, with a key==value **/
 	public List<AnnotationDoc> findAnnotation(Object annotationClassObject,final String key,final String value) {
-//		List<AnnotationDoc> l=new ArrayList<AnnotationDoc>();
-//		if(unit==null) return l;
-//		String annotationClass=AnnoUtils.toAnnotationClassName(annotationClassObject);
-//		if(annotationClass==null || annotationClass.length()==0) {
-//			Iterator<String> keys=unit.anno().getAnnotationMap().keySet().iterator();
-//			while(keys.hasNext()) {
-//				String k=keys.next();
-//				if(k!=null && k.length()>0) l.addAll(findAnnotation(k,key,value));
-//			}
-//		}else {
-//			List<AnnotationDoc> list=unit.anno().findAnnotation(annotationClass);
-//			for(int i=0;list!=null && i<list.size();i++) {
-//				AnnotationDoc an=list.get(i);
-//				if(key==null) { l.add(an); }
-//				else if(an.has(key,value)) { l.add(an); }
-//			}					
-//		}
-//		return l;
 		return findAnnotation(annotationClassObject,newComparatorKeyValue(key,value)); 
-	}
-	
-//	public DateFormat df=new SimpleDateFormat("dd.MM.YYYY");
-//	 
-//	public long toTime(String date) {
-//		if(date==null || date.length()==0) { return -1; }	
-//		try {
-//			return df.parse(date).getTime();
-//		}catch(Exception e) { Log.error("parse date exception "+date); return -1; }
-//	}		
+	}	
 	
 	/** create key,value comparator **/
 	public Comparator newComparatorKeyValue(final String key,final String value) {
 		if(key==null) { return null; }
 		return new Comparator<AnnotationDoc>() {@Override public int compare(AnnotationDoc a,AnnotationDoc b) { return 0; } @Override public boolean equals(Object an) { return ((AnnotationDoc)an).has(key,value); }};
 	}
-//	public Comparator newComparatorDate(final String key, final String from,final String to) {
-//		final long f=toTime(from),t=toTime(to);
-//		return new Comparator<AnnotationDoc>() { @Override public int compare(AnnotationDoc a,AnnotationDoc b) { return 0; }
-//			@Override public boolean equals(Object an) {
-//				String d=((AnnotationDoc)an).getValueString(key); long l=toTime(d);	
-////System.out.println("compare "+from+" >= "+d+" <= "+to+" "+an);				
-//				return l!=-1 && (f==-1 || l>=f) && (t==-1 || l<=t);
-//		}};		
-//	}
+
 	public List<AnnotationDoc> findAnnotation(Class cl,Class groupCl,String key,String value) {
 		return findAnnotation(cl,groupCl,newComparatorKeyValue(key,value));
 	}

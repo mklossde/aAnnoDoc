@@ -137,7 +137,7 @@ public class GenAppDoc extends AsciiDocGeneratorImpl implements DocGenerator {
 		
 		if(application!=null) {
 			w.paragraph(AnnoUtils.getDoc(application));
-			List<AnnotationDoc> attr=annotations.findAnnotationIn(application.getParent(),aAttribute.class,aDoc.fGROUP,null);
+			List<AnnotationDoc> attr=annotations.findAnnotation(application.getParent(),aAttribute.class,aDoc.fGROUP,null);
 			attribtue("Attributes", attr);
 		}
 		

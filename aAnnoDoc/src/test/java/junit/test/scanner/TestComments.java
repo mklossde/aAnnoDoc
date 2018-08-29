@@ -90,7 +90,7 @@ public class TestComments {
 		Assert.assertNotNull(aDoc);
 		Assert.assertEquals("aDocTestCommentsObj", aDoc.getComment());
 		// check only one annotation
-		List<AnnotationDoc> aList=clDoc.findAnnotation(aDoc.class);
+		List<AnnotationDoc> aList=clDoc.listAnnotation(aDoc.class);
 		Assert.assertNotNull(aList);
 		Assert.assertEquals(1, aList.size());		
 		

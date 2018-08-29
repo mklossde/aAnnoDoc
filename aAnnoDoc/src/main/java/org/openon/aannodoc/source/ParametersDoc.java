@@ -18,12 +18,17 @@ public class ParametersDoc extends DocObject {
 	public ParametersDoc(DocObject parent,DocObject group,int size) {
 		super("Parameters", parent, group);
 		params=new ParameterDoc[size];	
-		for(int i=0;i<size;i++) { params[i]=new ParameterDoc(this,group); }
+		for(int i=0;i<size;i++) { 
+			params[i]=new ParameterDoc(this,group);
+			addChild(params[i]);
+		}
 	}
 	
 	public ParameterDoc get(int index) { return params[index]; }
 	
-	protected void set(int index,List<AnnotationDoc> annos) { params[index].annotations=annos; }
+	protected void set(int index,List<AnnotationDoc> annos) { 
+		params[index].annotations=annos;				
+	}
 	public List<AnnotationDoc> getAnnotations(int index) { return params[index].annotations; }
 	
 	protected void set(int index,String className,String simpleClassName,String name) { 

@@ -1,5 +1,6 @@
 package org.openon.aannodoc.source;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -70,7 +71,7 @@ public abstract class TypeDoc extends DocObject implements Serializable {
 	} 
 
 	/** find doc for type **/
-	public TypeDoc getTypeClass() { return (TypeDoc)findClass(typeClassName); }
+	public TypeDoc getTypeClass() throws IOException { return (TypeDoc)findClass(typeClassName); }
 	
 	public int getModifiers() { return modifiers; }
 	 	

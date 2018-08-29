@@ -13,13 +13,13 @@ public class ClassDoc extends TypeDoc implements Serializable {
 	public String pkgComment;
 	
 	public List<String> imports;
-//	public List<String> extendList;
 	public String extendName;
 	public List<String> implementList;
 	
 	public List<FieldDoc> fields=new ArrayList<FieldDoc>(); // list of local fields
 	public List<MethodDoc> methods=new ArrayList<MethodDoc>();
 	public List<ConstructorDoc> constructors=new ArrayList<ConstructorDoc>();
+	public List<ClassDoc> subClasses=new ArrayList<ClassDoc>();
 	
 	public transient List<ClassDoc> parentList;  // reference-list of this and all extends/imports (as a transient-one-time-resolve)
 	
@@ -28,10 +28,15 @@ public class ClassDoc extends TypeDoc implements Serializable {
 		this.pkg=pkg;
 	}
 	
-	public void addMethod(MethodDoc method) { methods.add(method); }
-	public void addField(FieldDoc field) { fields.add(field); }
-	public void addConstructor(ConstructorDoc constructor) { constructors.add(constructor); }
-
+	public void addMethod(MethodDoc method) { methods.add(method); addChild(method); }
+	public void addField(FieldDoc field) { fields.add(field); addChild(field); }
+	public void addConstructor(ConstructorDoc constructor) { constructors.add(constructor);  addChild(constructor);  }
+	public void addSubClass(ClassDoc subClass) { 
+		subClasses.add(subClass);
+		//TODO: add subClass as child result in double or recursive machtes (e.g. annotaions of fields)
+		//addChild(subClass);  
+	}
+	
 	/** get a list of relevant (this and parent classes, e.g. to search for all fields) **/
 	public List<ClassDoc> relevantClasses(JarDoc doc) {
 		if(parentList==null) { parentList=doc.getParentList(this,true); }
@@ -42,6 +47,8 @@ public class ClassDoc extends TypeDoc implements Serializable {
 	public String getVersion() { return AnnoUtils.getVersion(this,0); }
 	public String getDeprecated() { return AnnoUtils.getDeprecated(this,0); }
 
+	public List<ClassDoc> getSubClasses() { return subClasses; }
+	
 	//------------------------------------------------------------------
 	
 	public PackageDoc getPackage() { return pkg; }
@@ -156,6 +163,39 @@ public class ClassDoc extends TypeDoc implements Serializable {
 //			if(!im.startsWith(pkg)) list.add(im); 
 //		}
 //		return list;
+	}
+	
+	/** find doc for name **/
+	public DocObject findClass(String name) {
+		if(name==null || name.length()==0) { return null; }
+		
+		JarDoc unit=findJarDoc();  if(unit==null) { return null; }
+		//TODO: exclude java.lang ?
+		if(unit.isJavaLangClass(name)) { return null; }
+		
+		// find in sub-classes
+		for(int i=0;subClasses!=null && i<subClasses.size();i++) {
+			ClassDoc cl=subClasses.get(i); 
+			if(cl.equals(name)) { return cl; }
+		}
+		
+		String fullName=getFullName(name);
+		// find via unit		
+		return unit.findClass(fullName);
+	}
+	
+	/** get fullName, package plus simpleName **/
+	public String getFullName(String name) {
+		if(name==null || name.length()==0) { return null; }
+		else if(name.indexOf('.')!=-1) { return name; } // alrady fullName
+		String key="."+name; 
+		for(int i=0;imports!=null && i<imports.size();i++) { // search inputs
+			String in=imports.get(i);
+			if(in.endsWith(key)) { return in; }
+		}
+//TODO: java.lang.name is not used, always use package.name. ok ? 
+		return typePackage+key; // get name for class-package
+//		return name;
 	}
 	
 	//------------------------------------------------------------------

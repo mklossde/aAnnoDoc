@@ -1,5 +1,6 @@
 package org.openon.aannodoc.source;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import org.openon.aannodoc.doc.AnnotationDocScanner;
 import org.openon.aannodoc.utils.AnnoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.ls.LSInput;
 
 
 /**
@@ -25,14 +27,16 @@ public abstract class DocObject implements Serializable {
 	private static final long serialVersionUID = -7225995181546556626L;
 
 	public DocObject group;
-//	public PackageDoc pgkDoc;
-//	public ClassDoc classDoc;
 	
 	public DocObject parent;
 	public String name;
 	protected String comment;
 		
+	/** list of all annotaitons inside this **/
 	public List<AnnotationDoc> annotations=new ArrayList<AnnotationDoc>();
+	
+	/** list of childs docs **/
+	public List<DocObject> childs=new ArrayList<DocObject>();
 	
 	public DocObject(String name,DocObject parent,DocObject group) { 
 		this.name=name; 	
@@ -41,6 +45,11 @@ public abstract class DocObject implements Serializable {
 	
 	public void setParent(DocObject parent) { this.parent=parent; }
 	public void setGrup(DocObject group) { this.group=group; }
+	
+	/** get lsit of all documenation childs **/
+	public List<DocObject> getChilds() { return childs; }
+	/**add documentation child to this **/
+	public void addChild(DocObject child) { childs.add(child); }
 	
 	//--------------------------------------------------------------------------
 	
@@ -57,6 +66,9 @@ public abstract class DocObject implements Serializable {
 	
 	public String getComment() { return comment; }
 	
+	/** get list of all annotations in object **/
+	public List<AnnotationDoc> getAnnotations() { return annotations; }
+	/** add annoation **/
 	public void addAnnotation(AnnotationDoc anno) { annotations.add(anno);}
 //	public void addAnnotations(List<AnnotationDoc> annos) { annotations.addAll(annos); }
 
@@ -83,7 +95,17 @@ public abstract class DocObject implements Serializable {
 	//--------------------------------------------------------------------------
 	
 	/** find doc for name **/
-	public DocObject findClass(String name) { JarDoc unit=findJarDoc(); if(unit!=null) { return unit.findClass(name); } else { return null; }}
+	public DocObject findClass(String name) throws IOException {
+		if(name==null || name.length()==0) { return null; }
+		// find via class
+		ClassDoc cl=getClassDoc();
+		if(cl!=null) { return cl.findClass(name); } 
+		throw new IOException("no class to find "+name);
+//		// find via unit
+//		JarDoc unit=findJarDoc();  if(unit==null) { return null; }
+//		return unit.findClass(name);
+	}
+	
 	/** find jarDoc/unit **/
 	public JarDoc findJarDoc() { DocObject parent=this.parent; while(parent!=null && !(parent instanceof JarDoc)) { parent=parent.getParent(); } return (JarDoc)parent;}
 	
@@ -112,30 +134,30 @@ public abstract class DocObject implements Serializable {
 
 	
 		
-	//--------------------------------------------------------------------------
-	/** get first annotation for type **/
-	public AnnotationDoc getAnnotationType(String typeName) {
-		for(int i=0;annotations!=null && i<annotations.size();i++) {
-			AnnotationDoc anno=annotations.get(i);
-			if(typeName.equals(anno.getName())) return anno;
-		}
-		return null;
-	}
-	
-	/** get list of annotations for type **/
-	public List<AnnotationDoc> listAnnotationType(String typeName) { return listAnnotationType(typeName,null,null); }
-		
-	/** get list of annotations for type, with key and value **/
-	public List<AnnotationDoc> listAnnotationType(String typeName,String key,String value) {
-		List list=new ArrayList();
-		for(int i=0;annotations!=null && i<annotations.size();i++) {
-			AnnotationDoc anno=annotations.get(i);
-			if(typeName.equals(anno.getName())) {
-				if(key==null || anno.is(key, value)) list.add(anno);
-			}
-		}
-		return list;
-	}
+//	//--------------------------------------------------------------------------
+//	/** get first annotation for type **/
+//	public AnnotationDoc getAnnotationType(String typeName) {
+//		for(int i=0;annotations!=null && i<annotations.size();i++) {
+//			AnnotationDoc anno=annotations.get(i);
+//			if(typeName.equals(anno.getName())) return anno;
+//		}
+//		return null;
+//	}
+//	
+//	/** get list of annotations for type **/
+//	public List<AnnotationDoc> listAnnotationType(String typeName) { return listAnnotationType(typeName,null,null); }
+//		
+//	/** get list of annotations for type, with key and value **/
+//	public List<AnnotationDoc> listAnnotationType(String typeName,String key,String value) {
+//		List list=new ArrayList();
+//		for(int i=0;annotations!=null && i<annotations.size();i++) {
+//			AnnotationDoc anno=annotations.get(i);
+//			if(typeName.equals(anno.getName())) {
+//				if(key==null || anno.is(key, value)) list.add(anno);
+//			}
+//		}
+//		return list;
+//	}
 	
 	/** get first annotaion with name **/
 	public AnnotationDoc getAnnotation(Object annotationClassObject) { 
@@ -147,19 +169,20 @@ public abstract class DocObject implements Serializable {
 		}
 		return null;
 	}
-	/** get first annotation with key==value **/
+	/** get first annotation with key==value of this class **/
 	public AnnotationDoc getAnnotation(Object annotationClassObject,String key,String value) {
 		String annoName=AnnoUtils.toAnnotationClassName(annotationClassObject);
 		for(int i=0;annotations!=null && i<annotations.size();i++) {
 			AnnotationDoc anno=annotations.get(i);
 			if((annoName==null || annoName.equals(anno.name)) 
-					&& anno.has(key, value)) { return anno; }
+					&& (key==null || anno.has(key, value))) { return anno; }
 		}
 		return null;
 	}
 	
-	public List<AnnotationDoc> findAnnotation(Object annotationClassObject) { return findAnnotation(annotationClassObject,null,null); }
-	public List<AnnotationDoc> findAnnotation(Object annotationClassObject,String key,String value) {
+	/** list annoation in this class **/
+	public List<AnnotationDoc> listAnnotation(Object annotationClassObject) { return listAnnotation(annotationClassObject,null,null); }
+	public List<AnnotationDoc> listAnnotation(Object annotationClassObject,String key,String value) {
 		String annoName=AnnoUtils.toAnnotationClassName(annotationClassObject);
 		List<AnnotationDoc> list=new ArrayList<AnnotationDoc>();
 		for(int i=0;annotations!=null && i<annotations.size();i++) {
@@ -170,8 +193,18 @@ public abstract class DocObject implements Serializable {
 		return list;
 	}
 	
-	/** get list of all annotations in object **/
-	public List<AnnotationDoc> getAnnotations() { return annotations; }
+	/** find annoations in this and child **/
+	public List<AnnotationDoc> findAnnotation(Object annotationClassObject) { return findAnnotation(annotationClassObject,null,null); }
+	public List<AnnotationDoc> findAnnotation(Object annotationClassObject,String key,String value) {
+		List<AnnotationDoc> list=listAnnotation(annotationClassObject, key, value);
+		for(int i=0;childs!=null && i<childs.size();i++) { // find annaotions in childs
+			List<AnnotationDoc> childList=childs.get(i).findAnnotation(annotationClassObject,key,value); 
+			if(childList!=null) { list.addAll(childList); }
+		}
+		return list;
+	}
+	
+
 	public String getName() { return name; }
 	
 	/** get this soruce depends to **/

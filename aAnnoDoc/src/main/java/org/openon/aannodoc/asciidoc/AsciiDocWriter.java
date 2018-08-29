@@ -125,7 +125,7 @@ public class AsciiDocWriter {
 	public AsciiDocWriter table(Object title,Object... heads) { tableTitle(title); tableOptions(TableWriter.OPTIONS_DEFAULT); tableStart(); return tableHead(heads); }
 	public AsciiDocWriter table(Object title,String cols[],String options,Object... heads) { tableTitle(title); tableOptions(options,cols);tableStart(); return tableHead(heads); }
 	
-	public AsciiDocWriter tableTitle(Object title) { if(title==null) {return this; } return nnl2().w(".").w(title); } 	
+	public AsciiDocWriter tableTitle(Object title) { if(title==null) {return this; } return nnl2().w(".table ").w(title); } 	
 	public AsciiDocWriter tableOptions(String options) { if(options==null) { return this; }return nl().w("[").w(options).w("]").nl(); }
 	public AsciiDocWriter tableOptions(String options,Object...cols) {		
 		if(cols==null && options==null) { return this; }  

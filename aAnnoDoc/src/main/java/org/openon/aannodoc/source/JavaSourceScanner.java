@@ -77,6 +77,8 @@ public class JavaSourceScanner {
 	
 	public static final String ANNO_VALUE="value";
 	
+//	public static final String SUB_CLASS_DEL="$";
+	
 //	public static final String IMPLEMENT_FILES=".adoc$";
 	public static final String IMPLEMENT_FILES=".sdoc$"; // sdoc = sourceDoc
 	
@@ -256,7 +258,7 @@ public class JavaSourceScanner {
 		    for(int a=0;allCl!=null && a<allCl.size();a++) {
 		    	TypeDeclaration clDeclarion=allCl.get(a);
 		    	
-		    	// create ClassDoc
+		    	// create ClassDoc			   
 		    	ClassDoc clSource=toClassDoc(cu, p, clDeclarion, pkg);		    
 		    	
 		    	// import------------------------------------------------------------------------------			  
@@ -281,7 +283,8 @@ public class JavaSourceScanner {
 	}
 	
 	public ClassDoc toClassDoc(CompilationUnit cu,Node p,TypeDeclaration clDeclarion,PackageDoc pkg) {
-	    String sourceName=clDeclarion.getName();	    
+		String sourceName=clDeclarion.getName();
+		
 		ClassDoc clSource=pkg.addClass(sourceName); // add Class
 		
 	    clSource.pkgComment=findComment(prev,cu,p,comments); // package comment in class 
@@ -334,8 +337,9 @@ public class JavaSourceScanner {
 	
 	/** scan extends and implements **/ 
 	public void scanImplements(CompilationUnit cu,TypeDeclaration ClassOrInterfaceDeclaration,ClassDoc clSource) throws Exception {
-    	ClassOrInterfaceDeclaration td=(ClassOrInterfaceDeclaration)get(cu,ClassOrInterfaceDeclaration.class);		    	
-    	
+//    	ClassOrInterfaceDeclaration td=(ClassOrInterfaceDeclaration)get(cu,ClassOrInterfaceDeclaration.class);		    	
+		ClassOrInterfaceDeclaration td=(ClassOrInterfaceDeclaration)ClassOrInterfaceDeclaration;
+		
 	    // extends 
 	    ArrayList<String> exList=new ArrayList<String>();
 	    List<ClassOrInterfaceType> exts=td.getExtends();
@@ -438,8 +442,10 @@ public class JavaSourceScanner {
 	    		
 	    	}else if(body instanceof ClassOrInterfaceDeclaration) { // inner Class
 	    		ClassOrInterfaceDeclaration innerCl=(ClassOrInterfaceDeclaration)body;
+//	    		String sourceName=clDeclarion.getName()+SUB_CLASS_DEL+innerCl.getName();
 	    		ClassDoc clDoc=toClassDoc(cu,  prev, innerCl, pkg);
-	    		scanClass(cu, innerCl, pkg, clDoc);
+	    		clSource.addSubClass(clDoc);
+	    		scanClass(cu, innerCl, pkg, clDoc);    		
 	    		
 	    	}else if(body instanceof EmptyMemberDeclaration) { // ;
 	    	}else if(body instanceof InitializerDeclaration) { // static initialisation 			    		
