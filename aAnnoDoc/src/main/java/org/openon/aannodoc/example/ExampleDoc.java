@@ -28,12 +28,12 @@ public class ExampleDoc {
 		
 		this.name=doc.getTitle();
 		if(this.name==null) { name=this.cl.getParent().getName(); }
-		this.attribute=doc.getValueString("attribute"); 
+		this.attribute=doc.getResolveString("attribute"); 
 		
-		this.design=doc.getValueString("design");
+		this.design=doc.getResolveString("design");
 		if(this.design==null) {
 			AnnotationDoc aDoc=cl.getAnnotation(AnnotationDocDefinition.DOC_EXAMPLE);
-			if(aDoc!=null) { this.design=(String) aDoc.getValueString("design"); }
+			if(aDoc!=null) { this.design=(String) aDoc.getResolveString("design"); }
 		}	
 	}
 	

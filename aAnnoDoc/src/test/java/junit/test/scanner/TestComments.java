@@ -114,7 +114,7 @@ public class TestComments {
 		aDoc=fDoc.getAnnotation(aDoc.class);
 		Assert.assertNotNull(aDoc);
 		Assert.assertEquals("aDoc3", aDoc.getComment());
-		Assert.assertEquals("title", aDoc.getValueString("title"));
+		Assert.assertEquals("title", aDoc.getResolveString("title"));
 		
 		fDoc=clDoc.getField(unit, "docs");
 		Assert.assertNotNull(fDoc);	

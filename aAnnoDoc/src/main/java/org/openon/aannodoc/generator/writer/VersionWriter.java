@@ -65,7 +65,7 @@ public class VersionWriter extends ApplicationWriter {
 	public String prevDate(AnnotationDoc version) throws IOException  {
 		AnnotationDoc prevVersion=previusVersion(version);
 		if(prevVersion==null) { return null; } 
-		return prevVersion.getValueString(aDoc.fDATE);
+		return prevVersion.getResolveString(aDoc.fDATE);
 	}
 	
 	public boolean isVersion(AnnotationDoc v1,AnnotationDoc v2) throws IOException  {
@@ -110,7 +110,7 @@ public class VersionWriter extends ApplicationWriter {
 		List<AnnotationDoc> versions=versions();
 		for(int i=0;versions!=null && i<versions.size();i++) {
 			String fromDate=null;
-			if(i<versions.size()-1) { fromDate=versions.get(i+1).getValueString(aDoc.fDATE); }
+			if(i<versions.size()-1) { fromDate=versions.get(i+1).getResolveString(aDoc.fDATE); }
 			AnnotationDoc version=versions.get(i);
 			writeVersion(version);			
 		}
@@ -135,7 +135,7 @@ public class VersionWriter extends ApplicationWriter {
 		
 		String ver=AnnoUtils.getVersion(version, 1);
 		String fromDate=prevDate(version);
-		String toDate=version.getValueString(aDoc.fDATE);
+		String toDate=version.getResolveString(aDoc.fDATE);
 		
 		List<AnnotationDoc> changes=new ArrayList<AnnotationDoc>();
 		if(includeFeatures) { changes.addAll(AnnoUtils.findFeatures(annotations, ver,fromDate,toDate));	} // Features

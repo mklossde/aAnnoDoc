@@ -88,7 +88,7 @@ public class GenAllAnno extends AsciiDocGeneratorImpl implements DocGenerator {
 				w.reference(ad.getClassDoc().getTypeName());
 				Iterator<String> it=ad.getValueKeys();
 				while(it.hasNext()) {
-					String key=it.next(),value=ad.getValueString(key);
+					String key=it.next(),value=ad.getResolveString(key);
 					w.label(key,value);
 				}
 				w.paragraph(ad.getComment());
