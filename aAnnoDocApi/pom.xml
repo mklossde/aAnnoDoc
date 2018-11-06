@@ -3,7 +3,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-	<!-- for release: clean deploy -DperformRelease=true -->
+	<!-- for release: clean deploy -DperformRelease=true see - setings.xml for key-->
   <parent>
 		<groupId>org.openon.aannodoc</groupId>
 		<artifactId>aAnnoDoc-parent</artifactId>
@@ -89,19 +89,7 @@
           <source>1.6</source>
           <target>1.6</target>
         </configuration>
-      </plugin>
-      
-	 	<plugin>
-	      <groupId>org.sonatype.plugins</groupId>
-	      <artifactId>nexus-staging-maven-plugin</artifactId>
-	      <version>1.6.7</version>
-	      <extensions>true</extensions>
-	      <configuration>
-	        <serverId>ossrh</serverId>
-	        <nexusUrl>https://oss.sonatype.org/</nexusUrl> 
-	        <autoReleaseAfterClose>true</autoReleaseAfterClose>
-	      </configuration>
-	    </plugin>
+      </plugin>      
           
 	 	<plugin>
 	      <groupId>org.apache.maven.plugins</groupId>
@@ -138,8 +126,7 @@
 		     <executions>
 		       <execution>
 		         <id>sign-artifacts</id>
-		         <!-- <phase>verify</phase> -->
-				 <phase>deploy</phase>
+		         <phase>verify</phase>
 		         <goals>
 		           <goal>sign</goal>
 		         </goals>
@@ -147,6 +134,7 @@
 		     </executions>
 		   </plugin>
                   
+	                      
 		<plugin>
 		  <groupId>org.sonatype.plugins</groupId>
 		  <artifactId>nexus-staging-maven-plugin</artifactId>
