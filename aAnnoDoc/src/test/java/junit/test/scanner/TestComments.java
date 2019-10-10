@@ -21,9 +21,16 @@ public class TestComments {
 		TestComments test=new TestComments();
 		
 		test.testCommentsObj();
-		test.testCommentsAnno();
+//		test.testCommentsObj3();
+//		test.testCommentsAnno();
 		
 		System.out.println("end");
+	}
+	
+	@Test
+	public void testCommentsObj3() throws Exception {
+		JavaSourceScanner scanner=new JavaSourceScanner(null,null);
+		scanner.readFile("src/test/java/junit/test/scanner/TestCommentsObj3.java");
 	}
 	
 	@Test

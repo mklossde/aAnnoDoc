@@ -70,6 +70,12 @@ public abstract class TypeDoc extends DocObject implements Serializable {
 		return type; 
 	} 
 
+	/** get JavaClassName of aprent **/
+	public String getJavaClassName() {
+		if(parent instanceof ClassDoc) { return parent.getName(); }
+		else { return null; }
+	}
+	
 	/** find doc for type **/
 	public TypeDoc getTypeClass() throws IOException { return (TypeDoc)findClass(typeClassName); }
 	

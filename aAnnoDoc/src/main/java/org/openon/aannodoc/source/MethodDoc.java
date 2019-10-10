@@ -72,5 +72,5 @@ public class MethodDoc extends TypeDoc implements Serializable{
 	}
 	
 	public String toJava() { return toJava(modifiers)+" "+name+"("+(parameter.toJava())+")"; }
-	public String toString() { return "Method "+name; }
+	public String toString() { return "Method "+getJavaClassName()+"."+name; }
 }

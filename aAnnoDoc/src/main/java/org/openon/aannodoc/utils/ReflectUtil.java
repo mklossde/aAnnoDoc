@@ -41,6 +41,13 @@ public class ReflectUtil {
 		else { throw new IOException("unkown "+obj.getClass()); }
 	}
 	 
+	public static Object getInstance(Class cl) throws IOException  {
+		try {
+//FIXME: inner instaces			
+			return cl.newInstance();
+		}catch(Throwable e) { throw new IOException(e); }	
+	}
+	
     /** get instanceof of class from obj **/
 	public static Object getInstance(Class cl,Object obj) throws IOException  {
 		try {

@@ -287,7 +287,7 @@ public class JavaSourceScanner {
 		
 		ClassDoc clSource=pkg.addClass(sourceName); // add Class
 		
-	    clSource.pkgComment=findComment(prev,cu,p,comments); // package comment in class 
+	    clSource.pkgComment=findComment(cu,p,comments); // package comment in class 
 	    clSource.modifiers=clDeclarion.getModifiers(); // modifierers
 	    
 	    LOG.trace("class "+sourceName);
@@ -385,7 +385,7 @@ public class JavaSourceScanner {
 	    			LOG.trace("VariableDeclarator "+id.getName());
 	    			setAnnotations(field, dec.getAnnotations(), clSource,comments);
 	    			field.modifiers=dec.getModifiers();
-	    			field.setComment(findComment(prev,cu, dec,comments)); // toString(dec.getJavaDoc());
+	    			field.setComment(findComment(cu, dec,comments)); // toString(dec.getJavaDoc());
 	    			clSource.addField(field);		    			
 	    			scanComments(prev,v, field, clSource,comments); // scan inside comments
 	    			prev=v;
@@ -397,7 +397,7 @@ public class JavaSourceScanner {
 	    		LOG.trace("ConstructorDeclaration "+con.getName());
 	    		setAnnotations(cs, con.getAnnotations(), clSource,comments);
 	    		cs.modifiers=con.getModifiers();
-	    		cs.setComment(findComment(prev,cu, con,comments));
+	    		cs.setComment(findComment(cu, con,comments));
 	    		clSource.addConstructor(cs);
 	    		scanComments(prev,con, cs, clSource,comments); // scan inside comments
 	    		
@@ -412,7 +412,7 @@ public class JavaSourceScanner {
 	    		LOG.trace("MethodDeclaration "+method.getName());
 	    		setAnnotations(mc, method.getAnnotations(), clSource,comments);
 	    		mc.modifiers=method.getModifiers();
-	    		mc.setComment(findComment(prev,cu, method,comments));
+	    		mc.setComment(findComment(cu, method,comments));
 	    		clSource.addMethod(mc);
 	    		scanComments(prev,method, mc, clSource,comments); // scan inside comments
 	    		
@@ -427,7 +427,7 @@ public class JavaSourceScanner {
 	    		
     			setAnnotations(annoParam, an.getAnnotations(), clSource,comments);
     			annoParam.modifiers=an.getModifiers();
-    			annoParam.setComment(findComment(prev,cu, an,comments)); // toString(dec.getJavaDoc());
+    			annoParam.setComment(findComment(cu, an,comments)); // toString(dec.getJavaDoc());
     			clSource.addField(annoParam);		 
     			
     			/** aBug(author="mk",date="18.07.2018",title="parser use wrong line",fix="use line of type") **/
@@ -525,7 +525,7 @@ public class JavaSourceScanner {
 	//---------------------------------------------------------------------------------------
 
 	
-	private String findComment(Node prev,CompilationUnit cu,Node actual,List<Comment> comments) {
+	private String findComment(CompilationUnit cu,Node actual,List<Comment> comments) {
 		if(comments==null) { return null; }
 		Node previus=prev;
 		StringBuffer sb=new StringBuffer();		
@@ -540,6 +540,7 @@ public class JavaSourceScanner {
 	    				if(sb.length()>0) sb.append("\n");
 	    				sb.append(str);
 	    				it=null; // only first comment
+prev=c;
 	    			}
 	    			
 	    		}

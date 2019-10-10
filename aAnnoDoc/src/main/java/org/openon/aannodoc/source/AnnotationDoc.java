@@ -145,7 +145,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 		if(values==null) { return null; }
 		return values.get(key); 
 	}
-	
+	 
 	
 	/** get resolved value as string **/
 	public String getResolveString(String key) { 

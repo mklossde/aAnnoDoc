@@ -11,8 +11,13 @@ public class TestScanner {
 
 	public static void main(String[] args) throws Exception {
 		TestScanner test=new TestScanner();
-		test.test();
+		test.testX();
 		System.out.println("end");
+	}
+	
+	public void testX() throws Exception {
+		JavaSourceScanner scanner=new JavaSourceScanner(null,null);
+//		scanner.readDir();
 	}
 	
 	@Test
