@@ -15,5 +15,5 @@ public class FieldDoc extends TypeDoc implements Serializable {
 	public Object getValue() { return value; }
 	
 	public String toJava() { return toJava(modifiers)+" "+name+" = "+value; }
-	public String toString() { return "Field "+name; }
+	public String toString() { return "Field "+getJavaClassName()+"."+name; }
 }

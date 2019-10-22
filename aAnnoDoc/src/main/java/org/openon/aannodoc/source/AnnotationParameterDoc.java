@@ -14,5 +14,5 @@ public class AnnotationParameterDoc extends FieldDoc implements Serializable {
 //	public Object getValue() { return value; }
 	
 	public String toJava() { return toJava(modifiers)+" "+name+" = "+value; }
-	public String toString() { return "AnnotationParam "+name; }
+	public String toString() { return "AnnotationParam "+getJavaClassName()+"."+name; }
 }

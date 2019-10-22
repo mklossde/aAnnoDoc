@@ -254,26 +254,28 @@ public class JavaSourceScanner {
 		    PackageDoc pkg=unit.addPackage(pkgName); // add package			    		    
 		    prev=p;
 		    
+		    ClassDoc firstClSource=null;
+		    
 		    List<TypeDeclaration> allCl=cu.getTypes();	   
 		    for(int a=0;allCl!=null && a<allCl.size();a++) {
 		    	TypeDeclaration clDeclarion=allCl.get(a);
 		    	
 		    	// create ClassDoc			   
 		    	ClassDoc clSource=toClassDoc(cu, p, clDeclarion, pkg);		    
+		    	if(firstClSource==null) { firstClSource=clSource; }
 		    	
 		    	// import------------------------------------------------------------------------------			  
 			    clSource.imports=scanImports(cu);
 			    					    
 			    // scan class
-			    scanClass(cu,clDeclarion, pkg,clSource);
-			    			    			  
+			    scanClass(cu,clDeclarion, pkg,clSource);			    			    			  
 		    }		    
 		    
 		    // unscanned - comments-------------------------------------------------------		    
 		    for(int i=0;comments!=null && i<comments.size();i++) {
 		    	Comment com=comments.get(i);
 	    		LOG.trace("ignored comment "+com);	    			    	
-	    		scanComment(com,pkg,pkg,true);
+	    		scanComment(com,pkg,firstClSource,false);
 		    }		    			    	
 		     
 		}catch(Throwable e) {
@@ -282,6 +284,42 @@ public class JavaSourceScanner {
 		}
 	}
 	
+	/** create any Doc object **/
+	public DocObject toDoc(CompilationUnit cu,Node p,PackageDoc pkg) {
+		String name=p.toString();
+		String anyType=cu.toString();
+		
+		DocObject doc=new AnyDoc(anyType,name,pkg,null);		
+		doc.comment=findComment(cu,p,comments); // package comment in class 
+	    
+		if(p instanceof TypeDeclaration) {
+			TypeDeclaration td=(TypeDeclaration)p;
+			List<Node> childs=td.getChildrenNodes();		    		
+			for(int t=0;childs!=null && t<childs.size();t++) {
+				Node child=childs.get(t);				
+				DocObject sd=toDoc(cu, child, pkg);		
+				doc.addChild(sd);
+			}
+		}
+		
+		addAllComments(doc,p); // add all coments to doc
+		
+	    LOG.trace("AnyDoc "+name);
+	    return doc;
+	}
+	
+	/** all comments from node to doc **/
+	protected void addAllComments(DocObject doc,Node p) {
+		// add all internal comments 
+		List<Comment> coms=p.getAllContainedComments();
+		for (Comment c : coms) {
+			int index=comments.indexOf(c);
+			if(index!=-1) { comments.remove(index); }
+			doc.setComment(toString(c),true);
+		}
+	}
+	
+	/** create a ClassDoc object **/
 	public ClassDoc toClassDoc(CompilationUnit cu,Node p,TypeDeclaration clDeclarion,PackageDoc pkg) {
 		String sourceName=clDeclarion.getName();
 		
@@ -417,6 +455,9 @@ public class JavaSourceScanner {
 	    		scanComments(prev,method, mc, clSource,comments); // scan inside comments
 	    		
 	    		recursiveSan(method,mc,clSource);
+	    		
+	    		addAllComments(mc, body);
+	    		
 	    	}else if(body instanceof AnnotationMemberDeclaration) {// Annotation attribute/parameter definition (e.g. public Type type();)
 	    		AnnotationMemberDeclaration an=(AnnotationMemberDeclaration)body;
 	    		LOG.trace("AnnotationMemberDeclaration "+an.getName());	
@@ -447,11 +488,30 @@ public class JavaSourceScanner {
 	    		clSource.addSubClass(clDoc);
 	    		scanClass(cu, innerCl, pkg, clDoc);    		
 	    		
-	    	}else if(body instanceof EmptyMemberDeclaration) { // ;
-	    	}else if(body instanceof InitializerDeclaration) { // static initialisation 			    		
-	    	}else if(body instanceof EnumDeclaration) { // enum declaration 
+	    	//----------------------------------------------------------------------------------------------------------------------
 	    		
-	    	}else { LOG.warn("not parsed body '"+body.getClass()+"' "+toAtString(body, clSource)+" in "+clDeclarion.getName()); }
+	    	}else if(body instanceof EmptyMemberDeclaration) { // 
+	    		DocObject doc=toDoc(cu, body, pkg);
+	    		scanComments(prev,body, doc, clSource,comments); // scan inside comments
+	    		clSource.addChild(doc);
+	    		
+	    	}else if(body instanceof InitializerDeclaration) { // static initialisation
+	    		DocObject doc=toDoc(cu, body, pkg);
+	    		scanComments(prev,body, doc, clSource,comments); // scan inside comments
+	    		clSource.addChild(doc);
+	    		
+	    	}else if(body instanceof EnumDeclaration) { // enum declaration 
+	    		DocObject doc=toDoc(cu, body, pkg);
+	    		scanComments(prev,body, doc, clSource,comments); // scan inside comments	    		
+	    		clSource.addChild(doc);
+	    		
+	    	}else { 
+	    		LOG.warn("not parsed body '"+body.getClass()+"' "+toAtString(body, clSource)+" in "+clDeclarion.getName());
+	    		DocObject doc=toDoc(cu, body, pkg);
+	    		scanComments(prev,body, doc, clSource,comments); // scan inside comments
+	    		clSource.addChild(doc);
+	    		
+	    	}
 	    	prev=body;
 	    }
 	}
@@ -553,20 +613,15 @@ prev=c;
 	/** scan all comments inside node **/
 	public void scanComments(Node prev,Node now,DocObject parent,ClassDoc clSource, List<Comment> comments) throws Exception {
 		if(comments==null) return ;		
-//		int nowLine=now.getBeginLine(),nowCol=now.getBeginColumn(),nowEndLine=now.getEndLine(),nowEndCol=now.getEndColumn();
-//		int prevLine=-1,prevCol=-1; if(prev!=null) { prevLine=prev.getBeginLine(); prevCol=prev.getBeginColumn(); } //PROBLEM class begin=ClassBegin,end=ClassEnd
 		Iterator<Comment> it=comments.iterator();
 		while(it.hasNext()) { 
 	    	Comment c=it.next(); 
-//	    	int comStart=c.getBeginLine(), comEnd=c.getEndLine(),comEndCol=c.getEndColumn();  	
-//	    	if(prevLine==-1 || (c.getBeginLine()>prevLine || (c.getBeginLine()==prevLine && c.getBeginColumn()>prevCol))) {
-//	    		if(comEnd<nowLine || ( comEnd==nowLine && comEndCol<=nowCol)) {
-		    		if(is(prev,now,c) && !have(prev,c) && useComment(c)) {
-		    			scanComment(c,parent,clSource,true);
-		    			it.remove(); // remove from list
-		    		}
-//	    		}
-//	    	}	
+    		if(useComment(c) 
+    				&& is(prev,now,c) 
+    				&& !have(prev,c)) {
+    			scanComment(c,parent,clSource,true);
+    			it.remove(); // remove from list
+    		}
 	    }
 	}
 	

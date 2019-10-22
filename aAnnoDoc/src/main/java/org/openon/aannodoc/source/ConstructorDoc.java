@@ -9,5 +9,5 @@ public class ConstructorDoc extends TypeDoc implements Serializable {
 		super(name,typeName,parent,clSource); 
 	}
 	
-	public String toString() { return "Method "+name; }
+	public String toString() { return "Contructur "+getJavaClassName()+"."+name; }
 }

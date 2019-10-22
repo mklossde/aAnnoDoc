@@ -53,16 +53,19 @@ public abstract class DocObject implements Serializable {
 	
 	//--------------------------------------------------------------------------
 	
-	public void setComment(String comment) {
+	public void setComment(String comment) { setComment(comment,false); }
+	public void setComment(String comment,boolean addDouble) {
 		if(comment==null || comment.length()==0) { return ; }
 		if(this.comment==null || this.comment.length()==0) {
 			this.comment=comment; 
+		}else if(addDouble){
+			this.comment=this.comment+"\n"+comment;
 		}else {
 			LOG.warn("{} double comment old:'{}' new:'{}'",this,this.comment,comment);
-//			this.comment=this.comment+"\n"+comment;
 			this.comment=comment; // use only last 
 		}
 	}
+
 	
 	public String getComment() { return comment; }
 	

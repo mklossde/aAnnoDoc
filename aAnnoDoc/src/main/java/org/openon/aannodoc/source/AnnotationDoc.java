@@ -228,7 +228,7 @@ public class AnnotationDoc extends TypeDoc implements Serializable,Comparable {
 	}
 	
 	@Override public String toString() { 
-		return "Annotation "+name+" "+values;  
+		return "Annotation "+getJavaClassName()+"."+name+" "+values;  
 	}
 
 
