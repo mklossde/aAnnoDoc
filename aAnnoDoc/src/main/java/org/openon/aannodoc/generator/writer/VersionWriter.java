@@ -36,15 +36,19 @@ public class VersionWriter extends ApplicationWriter {
 	
 	/** get versions of application **/
 	public List<AnnotationDoc> versions()   throws IOException {
+		List<AnnotationDoc> versions=null;
+		
 		AnnotationDoc application=application();
-		if(application==null) { return null; }
-		// get versions from @aAppliction
-		 List<AnnotationDoc> versions=(List<AnnotationDoc>)application.getValueObject(aDoc.fVERSIONS); 
+		if(application!=null) {  // get versions from @aAppliction
+			versions=(List<AnnotationDoc>)application.getValueObject(aDoc.fVERSIONS); 
+		}
+		
 		//  find all @aVersion in all classes	
 		List<AnnotationDoc> versionList=annotations.findAnnotation(aVersion.class); 
-		if(versions==null) { versions=versionList; versionList=null; }  // without versions in @aAppliction =>	user versionList			
+		if(versions==null || versions.size()==0) { versions=versionList; }  // without versions in @aAppliction =>	user versionList			
 		else { versions.addAll(versionList); }
 		
+//		AnnoUtils.removeDoubleVersion(versions);
 		AnnoUtils.sortDate(versions);
 		return versions;
 	}

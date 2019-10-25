@@ -27,12 +27,28 @@ import org.openon.aannodoc.source.FieldDoc;
 import org.openon.aannodoc.source.TypeDoc;
 
 import net.sourceforge.plantuml.Log;
+import net.sourceforge.plantuml.skin.rose.ComponentRoseActor;
 
 public class AnnoUtils {
 
 	public static void sortDate(List<AnnotationDoc> list) {
 		Comparator comp=newComparatorDate(aDoc.fDATE, null, null);
 		Collections.sort(list,comp);
+	}
+	
+	public static void removeDoubleVersion(List<AnnotationDoc> list) { removeDouble(list, newComparator(aDoc.fVERSION, null)); }
+	public static void removeDoubleDate(List<AnnotationDoc> list) { removeDouble(list, newComparatorDate(aDoc.fDATE, null, null)); }
+	public static void removeDouble(List<AnnotationDoc> list,Comparator<AnnotationDoc> comp) {
+		for(int i=0;list!=null && i<list.size();i++) {
+			AnnotationDoc a=list.get(i);
+			boolean found=false;
+			for(int t=i+1;t<list.size();t++) {
+				AnnotationDoc b=list.get(i);				
+				if(comp.compare(a, b)==0) {	
+					found=true;  t=list.size(); }
+			}
+			if(found) {list.remove(i); }
+		}
 	}
 	
 	//---------
@@ -55,6 +71,25 @@ public class AnnoUtils {
 				}else { return false; }
 		}};	
 	}	
+	
+	public static Comparator<AnnotationDoc> newComparator(final String key,Object val) {
+		final Object db=val;
+		return new Comparator<AnnotationDoc>() { 
+			@Override public int compare(AnnotationDoc a,AnnotationDoc b) { // for sort
+				String da=((AnnotationDoc)a).getResolveString(key); 
+				String db=((AnnotationDoc)b).getResolveString(key);
+				if(da==null && db==null) { return 0; }
+				else if(da==null) { return -1; }
+				else { return da.compareTo(db); }
+			}
+			@Override public boolean equals(Object an) { // for find 
+				String da=((AnnotationDoc)an).getResolveString(key); 
+				if(da==null && db==null) { return true; }
+				else if(da==null) { return false; }
+				else { return da.equals(db); }
+		}};	
+	}	
+	
 	
 	public static long toTime(String date) {
 		if(date==null || date.length()==0) { return -1; }	

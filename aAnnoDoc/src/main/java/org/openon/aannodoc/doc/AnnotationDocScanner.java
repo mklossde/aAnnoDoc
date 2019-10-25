@@ -26,7 +26,7 @@ public class AnnotationDocScanner {
 	public int pos=0,x=0;
 	/** is this scann inline **/
 	protected boolean inline=false;
-	protected int minAnnoPos=1;
+//	protected int minAnnoPos=1;
 		
 	/** instance new scanner for text **/
 	public AnnotationDocScanner(String text,boolean inline) { this.text=text; this.inline=inline; pos=0; }
@@ -38,6 +38,7 @@ public class AnnotationDocScanner {
 		return this.text.substring(0,firstAnno);
 	}
 	//------------------------------------------------------------------------------
+
 	
 	/** get next annotation (unitl null return=no more annotations in text) **/
 	public AnnotationDoc nextAnnotation() throws IOException {
@@ -58,18 +59,18 @@ public class AnnotationDocScanner {
 			while(aPos<text.length()) {				
 				int endPos=isNextChar(text,aPos, ')');
 				if(endPos!=-1) { aPos=endPos+1; break; }
-//FIXME: array and none-key definition - WRONG !! 					
-//				int arrayPos=isNextChar(text,aPos, '{');
-//				if(arrayPos!=-1) {				
-//                   aPos=nextChar(text,arrayPos, '}');
-//				}else {
+			
 				aPos=nextKeyStart(text,aPos);					
 				int keyEnd=nextKey(text,aPos);
-				if(keyEnd==-1) { throw new IOException("wrong attribute-key '"+text.substring(nameEnd,aPos)+"'");}
+				if(keyEnd==-1) { 
+					throw new IOException("wrong '"+name+"' attribute-key:'"+text.substring(nameEnd,aPos)+"'");
+				}
 				String attrKey=text.substring(aPos,keyEnd).trim();
 				aPos=nextChar(text,keyEnd, '=');
+					
 				int valEnd=nextKey(text,aPos);
 				Object attrVal;
+				
 				if(valEnd!=-1) {  
 					attrVal=toObject(text.substring(aPos,valEnd).trim());
 					aPos=valEnd;
@@ -79,7 +80,7 @@ public class AnnotationDocScanner {
 					aPos=keyEnd;
 				}												
 				if(attrKey!=null && attrKey.length()>0 && attrVal!=null) {
-					if(attr==null) { attr=new HashMap<String, String>(); }
+					if(attr==null) { attr=new HashMap<String, String>(); }				
 					attr.put(attrKey, attrVal);
 				}
 			}
@@ -113,11 +114,14 @@ public class AnnotationDocScanner {
 	//-------------------------------------------------------------------------
 	/** next \@ for annotation **/
 	protected int nextAnnotationStart(int pos) {
+		char last=' ' ;
 		while(text!=null && pos<text.length()) {
 			char c=text.charAt(pos);
-			if(c=='@' && x<=minAnnoPos) { return pos; }
+//			if(c=='@' && x<=minAnnoPos) { return pos; }
+			if(c=='@' && last!='\\') { return pos; }
 			else if(c=='\n') { x=0; pos++; }
 			else { pos++; x++; }
+			last=c;
 		}
 		return -1;
 	}

@@ -60,8 +60,6 @@ import japa.parser.ast.expr.NullLiteralExpr;
 import japa.parser.ast.expr.SingleMemberAnnotationExpr;
 import japa.parser.ast.expr.StringLiteralExpr;
 import japa.parser.ast.expr.UnaryExpr;
-import japa.parser.ast.stmt.BlockStmt;
-import japa.parser.ast.stmt.Statement;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.PrimitiveType;
 import japa.parser.ast.type.ReferenceType;
@@ -94,6 +92,11 @@ public class JavaSourceScanner {
 
 	protected DocFilter filter;
 	protected int fileCount=0;
+
+	public boolean ADD_LINE_COMMAND=false; // //
+	public boolean ADD_BLOCK_COMMAND=true; // /* */
+	public boolean ADD_JAVA_COMMAND=true;  // /** **/
+	public boolean ADD_OTHER_COMMAND=true; // 
 	
 	protected static Map<String,String> defaultClass=new HashMap<String,String>();
 		
@@ -240,7 +243,7 @@ public class JavaSourceScanner {
 //TODO: JavaParserBug: comments with some conent will not be doubled add. ?? why ??
 			comments=cu.getComments();
 			Iterator<Comment> it=comments.iterator();
-			while(it.hasNext()) { if(!useComment(it.next())) { it.remove(); } } // remove unused comments (e.g. line commends) 
+			while(it.hasNext()) { if(!isComment(it.next())) { it.remove(); } } // remove unused comments (e.g. line commends) 
 			
 	    	// package------------------------------------------------------------------------------
 		    PackageDeclaration p=cu.getPackage();
@@ -366,9 +369,10 @@ public class JavaSourceScanner {
 	    // scan body of class
 	    scanBody(cu,clDeclarion, pkg,clSource);
 
-	    // scan comments
-//TODO: add comments of class before ?			    
-//	    scanComments(prev,clDeclarion, clSource, clSource,comments); // scan inside comments	
+	    // add all missing comments as class comment 
+	    for(int i=0;comments!=null && i<comments.size();i++) {
+	    	clSource.setComment(toString(comments.get(i)), true);
+	    }
 	    
 	    LOG.trace("scanned class {}",clSource.name);
 	}	
@@ -407,7 +411,6 @@ public class JavaSourceScanner {
 	    List<BodyDeclaration> mem=clDeclarion.getMembers();
 	    for(int i=0;mem!=null && i<mem.size();i++) {
 	    	BodyDeclaration body=mem.get(i);		    	
-//System.out.println("body:"+body.getClass()+" b:"+body);	
 
 	    	if(body instanceof FieldDeclaration) { // Field
 	    		FieldDeclaration dec=(FieldDeclaration)body;
@@ -514,6 +517,8 @@ public class JavaSourceScanner {
 	    	}
 	    	prev=body;
 	    }
+	    
+	    
 	}
 	
 	/** recursive scan java programm **/
@@ -616,7 +621,7 @@ prev=c;
 		Iterator<Comment> it=comments.iterator();
 		while(it.hasNext()) { 
 	    	Comment c=it.next(); 
-    		if(useComment(c) 
+    		if(isComment(c) 
     				&& is(prev,now,c) 
     				&& !have(prev,c)) {
     			scanComment(c,parent,clSource,true);
@@ -666,13 +671,13 @@ prev=c;
 	}
 	
 	/** use comment or ignore **/
-	public boolean useComment(Comment c) {
+	public boolean isComment(Comment c) {
 		if(c==null) { return false; }
 		else if(c.getContent()==null || c.getContent().trim().length()==0) { return false; } // remove empty
-		else if(c instanceof BlockComment) { return false; } // ignore blocks
-		else if(c instanceof LineComment) { return false; } // ignore blocks
-//		if(c instanceof JavadocComment) { return true; }
-		return true;
+		else if(c instanceof BlockComment) { return ADD_BLOCK_COMMAND; } // ignore blocks
+		else if(c instanceof LineComment) { return ADD_LINE_COMMAND; } // ignore blocks
+		else if(c instanceof JavadocComment) { return ADD_JAVA_COMMAND; }
+		else { return ADD_OTHER_COMMAND; }
 	}
 
 	protected void setComment(DocObject clDoc,List<Comment> c,DocObject clSource,boolean setInParent) throws Exception {
@@ -716,7 +721,7 @@ prev=c;
 					anno.setParent(parent); 
 					anno.setGrup(clSource);
 					
-					unit.addAnnotation(anno); // add annotation to unit
+//					unit.addAnnotation(anno); // add annotation to unit
 //					clSource.addAnnotation(anno); // add annotaion as source
 //					parent.addAnnotation(anno); // add annotation to parent
 					addAnnoation(clSource,anno);
